@@ -1,5 +1,5 @@
+### Rogue-like 
 Rough starting point for the rogue-like game
-
 - get:
   ```bash
   
@@ -37,3 +37,8 @@ After installation you can test if everything is ok:
 ```bash
 > python ./python_src/main.py 
 ```
+
+### Dependencies
+
+ - [pybind11](https://github.com/pybind/pybind11)
+ - [magic enum](https://github.com/Neargye/magic_enum)
