@@ -42,3 +42,8 @@ After installation you can test if everything is ok:
 
  - [pybind11](https://github.com/pybind/pybind11)
  - [magic enum](https://github.com/Neargye/magic_enum)
+
+### Design doc
+
+The design document along with various diagrams can be found at 
+[Notion](https://www.notion.so/c751085ebb244bcf8942cf17ddce652b).
