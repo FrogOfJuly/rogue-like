@@ -38,7 +38,7 @@ package "Info" {
 (PLR) --> (VINV)
 (PLR) --> (VMAP)
 
-(MOV) <-- (CHP) : "to empty spot"
+(MOV) <-- (CHP) : "to empty spot or item"
 (MOV) <-- (PUI) : "to item"
 (MOV) <-- (STR) : "to enemy"
 (MOV) <-- (OPD) : "to door && has key"
