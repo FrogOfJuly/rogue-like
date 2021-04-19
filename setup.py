@@ -103,11 +103,11 @@ class CMakeBuild(build_ext):
 # The information here can also be placed in setup.cfg - better separation of
 # logic and declaration, and simpler if you include description/version in a file.
 setup(
-    name="rogue_like",
+    name="roguelike",
     version="0.0.1",
     description="A test project using pybind11 and CMake",
     long_description="",
-    ext_modules=[CMakeExtension("rogue_like")],
+    ext_modules=[CMakeExtension("roguelike")],
     cmdclass={"build_ext": CMakeBuild},
     zip_safe=False,
 )

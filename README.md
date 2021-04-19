@@ -2,7 +2,7 @@
 Rough starting point for the rogue-like game
 - clone:
   ```bash
-  > git clone https://github.com/FrogOfJuly/rogue-like.git
+  > git clone https://github.com/FrogOfJuly/roguelike.git
   ```
 - get dependencies:
   ```bash
@@ -23,7 +23,7 @@ Rough starting point for the rogue-like game
   you should get ``.so`` file which can be used as python module.
 - install:
   ```bash
-  > pip install ./rougle-like
+  > pip install ./rouglelike
   ```
   after this you should be able to import this module from anywhere.
 
