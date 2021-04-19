@@ -1,0 +1,34 @@
+{
+  "GameState": {
+    "lvl_num": 3,
+    "score": 102,
+    "log": "blbllblb, blblb\n blbll\n blblab\n",
+    "player": {
+      "level": 4,
+      "hp": 40,
+      "exp": 32
+    },
+    "Level": {
+      "h": 4,
+      "w": 1,
+      "tiles": [
+        {
+          "representation": " ",
+          "level": 4
+        },
+        {
+          "representation": "/",
+          "level": 4
+        },
+        {
+          "representation": " ",
+          "level": -1
+        },
+        {
+          "representation": " ",
+          "level": -1
+        }
+      ]
+    }
+  }
+}
