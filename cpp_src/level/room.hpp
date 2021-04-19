@@ -9,11 +9,12 @@
 #include "../entity/entity.hpp"
 #include "../entity/player.h"
 #include "../entity/goblin.h"
+#include "../entity/potion.h"
 
 #ifndef ROGUE_LIKE_LEVEL_H
 #define ROGUE_LIKE_LEVEL_H
 namespace roguelike {
-    using entity_type = std::variant<player *, goblin *, entity *>;
+    using entity_type = std::variant<player *, goblin *, entity *, potion *>;
 
     void to_json(nlohmann::json &j, const entity_type &p) {
         j = std::visit(

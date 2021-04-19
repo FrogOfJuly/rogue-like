@@ -30,8 +30,10 @@ namespace roguelike {
         move_component m_cpt;
         atk_component a_cpt;
         decision_making_component dm_cpt;
+        repr_component repr_cpt = repr_component("p");
     };
-    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(player, id, lvl, h_cpt, m_cpt, a_cpt, dm_cpt, log);
+
+    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(player, id, lvl, h_cpt, m_cpt, a_cpt, dm_cpt, log, repr_cpt);
 
     template<typename entityType>
     struct interacter<player, entityType> {
@@ -40,9 +42,11 @@ namespace roguelike {
                 auto dmg = inting.a_cpt.damage;
                 inted.h_cpt.health -= dmg;
                 std::cout << "player was attacked by the unknown" << std::endl;
+                inted.log += "player was attacked by the unknown";
                 return;
             }
             std::cout << "player interacted by the unknown" << std::endl;
+            inted.log += "player interacted by the unknown";
             return;
         }
     };

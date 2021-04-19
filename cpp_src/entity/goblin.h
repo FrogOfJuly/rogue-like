@@ -25,13 +25,28 @@ namespace roguelike {
         health_component h_cpt;
         atk_component a_cpt;
         move_component m_cpt;
+        repr_component repr_cpt = repr_component([this]() -> std::string {
+            switch (this->dm_cpt.decision) {
+                case LEFT:
+                    return "<";
+                case RIGHT:
+                    return ">";
+                case DOWN:
+                    return "v";
+                case UP:
+                    return "^";
+                default:
+                    return "x";
+            }
+        });
     };
-    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(goblin, dm_cpt, h_cpt, a_cpt, m_cpt)
+
+    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(goblin, dm_cpt, h_cpt, a_cpt, m_cpt, repr_cpt)
 
     template<typename entityType>
-    struct interacter<goblin, entityType>{
-        static void interact(goblin& inted, entityType& inting){
-            if constexpr (has_member_a_cpt<entityType>::value){
+    struct interacter<goblin, entityType> {
+        static void interact(goblin &inted, entityType &inting) {
+            if constexpr (has_member_a_cpt<entityType>::value) {
                 auto dmg = inting.a_cpt.damage;
                 inted.h_cpt.health -= dmg;
                 std::cout << "goblin was attacked by the unknown" << std::endl;

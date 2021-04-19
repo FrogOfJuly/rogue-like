@@ -102,7 +102,7 @@ namespace roguelike {
                 level.spawn_on_level(players[i]);
             }
 
-            for(int i = 0; i < 2; ++i){
+            for (int i = 0; i < 2; ++i) {
                 auto g = new goblin();
                 level.residents.emplace_back(g);
                 level.spawn_on_level(*g);// potential memory leak
@@ -233,7 +233,14 @@ namespace roguelike {
                     },
                     [p](entity_id id) {
                         auto j_local = nlohmann::json();
-                        nlohmann::to_json(j_local["unknown"], p.level.residents[id.value]);
+                        auto var_ent = p.level.residents[id.value];
+                        nlohmann::to_json(j_local["entity"], var_ent);
+                        //j_local["entity"]["repr_cpt"]["repr"] = var_ent.repr_cpt.repr();
+                        // ^--- only if entity has repr component.
+                        if (not j_local["entity"].contains("repr_cpt")) {
+                            j_local["entity"]["repr_cpt"]["repr"] = "?";
+                            return j_local;
+                        }
                         return j_local;
                     }}, tle.resident.value());
             cur_tile_json["tile"] = resident_json;

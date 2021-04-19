@@ -12,6 +12,7 @@ namespace roguelike {
         using component_id = int;
         component_id id = -1;
     };
+
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(component, id);
 
     struct move_component : public component {
@@ -19,6 +20,7 @@ namespace roguelike {
         tile_idx residency = -1;
 
     };
+
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(move_component, x, y, residency, id);
 
     define_has_member(m_cpt);
@@ -27,6 +29,7 @@ namespace roguelike {
         int damage = -1;
 
     };
+
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(atk_component, damage, id);
 
     define_has_member(a_cpt);
@@ -35,12 +38,46 @@ namespace roguelike {
         int health = -1;
 
     };
+
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(health_component, health, id);
 
     define_has_member(h_cpt);
 
+    struct repr_component : public component {
+
+        explicit repr_component(std::string repr_string) {
+            repr = [repr_string]() -> std::string {
+                return repr_string;
+            };
+        }
+
+        explicit repr_component(const std::function<std::string()> &repr_func) {
+            repr = repr_func;
+        };
+
+    private:
+        std::function<std::string()> repr = []() -> std::string {
+            return "?";
+        };
+
+        friend void to_json(nlohmann::json &j, const repr_component &p);
+    };
+
+    void to_json(nlohmann::json &j, const repr_component &p) {
+        j["id"] = p.id;
+        j["repr"] = p.repr();
+    }
+
+    void from_json(const nlohmann::json &j, repr_component &p) {
+        throw std::runtime_error("One CAN NOT reconstruct representation component from its serialization");
+    }
+
+    define_has_member(repr_cpt);
+
+
     struct decision_making_component : public component {
         cmd decision = cmd::PASS;
+
         std::pair<int, int> get_velocity() {
             switch (decision) {
                 case UP:
@@ -59,6 +96,7 @@ namespace roguelike {
         }
 
     };
+
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(decision_making_component, decision, id);
 
     define_has_member(dm_cpt);
