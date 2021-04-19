@@ -6,9 +6,12 @@
 #ifndef ROGUE_LIKE_POTION_H
 #define ROGUE_LIKE_POTION_H
 namespace roguelike {
-    struct potion : entity {
+    struct potion {
+        entity_id id;
         repr_component repr_cpt = repr_component("p");
     };
+
+    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(potion, id, repr_cpt);
 
     template<>
     struct interacter<potion, player> {
