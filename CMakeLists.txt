@@ -17,6 +17,7 @@ pybind11_add_module(rogue_like
         cpp_src/entity/player.h
         cpp_src/common.h
         cpp_src/entity/goblin.h
+        cpp_src/entity/potion.h
         )
 
 # EXAMPLE_VERSION_INFO is defined by setup.py and passed into the C++ code as a
