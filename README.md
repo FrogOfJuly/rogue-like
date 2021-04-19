@@ -10,7 +10,7 @@ Rough starting point for the rogue-like game
   > mkdir deps
   > cd deps
   > git clone https://github.com/pybind/pybind11.git
-  > git clone https://github.com/Neargye/magic_enum
+  > git clone https://github.com/Neargye/magic_enum.git
   > git clone https://github.com/nlohmann/json.git
   > cd ..
   ```
