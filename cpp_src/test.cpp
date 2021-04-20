@@ -3,13 +3,14 @@
 //
 
 #include <iostream>
-#include "entity/entity.hpp"
-#include "entity/player.h"
-#include "level/room.hpp"
 #include "game_state/gamestate.h"
-
 
 int main() {
     auto game = roguelike::gamestate();
-    game.initialize(1);
+    game.initialize(5);
+    game.receive_player_command(1, roguelike::cmd::UP);
+//    std::cout << game.get_serialization() << std::endl;
+    game.move_players();
+    game.interact();
+//    std::cout << game.get_serialization() << std::endl;
 }

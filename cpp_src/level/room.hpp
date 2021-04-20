@@ -43,7 +43,10 @@ namespace roguelike {
         room() = default;
 
         std::optional<tile> get_tile_if_exists(int x, int y) noexcept {
-            auto des_tile_idx = x * H + y;
+            if (x < 0 or y < 0) {
+                return std::optional<tile>();
+            }
+            auto des_tile_idx = x + y * W;
             if (des_tile_idx < H * W) {
                 return std::optional<tile>(tiles[des_tile_idx]);
             }
@@ -51,21 +54,21 @@ namespace roguelike {
         }
 
         tile &get_tile(int x, int y) {
-            auto des_tile_idx = x * H + y;
+            auto des_tile_idx = x + y * W;
             return tiles[des_tile_idx];
         }
 
         const tile &get_tile(int x, int y) const {
-            auto des_tile_idx = x * H + y;
+            auto des_tile_idx = x + y * W;
             return tiles[des_tile_idx];
         }
 
         static tile_idx idxFromPair(int x, int y) {
-            return x * H + y;
+            return x + y*W;
         }
 
         static std::pair<int, int> pairFromIdx(tile_idx idx) {
-            return std::make_pair(idx % W, idx / H);
+            return std::make_pair(idx % W, idx / W);
         }
 
         tile_idx get_empty_tile() const {
@@ -101,11 +104,11 @@ namespace roguelike {
 
         room(const room &) = delete;
 
-        room& operator=(const room &) = delete;
+        room &operator=(const room &) = delete;
 
         room(room &&) = default;
 
-        room& operator=(room &&) = default;
+        room &operator=(room &&) = default;
         /*
         void spawn_enemy(int tile_idx) {
             if (not tiles[tile_idx].empty()) {

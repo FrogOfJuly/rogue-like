@@ -91,6 +91,10 @@ namespace roguelike {
 
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(decision_making_component, decision, id);
 
+    struct logging_component : public component {
+        std::string log;
+    };
+
     struct entity {
         entity_id id;
         int level = -1;

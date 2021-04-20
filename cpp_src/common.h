@@ -4,6 +4,9 @@
 
 #include <variant>
 #include "../deps/json/single_include/nlohmann/json.hpp"
+#include "../deps/lwlog/lwlog.h"
+
+//#define lwlog_info //uncomment to turn off logging
 
 #ifndef ROGUE_LIKE_COMMON_H
 #define ROGUE_LIKE_COMMON_H
@@ -33,7 +36,7 @@ template<class... Ts>
 struct overloaded : Ts ... {
     using Ts::operator()...;
 };
-// explicit deduction guide (not needed as of C++20)
+
 template<class... Ts> overloaded(Ts...) -> overloaded<Ts...>;
 
 
@@ -57,13 +60,13 @@ namespace roguelike {
 
     //type aliasing is not enough, thus they deserve their own structs
     struct entity_id {
-        int value = 0;
+        int value = -1;
     };
 
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(entity_id, value);
 
     struct player_id {
-        int value = 0;
+        int value = -1;
     };
 
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(player_id, value);

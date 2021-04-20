@@ -46,13 +46,14 @@ namespace roguelike {
     template<typename entityType>
     struct interacter<goblin, entityType> {
         static void interact(goblin &inted, entityType &inting) {
+            if constexpr (has_member_lg_cpt<entityType>::value) {
+                inting.lg_cpt.log += "you interacted with goblin" + std::to_string(inted.id.value) + "\n";
+            }
             if constexpr (has_member_a_cpt<entityType>::value) {
                 auto dmg = inting.a_cpt.damage;
                 inted.h_cpt.health -= dmg;
-                std::cout << "goblin was attacked by the unknown" << std::endl;
                 return;
             }
-            std::cout << "goblin interacted by unknown" << std::endl;
             return;
         }
     };

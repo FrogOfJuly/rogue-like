@@ -6,10 +6,10 @@ set(CMAKE_CXX_STANDARD 17)
 add_subdirectory(deps/pybind11)
 add_subdirectory(deps/magic_enum)
 add_subdirectory(deps/json)
+#add_subdirectory(deps/lwlog)
 
 pybind11_add_module(roguelike
         cpp_src/wrapper.cpp
-#        cpp_src/game_state/gamestate.cpp
         cpp_src/game_state/gamestate.h
         cpp_src/level/room.hpp
         cpp_src/level/tile.h
@@ -24,8 +24,6 @@ pybind11_add_module(roguelike
 # define (VERSION_INFO) here.
 target_compile_definitions(roguelike PRIVATE VERSION_INFO=${EXAMPLE_VERSION_INFO})
 #
-#add_executable(roguelike_testing
-#        cpp_src/test.cpp
-#        cpp_src/game_state/gamestate.h
-#        cpp_src/game_state/gamestate.cpp
-#        )
+add_executable(roguelike_testing
+        cpp_src/test.cpp
+        )

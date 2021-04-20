@@ -10,7 +10,8 @@
 
 namespace roguelike {
     struct player {
-        player() {
+        player(int pl_id) {
+            id = player_id{pl_id};
             h_cpt.health = 10;
             a_cpt.damage = 1;
             m_cpt.x = 0;
@@ -18,14 +19,14 @@ namespace roguelike {
             dm_cpt.decision = PASS;
         }
 
-        player(int x, int y) : player() {
+        player(int id, int x, int y) : player(id) {
             m_cpt.x = x;
             m_cpt.y = y;
         }
 
-        player_id id;
+        player_id id = player_id{-1};
         int lvl = 0;
-        std::string log;
+        logging_component lg_cpt;
         health_component h_cpt;
         move_component m_cpt;
         atk_component a_cpt;
@@ -33,7 +34,7 @@ namespace roguelike {
         repr_component repr_cpt = repr_component("p");
     };
 
-    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(player, id, lvl, h_cpt, m_cpt, a_cpt, dm_cpt, log, repr_cpt);
+    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(player, id, lvl, h_cpt, m_cpt, a_cpt, dm_cpt, lg_cpt, repr_cpt);
 
     template<typename entityType>
     struct interacter<player, entityType> {
@@ -41,12 +42,10 @@ namespace roguelike {
             if constexpr(has_member_a_cpt<entityType>::value) {
                 auto dmg = inting.a_cpt.damage;
                 inted.h_cpt.health -= dmg;
-                std::cout << "player was attacked by the unknown" << std::endl;
-                inted.log += "player was attacked by the unknown";
+                inted.lg_cpt.log += "you was attacked by the unknown\n";
                 return;
             }
-            std::cout << "player interacted by the unknown" << std::endl;
-            inted.log += "player interacted by the unknown";
+            inted.lg_cpt.log += "you was interacted by the unknown\n";
             return;
         }
     };
@@ -56,7 +55,8 @@ namespace roguelike {
         static void interact(player &inted, player &inting) {
             auto dmg = inting.a_cpt.damage;
             inted.h_cpt.health -= dmg;
-            std::cout << "player interacted by player" << std::endl;
+            inted.lg_cpt.log += "you was interacted by the player " + std::to_string(inting.id.value) + "\n";
+            inting.lg_cpt.log += "you interacted with player" + std::to_string(inted.id.value) + "\n";
             return;
         }
     };

@@ -11,7 +11,7 @@
 
 
 namespace roguelike {
-    constexpr int room_size = 5;
+    constexpr int room_size = 10;
 
     class gamestate {
         using entity_pair = std::pair<general_id, general_id>;
@@ -92,35 +92,43 @@ namespace roguelike {
         gamestate() = default;
 
         void initialize(int player_num) {
-            players.resize(player_num);
+            lwlog_info("Initializning gamestate object");
+            lwlog_info("allocating  player objects");
 
             lvl_num = 0;
             level.generate_level(lvl_num);
 
             for (int i = 0; i < player_num; ++i) {
-                players[i].id = player_id{i}; //very easy to forget. Need to abstract somehow
+                lwlog_info("placing player");
+                auto p = player(i);
+                p.dm_cpt.decision = LEFT;
+                players.push_back(p);
                 level.spawn_on_level(players[i]);
             }
 
             for (int i = 0; i < 2; ++i) {
+                lwlog_info("placing goblin");
                 auto g = std::make_unique<goblin>();
                 g->id = entity_id{(int) level.residents.size()}; //bad cast, do something better
                 level.spawn_on_level(*g);
                 level.residents.emplace_back(std::move(g));
             }
             auto e = std::make_unique<entity>();
+            lwlog_info("placing entity");
             e->id = entity_id{(int) level.residents.size()}; //bad cast, do something better
-            level.spawn_on_level(*e);// potential memory leak
+            level.spawn_on_level(*e);
             level.residents.emplace_back(std::move(e));
 
 
             auto p = std::make_unique<potion>();
+            lwlog_info("placing potion");
             p->id = entity_id{(int) level.residents.size()}; //do better
-            level.spawn_on_level(*p);// potential memory leak
+            level.spawn_on_level(*p);
             level.residents.emplace_back(std::move(p));
         }
 
         void receive_player_command(int player_id, cmd command) {
+            lwlog_info("getting player command");
             if (player_id >= players.size()) {
                 throw std::runtime_error("No such player id: " + std::to_string(player_id));
             }
@@ -130,6 +138,7 @@ namespace roguelike {
 
         void move_players() {
             for (auto &plr : players) {
+                lwlog_info("moving player");
                 general_move<player>(plr);
             }
         }
@@ -145,13 +154,98 @@ namespace roguelike {
             }
         }
 
+        static void perform_interaction(entity_type &interacted, entity_type &interacting) {
+            std::visit([](auto &left_ptr, auto &right_ptr) {
+                lwlog_info("calling interaction method");
+                assert(left_ptr);
+                assert(right_ptr);
+                auto &left = *left_ptr;
+                auto &right = *right_ptr;
+                interacter<
+                        std::remove_reference_t<decltype(left)>,
+                        std::remove_reference_t<decltype(right)>
+                >::interact(left, right);
+            }, interacted, interacting);
+        }
+
+        void pp(player_id left_id, player_id right_id) {
+            // if there is a way to perform player to variational cast better??
+            assert(right_id.value < players.size());
+            assert(left_id.value < players.size());
+            lwlog_info("interaction between player and player");
+            entity_type left_player = std::unique_ptr<player>(&players[left_id.value]);
+            entity_type right_player = std::unique_ptr<player>(&players[right_id.value]);
+            perform_interaction(left_player,
+                                right_player);
+            lwlog_info("releasing left pointer");
+            std::visit([](auto &ptr) {
+                (void) ptr.release(); //release ptr. Not freed, bc memory is managed by vector of players.
+            }, left_player);
+            lwlog_info("releasing right pointer");
+            std::visit([](auto &ptr) {
+                (void) ptr.release(); //release ptr. Not freed, bc memory is managed by vector of players.
+            }, right_player);
+
+        }
+
+        void ep(entity_id left_id, player_id right_id) {
+            lwlog_info("interaction between unknown %d and player", left_id.value);
+            assert(right_id.value < players.size());
+            assert(left_id.value < level.residents.size());
+            entity_type right_player = std::unique_ptr<player>(&players[right_id.value]);
+            perform_interaction(level.residents[left_id.value],
+                                right_player);
+            lwlog_info("releasing right pointer");
+            std::visit([](auto &ptr) {
+                (void) ptr.release(); //release ptr. Not freed, bc memory is managed by vector of players.
+            }, right_player);
+        }
+
+        void ee(entity_id left_id, entity_id right_id) {
+            lwlog_info("interaction between unknown%d and unknown%d",
+                    left_id.value,
+                    right_id.value);
+            assert(right_id.value < level.residents.size());
+            assert(left_id.value < level.residents.size());
+            perform_interaction(level.residents[left_id.value],
+                                level.residents[right_id.value]);
+        }
+
+        void pe(player_id left_id, entity_id right_id) {
+            lwlog_info("interaction between player and unknown %d", right_id.value);
+            assert(left_id.value < players.size());
+            assert(right_id.value < level.residents.size());
+            entity_type left_player = std::unique_ptr<player>(&players[left_id.value]);
+            std::visit([](auto &ptr) {
+                (void) ptr.release(); //release ptr. Not freed, bc memory is managed by vector of players.
+            }, left_player);
+            lwlog_info("releasing left pointer");
+            perform_interaction(left_player,
+                                level.residents[right_id.value]);
+        }
+
+
+        static std::pair<int, bool> unsafe_recover_id(general_id id) {
+            return std::visit(
+                    [](auto &&id) -> std::pair<int, bool> {
+                        lwlog_info("recovering");
+                        if constexpr (std::is_same_v<decltype(id), entity_id>) {
+                            lwlog_info("entity");
+                            return std::make_pair(id.value, false);
+                        } else {
+                            lwlog_info("player");
+                            return std::make_pair(id.value, true);
+                        }
+                    }, id);
+        }
+
         void interact() {
+            lwlog_info("there are %lu interctions to perform", interactions.size());
             while (not interactions.empty()) {
                 entity_pair idx_pair = interactions.front();
                 interactions.pop();
                 //                      variational-------v---------------v
-                auto perform_interatction = [](auto &interacted, auto &interacting) {
-                    // unique_ptr ---v---------------v
+                auto perform_interaction = [](auto &interacted, auto &interacting) {
                     std::visit([](auto &left_ptr, auto &right_ptr) {
                         auto &left = *left_ptr;
                         auto &right = *right_ptr;
@@ -162,41 +256,35 @@ namespace roguelike {
                     }, interacted, interacting);
                 };
 
+                auto release_player = [](auto &plr_uniq) {
+                    (void) plr_uniq.release();
+                };
+
                 std::visit(
                         overloaded{
-                                [this, perform_interatction](player_id left_id, player_id right_id) {
-                                    // if there is a way to perform player to variational cast better??
+                                [this, perform_interaction, release_player](player_id left_id, player_id right_id) {
                                     entity_type left_player = std::unique_ptr<player>(&players[left_id.value]);
                                     entity_type right_player = std::unique_ptr<player>(&players[right_id.value]);
-                                    perform_interatction(left_player,
-                                                         right_player);
-                                    std::visit([](auto &ptr) {
-                                        ptr.release(); //release ptr. Not freed, bc memory is managed by vector of players.
-                                    }, left_player);
-                                    std::visit([](auto &ptr) {
-                                        ptr.release(); //release ptr. Not freed, bc memory is managed by vector of players.
-                                    }, right_player);
-
+                                    perform_interaction(left_player,
+                                                        right_player);
+                                    std::visit(release_player, left_player);
+                                    std::visit(release_player, right_player);
                                 },
-                                [this, perform_interatction](entity_id left_id, player_id right_id) {
+                                [this, perform_interaction, release_player](entity_id left_id, player_id right_id) {
                                     entity_type right_player = std::unique_ptr<player>(&players[right_id.value]);
-                                    perform_interatction(level.residents[left_id.value],
-                                                         right_player);
-                                    std::visit([](auto &ptr) {
-                                        ptr.release(); //release ptr. Not freed, bc memory is managed by vector of players.
-                                    }, right_player);
+                                    perform_interaction(level.residents[left_id.value],
+                                                        right_player);
+                                    std::visit(release_player, right_player);
                                 },
-                                [this, perform_interatction](player_id left_id, entity_id right_id) {
+                                [this, perform_interaction, release_player](player_id left_id, entity_id right_id) {
                                     entity_type left_player = std::unique_ptr<player>(&players[left_id.value]);
-                                    std::visit([](auto &ptr) {
-                                        ptr.release(); //release ptr. Not freed, bc memory is managed by vector of players.
-                                    }, left_player);
-                                    perform_interatction(left_player,
-                                                         level.residents[right_id.value]);
+                                    perform_interaction(left_player,
+                                                        level.residents[right_id.value]);
+                                    std::visit(release_player, left_player);
                                 },
-                                [this, perform_interatction](entity_id left_id, entity_id right_id) {
-                                    perform_interatction(level.residents[left_id.value],
-                                                         level.residents[right_id.value]);
+                                [this, perform_interaction](entity_id left_id, entity_id right_id) {
+                                    perform_interaction(level.residents[left_id.value],
+                                                        level.residents[right_id.value]);
                                 },
                         }, idx_pair.first, idx_pair.second
                 );
@@ -224,6 +312,7 @@ namespace roguelike {
         }
 
         [[nodiscard]] std::string get_serialization() const {
+            lwlog_info("getting serialization");
             auto j = nlohmann::json();
             to_json(j, *this);
             return to_string(j);
@@ -233,9 +322,11 @@ namespace roguelike {
 
         gamestate(const gamestate &) = delete;
 
-        gamestate& operator=(gamestate &&) = default;
+        gamestate &operator=(gamestate &&)
+        = default;
 
-        gamestate(gamestate &&) = default;
+        gamestate(gamestate
+                  &&) = default;
 
         /*
          * init() //I am sure something additional is needed before first level
@@ -286,6 +377,7 @@ namespace roguelike {
     void from_json(const nlohmann::json &j, gamestate &p) {
         throw std::runtime_error("One CAN NOT construct game state form it's serialization!!");
     }
+
 } //namespace roguelike
 
 #endif //ROGUE_LIKE_GAMESTATE_H
