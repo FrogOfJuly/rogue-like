@@ -23,8 +23,6 @@ namespace roguelike {
 
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(move_component, x, y, residency, id);
 
-    define_has_member(m_cpt);
-
     struct atk_component : public component {
         int damage = -1;
 
@@ -32,16 +30,12 @@ namespace roguelike {
 
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(atk_component, damage, id);
 
-    define_has_member(a_cpt);
-
     struct health_component : public component {
         int health = -1;
 
     };
 
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(health_component, health, id);
-
-    define_has_member(h_cpt);
 
     struct repr_component : public component {
 
@@ -72,8 +66,6 @@ namespace roguelike {
         throw std::runtime_error("One CAN NOT reconstruct representation component from its serialization");
     }
 
-    define_has_member(repr_cpt);
-
 
     struct decision_making_component : public component {
         cmd decision = cmd::PASS;
@@ -98,8 +90,6 @@ namespace roguelike {
     };
 
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(decision_making_component, decision, id);
-
-    define_has_member(dm_cpt);
 
     struct entity {
         entity_id id;

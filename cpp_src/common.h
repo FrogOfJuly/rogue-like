@@ -7,6 +7,7 @@
 
 #ifndef ROGUE_LIKE_COMMON_H
 #define ROGUE_LIKE_COMMON_H
+
 #define define_has_member(member_name)                                         \
     template <typename T>                                                      \
     class has_member_##member_name                                             \
@@ -17,9 +18,15 @@
         template <typename U> static no_type  test(...);                       \
     public:                                                                    \
         static constexpr bool value = sizeof(test<T>(0)) == sizeof(yes_type);  \
-    }
+    };
 
 #define has_member(class_, member_name)  has_member_##member_name<class_>::value
+
+#define register_component(cmpt_name) define_has_member(cmpt_name)
+
+#include "utility/register_for_component.h"
+
+#undef register_component
 
 
 template<class... Ts>

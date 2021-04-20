@@ -7,14 +7,19 @@
 #include <optional>
 #include <vector>
 #include "../entity/entity.hpp"
-#include "../entity/player.h"
-#include "../entity/goblin.h"
-#include "../entity/potion.h"
+#include "../utility/all_entities.h"
 
 #ifndef ROGUE_LIKE_LEVEL_H
 #define ROGUE_LIKE_LEVEL_H
 namespace roguelike {
-    using entity_type = std::variant<player *, goblin *, entity *, potion *>;
+#define register_entity(entity_name) entity_name*,
+    //hehehehhehehehehe!! It works!!
+    using entity_type = std::variant<
+
+#include "../utility/register_for_entities.h"
+
+    entity*>;
+#undef register_entity
 
     void to_json(nlohmann::json &j, const entity_type &p) {
         j = std::visit(
@@ -91,12 +96,12 @@ namespace roguelike {
         }
 
         void generate_level(int lvl_num) {}
-
+        /*
         void spawn_enemy(int tile_idx) {
             if (not tiles[tile_idx].empty()) {
                 throw std::runtime_error("Can't spawn enemy here: " + std::to_string(tile_idx));
             }
-        }
+        }*/
         /*
          * generate_enemies(int lvl_num)
          * generate_loot(int lvl_num)

@@ -13,7 +13,7 @@
 
 
 namespace roguelike {
-    constexpr int room_size = 3;
+    constexpr int room_size = 5;
 
     class gamestate {
         using entity_pair = std::pair<general_id, general_id>;
@@ -98,15 +98,25 @@ namespace roguelike {
             level.generate_level(lvl_num);
 
             for (int i = 0; i < player_num; ++i) {
-                players[i].id = player_id{i};
+                players[i].id = player_id{i}; //very easy to forget. Need to abstract somehow
                 level.spawn_on_level(players[i]);
             }
 
             for (int i = 0; i < 2; ++i) {
                 auto g = new goblin();
                 level.residents.emplace_back(g);
+                g->id = entity_id{(int) level.residents.size() - 1}; //bad cast, do something better
                 level.spawn_on_level(*g);// potential memory leak
             }
+            auto e = new entity();
+            level.residents.emplace_back(e);
+            e->id = entity_id{(int) level.residents.size() - 1}; //bad cast, do something better
+            level.spawn_on_level(*e);// potential memory leak. todo: consider unique_ptr
+
+            auto p = new potion();
+            level.residents.emplace_back(p);
+            p->id = entity_id{(int) level.residents.size() - 1}; //do better
+            level.spawn_on_level(*p);// potential memory leak
         }
 
         void receive_player_command(int player_id, cmd command) {
