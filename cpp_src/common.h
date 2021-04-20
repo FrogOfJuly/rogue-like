@@ -6,7 +6,7 @@
 #include "../deps/json/single_include/nlohmann/json.hpp"
 #include "../deps/lwlog/lwlog.h"
 
-//#define lwlog_info //uncomment to turn off logging
+#define lwlog_info //uncomment to turn off logging
 
 #ifndef ROGUE_LIKE_COMMON_H
 #define ROGUE_LIKE_COMMON_H

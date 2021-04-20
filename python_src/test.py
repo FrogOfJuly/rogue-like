@@ -7,4 +7,4 @@ if __name__ == '__main__':
     # print(g.get_serialization())
     g.move_players()
     g.perform_interactions()
-    # print(g.get_serialization())
+    print(g.get_serialization())

@@ -11,7 +11,7 @@
 
 
 namespace roguelike {
-    constexpr int room_size = 10;
+    constexpr int room_size = 4;
 
     class gamestate {
         using entity_pair = std::pair<general_id, general_id>;
