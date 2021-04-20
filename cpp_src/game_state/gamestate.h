@@ -3,10 +3,8 @@
 //
 #include <queue>
 #include <map>
+#include <memory>
 #include "../level/room.hpp"
-#include "../entity/entity.hpp"
-#include "../entity/player.h"
-#include "../entity/goblin.h"
 
 #ifndef ROGUE_LIKE_GAMESTATE_H
 #define ROGUE_LIKE_GAMESTATE_H
@@ -36,7 +34,7 @@ namespace roguelike {
                         //all we need to check is existence of move component;
                         //entry_ptr : std::variant<player*, goblin*, ... etc>
                         std::visit(
-                                [pr, dest_tile](auto *entity_ptr) {
+                                [pr, dest_tile](auto &entity_ptr) {
                                     auto &ent = *entity_ptr;
                                     if constexpr(has_member_m_cpt<
                                             std::remove_reference_t<decltype(ent)>
@@ -91,6 +89,8 @@ namespace roguelike {
         }
 
     public:
+        gamestate() = default;
+
         void initialize(int player_num) {
             players.resize(player_num);
 
@@ -103,20 +103,21 @@ namespace roguelike {
             }
 
             for (int i = 0; i < 2; ++i) {
-                auto g = new goblin();
-                level.residents.emplace_back(g);
-                g->id = entity_id{(int) level.residents.size() - 1}; //bad cast, do something better
-                level.spawn_on_level(*g);// potential memory leak
+                auto g = std::make_unique<goblin>();
+                g->id = entity_id{(int) level.residents.size()}; //bad cast, do something better
+                level.spawn_on_level(*g);
+                level.residents.emplace_back(std::move(g));
             }
-            auto e = new entity();
-            level.residents.emplace_back(e);
-            e->id = entity_id{(int) level.residents.size() - 1}; //bad cast, do something better
-            level.spawn_on_level(*e);// potential memory leak. todo: consider unique_ptr
+            auto e = std::make_unique<entity>();
+            e->id = entity_id{(int) level.residents.size()}; //bad cast, do something better
+            level.spawn_on_level(*e);// potential memory leak
+            level.residents.emplace_back(std::move(e));
 
-            auto p = new potion();
-            level.residents.emplace_back(p);
-            p->id = entity_id{(int) level.residents.size() - 1}; //do better
+
+            auto p = std::make_unique<potion>();
+            p->id = entity_id{(int) level.residents.size()}; //do better
             level.spawn_on_level(*p);// potential memory leak
+            level.residents.emplace_back(std::move(p));
         }
 
         void receive_player_command(int player_id, cmd command) {
@@ -134,8 +135,8 @@ namespace roguelike {
         }
 
         void move_nonplayers() {
-            for (auto ent : level.residents) {
-                std::visit([this](auto *ent_ptr) {
+            for (auto &ent : level.residents) {
+                std::visit([this](auto &ent_ptr) {
                     auto &ent_ref = *ent_ptr;
                     general_move<
                             std::remove_reference_t<decltype(ent_ref)>
@@ -149,8 +150,9 @@ namespace roguelike {
                 entity_pair idx_pair = interactions.front();
                 interactions.pop();
                 //                      variational-------v---------------v
-                auto perform_interatction = [](auto interacted, auto interacting) {
-                    std::visit([](auto *left_ptr, auto *right_ptr) {
+                auto perform_interatction = [](auto &interacted, auto &interacting) {
+                    // unique_ptr ---v---------------v
+                    std::visit([](auto &left_ptr, auto &right_ptr) {
                         auto &left = *left_ptr;
                         auto &right = *right_ptr;
                         interacter<
@@ -163,18 +165,32 @@ namespace roguelike {
                 std::visit(
                         overloaded{
                                 [this, perform_interatction](player_id left_id, player_id right_id) {
-                                    entity_type left_player = &players[left_id.value];
-                                    entity_type right_player = &players[right_id.value];
+                                    // if there is a way to perform player to variational cast better??
+                                    entity_type left_player = std::unique_ptr<player>(&players[left_id.value]);
+                                    entity_type right_player = std::unique_ptr<player>(&players[right_id.value]);
                                     perform_interatction(left_player,
                                                          right_player);
+                                    std::visit([](auto &ptr) {
+                                        ptr.release(); //release ptr. Not freed, bc memory is managed by vector of players.
+                                    }, left_player);
+                                    std::visit([](auto &ptr) {
+                                        ptr.release(); //release ptr. Not freed, bc memory is managed by vector of players.
+                                    }, right_player);
+
                                 },
                                 [this, perform_interatction](entity_id left_id, player_id right_id) {
-                                    entity_type right_player = &players[right_id.value];
+                                    entity_type right_player = std::unique_ptr<player>(&players[right_id.value]);
                                     perform_interatction(level.residents[left_id.value],
                                                          right_player);
+                                    std::visit([](auto &ptr) {
+                                        ptr.release(); //release ptr. Not freed, bc memory is managed by vector of players.
+                                    }, right_player);
                                 },
                                 [this, perform_interatction](player_id left_id, entity_id right_id) {
-                                    entity_type left_player = &players[left_id.value];
+                                    entity_type left_player = std::unique_ptr<player>(&players[left_id.value]);
+                                    std::visit([](auto &ptr) {
+                                        ptr.release(); //release ptr. Not freed, bc memory is managed by vector of players.
+                                    }, left_player);
                                     perform_interatction(left_player,
                                                          level.residents[right_id.value]);
                                 },
@@ -195,8 +211,8 @@ namespace roguelike {
             for (auto &plr : players) {
                 plr.dm_cpt.decision = PASS;
             }
-            for (auto var_ent : level.residents) {
-                std::visit([](auto *ent_ptr) {
+            for (auto &var_ent : level.residents) {
+                std::visit([](auto &ent_ptr) {
                     auto &ent_ref = *ent_ptr;
                     if constexpr(has_member_dm_cpt<
                             std::remove_reference_t<decltype(ent_ref)>
@@ -212,6 +228,14 @@ namespace roguelike {
             to_json(j, *this);
             return to_string(j);
         }
+
+        gamestate &operator=(const gamestate &) = delete;
+
+        gamestate(const gamestate &) = delete;
+
+        gamestate& operator=(gamestate &&) = default;
+
+        gamestate(gamestate &&) = default;
 
         /*
          * init() //I am sure something additional is needed before first level
@@ -236,14 +260,14 @@ namespace roguelike {
                 continue;
             }
             auto resident_json = std::visit(overloaded{
-                    [p](player_id id) {
+                    [&p](player_id id) {
                         auto j_local = nlohmann::json();
                         nlohmann::to_json(j_local["player"], p.players[id.value]);
                         return j_local;
                     },
-                    [p](entity_id id) {
+                    [&p](entity_id id) {
                         auto j_local = nlohmann::json();
-                        auto var_ent = p.level.residents[id.value];
+                        const auto &var_ent = p.level.residents[id.value];
                         nlohmann::to_json(j_local["entity"], var_ent);
                         //j_local["entity"]["repr_cpt"]["repr"] = var_ent.repr_cpt.repr();
                         // ^--- only if entity has repr component.
