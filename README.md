@@ -12,6 +12,7 @@ Rough starting point for the rogue-like game
   > git clone https://github.com/pybind/pybind11.git
   > git clone https://github.com/Neargye/magic_enum.git
   > git clone https://github.com/nlohmann/json.git
+  > git clone https://github.com/Akagi201/lwlog.git
   > cd ..
   ```
 - build:
