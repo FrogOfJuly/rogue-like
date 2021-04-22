@@ -7,7 +7,7 @@
 #include "../deps/json/single_include/nlohmann/json.hpp"
 #include "../deps/lwlog/lwlog.h"
 
-#define lwlog_info //uncomment to turn off logging
+LOG_LEVEL(-1);
 
 #ifndef ROGUE_LIKE_COMMON_H
 #define ROGUE_LIKE_COMMON_H
@@ -24,7 +24,6 @@
         static constexpr bool value = sizeof(test<T>(0)) == sizeof(yes_type);  \
     };
 
-#define has_member(class_, member_name)  has_member_##member_name<class_>::value
 
 #define register_component(cmpt_name) define_has_member(cmpt_name)
 
