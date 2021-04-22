@@ -42,10 +42,10 @@ namespace roguelike {
             if constexpr(has_member_a_cpt<entityType>::value) {
                 auto dmg = inting.a_cpt.damage;
                 inted.h_cpt.health -= dmg;
-                inted.lg_cpt.log += "you was attacked by the unknown\n";
+                inted.lg_cpt.log << "you was attacked by the unknown\n";
                 return;
             }
-            inted.lg_cpt.log += "you was interacted by the unknown\n";
+            inted.lg_cpt.log << "you was interacted by the unknown\n";
             return;
         }
     };
@@ -55,8 +55,8 @@ namespace roguelike {
         static void interact(player &inted, player &inting) {
             auto dmg = inting.a_cpt.damage;
             inted.h_cpt.health -= dmg;
-            inted.lg_cpt.log += "you was interacted by the player " + std::to_string(inting.id.value) + "\n";
-            inting.lg_cpt.log += "you interacted with player" + std::to_string(inted.id.value) + "\n";
+            inted.lg_cpt.log << "you was interacted by the player " << std::to_string(inting.id.value) << "\n";
+            inting.lg_cpt.log << "you interacted with player" << std::to_string(inted.id.value) << "\n";
             return;
         }
     };

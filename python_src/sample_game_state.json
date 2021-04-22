@@ -19,7 +19,8 @@
             "value": 0
           },
           "lg_cpt": {
-            "id": -1
+            "id": -1,
+            "log": ""
           },
           "lvl": 0,
           "m_cpt": {
@@ -54,7 +55,8 @@
             "value": 1
           },
           "lg_cpt": {
-            "id": -1
+            "id": -1,
+            "log": "you was interacted by the player 2\n"
           },
           "lvl": 0,
           "m_cpt": {
@@ -89,7 +91,8 @@
             "value": 2
           },
           "lg_cpt": {
-            "id": -1
+            "id": -1,
+            "log": "you interacted with player1\nyou was interacted by the player 3\n"
           },
           "lvl": 0,
           "m_cpt": {
@@ -124,7 +127,8 @@
             "value": 3
           },
           "lg_cpt": {
-            "id": -1
+            "id": -1,
+            "log": "you interacted with player2\n"
           },
           "lvl": 0,
           "m_cpt": {
@@ -159,7 +163,8 @@
             "value": 4
           },
           "lg_cpt": {
-            "id": -1
+            "id": -1,
+            "log": ""
           },
           "lvl": 0,
           "m_cpt": {
@@ -264,25 +269,25 @@
       }
     },
     {
-      "tile": ""
+      "tile": null
     },
     {
-      "tile": ""
+      "tile": null
     },
     {
-      "tile": ""
+      "tile": null
     },
     {
-      "tile": ""
+      "tile": null
     },
     {
-      "tile": ""
+      "tile": null
     },
     {
-      "tile": ""
+      "tile": null
     },
     {
-      "tile": ""
+      "tile": null
     }
   ]
 }

@@ -3,6 +3,7 @@
 //
 
 #include <variant>
+#include <sstream>
 #include "../deps/json/single_include/nlohmann/json.hpp"
 #include "../deps/lwlog/lwlog.h"
 

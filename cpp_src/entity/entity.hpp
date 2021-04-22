@@ -2,7 +2,6 @@
 // Created by Kirill Golubev on 17.04.2021.
 //
 
-#include <iostream>
 #include "../common.h"
 
 #ifndef ROGUE_LIKE_ENTITY_HPP
@@ -92,8 +91,18 @@ namespace roguelike {
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(decision_making_component, decision, id);
 
     struct logging_component : public component {
-        std::string log;
+        std::stringstream log{};
     };
+
+    void to_json(nlohmann::json &j, const logging_component &p) {
+        j["id"] = p.id;
+        j["log"] = p.log.str();
+    }
+
+    void from_json(const nlohmann::json &j, logging_component &p) {
+        p.id = j["id"];
+        p.log << j["log"];
+    }
 
     struct entity {
         entity_id id;
@@ -106,7 +115,7 @@ namespace roguelike {
     struct interacter {//bc C++ does not permit partial function specialization
     public:
         static void interact(interacted &inted, interacting &inting) {
-            std::cout << "unknown interacted by unknown" << std::endl;
+//            std::cout << "unknown interacted by unknown" << std::endl;
             return;
         }
     };

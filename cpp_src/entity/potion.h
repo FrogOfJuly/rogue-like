@@ -16,7 +16,7 @@ namespace roguelike {
     template<>
     struct interacter<potion, player> {
         static void interact(potion &inted, player &inting) {
-            inting.lg_cpt.log += "you interacted with potion\n";
+            inting.lg_cpt.log << "you interacted with potion\n";
         }
     };
 } // namespace roguelike
