@@ -4,7 +4,7 @@ import math
 
 
 def print_serialized_gamestate(jsoned_game_state):
-    level = state["level"]
+    level = jsoned_game_state["level"]
     n = int(math.sqrt(len(level)))
     assert n * n == len(level)
     for j in range(n):
