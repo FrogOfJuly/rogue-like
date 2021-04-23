@@ -14,12 +14,12 @@
 #define ROGUE_LIKE_LEVEL_H
 namespace roguelike {
     using entity_type = std::variant<
-#define register_entity(entity_type_name) std::unique_ptr<entity_type_name>,
+#define register_entity(entity_type_name, repr_function) entity_type_name *,
     // hehehehhehehehehe!! It works!!
 #include "../utility/register_for_entities.h"
 
 #undef register_entity
-        std::unique_ptr<entity>>;
+        entity *>;
 
     void to_json(nlohmann::json &j, const entity_type &p) {
         j = std::visit(
@@ -107,6 +107,19 @@ namespace roguelike {
         room(room &&) = default;
 
         room &operator=(room &&) = default;
+
+        ~room() {
+            for (const auto &var_ent : residents) {
+                std::visit(
+                    [](auto *ent_ptr) {
+                        if constexpr (std::is_same_v<player, std::decay_t<decltype(ent_ptr)>>) {
+                            assert(false);
+                        }
+                        delete ent_ptr;
+                    },
+                    var_ent);
+            }
+        }
         /*
         void spawn_enemy(int tile_idx) {
             if (not tiles[tile_idx].empty()) {

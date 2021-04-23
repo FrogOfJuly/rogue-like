@@ -13,14 +13,9 @@ namespace roguelike {
             id = player_id{pl_id};
             h_cpt.health = 10;
             a_cpt.damage = 1;
-            m_cpt.x = 0;
-            m_cpt.y = 0;
+            m_cpt.x = -1;
+            m_cpt.y = -1;
             dm_cpt.decision = PASS;
-        }
-
-        player(int id, int x, int y) : player(id) {
-            m_cpt.x = x;
-            m_cpt.y = y;
         }
 
         player_id id = player_id{-1};
@@ -30,7 +25,7 @@ namespace roguelike {
         move_component m_cpt;
         atk_component a_cpt;
         decision_making_component dm_cpt;
-        repr_component repr_cpt = repr_component("p");
+        repr_component repr_cpt;
     };
 
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(player, id, lvl, h_cpt, m_cpt, a_cpt, dm_cpt, lg_cpt, repr_cpt);

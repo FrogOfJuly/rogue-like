@@ -13,14 +13,14 @@ namespace roguelike {
 
     //--------------end of component---------------------------------------------
 
-    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(component, id);
+    //    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(component);
 
     struct move_component : public component {
         int x = -1, y = -1;
         tile_idx residency = -1;
     };
 
-    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(move_component, x, y, residency, id);
+    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(move_component, x, y, residency);
 
     //--------------end of move_component----------------------------------------
 
@@ -28,7 +28,7 @@ namespace roguelike {
         int damage = -1;
     };
 
-    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(atk_component, damage, id);
+    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(atk_component, damage);
 
     //--------------end of atk_component-----------------------------------------
 
@@ -36,31 +36,15 @@ namespace roguelike {
         int health = -1;
     };
 
-    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(health_component, health, id);
+    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(health_component, health);
 
     //--------------end of health_component--------------------------------------
 
     struct repr_component : public component {
-        explicit repr_component(std::string repr_string) {
-            repr = [repr_string]() -> std::string { return repr_string; };
-        }
-
-        explicit repr_component(const std::function<std::string()> &repr_func) { repr = repr_func; };
-
-       private:
-        std::function<std::string()> repr = []() -> std::string { return "?"; };
-
-        friend void to_json(nlohmann::json &j, const repr_component &p);
+        std::string repr = "?";
     };
 
-    void to_json(nlohmann::json &j, const repr_component &p) {
-        j["id"] = p.id;
-        j["repr"] = p.repr();
-    }
-
-    void from_json(const nlohmann::json &j, repr_component &p) {
-        throw std::runtime_error("One CAN NOT reconstruct representation component from its serialization");
-    }
+    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(repr_component, repr);
 
     //--------------end of repr_component----------------------------------------
 
@@ -85,7 +69,7 @@ namespace roguelike {
         }
     };
 
-    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(decision_making_component, decision, id);
+    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(decision_making_component, decision);
 
     //--------------end of decision_making_component-----------------------------
 
@@ -94,7 +78,7 @@ namespace roguelike {
     };
 
     void to_json(nlohmann::json &j, const logging_component &p) {
-        j["id"] = p.id;
+        //        j["id"] = p.id;
         j["log"] = p.log.str();
     }
 

@@ -9,7 +9,9 @@
 #define ROGUE_LIKE_ENTITY_HPP
 namespace roguelike {
     struct entity {
-        entity_id id;
+        entity(int id) : id{id} {}
+
+        entity_id id{-1};
         int level = -1;
     };
 

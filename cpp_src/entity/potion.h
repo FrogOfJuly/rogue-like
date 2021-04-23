@@ -7,8 +7,9 @@
 #define ROGUE_LIKE_POTION_H
 namespace roguelike {
     struct potion {
+        potion(int id) : id{id} {}
         entity_id id;
-        repr_component repr_cpt = repr_component("p");
+        repr_component repr_cpt;
     };
 
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(potion, id, repr_cpt);

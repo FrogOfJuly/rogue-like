@@ -1,6 +1,7 @@
 //
 // Created by Kirill Golubev on 17.04.2021.
 //
+#include <iostream>
 #include <map>
 #include <memory>
 #include <queue>
@@ -13,16 +14,21 @@
 namespace roguelike {
     constexpr int room_size = 4;
 
+    enum entity_names {
+#define register_entity(entity_type_name, representation_function) entity_type_name##_entity,
+#include "../utility/register_for_entities.h"
+#undef register_entity
+    };
+
     class gamestate {
         using entity_pair = std::pair<general_id, general_id>;
         using room = room<room_size, room_size>;
         room level;
         int lvl_num = -1;
-        std::queue<entity_pair> interactions;
         std::vector<player> players;
 
        public:
-        gamestate() : mv_system(this), inter_system(this) {}
+        gamestate() noexcept : mv_system(this), inter_system(this), draw_system(this) {}
 
         void initialize(int player_num) {
             lwlog_info("Initializning gamestate object");
@@ -41,22 +47,26 @@ namespace roguelike {
 
             for (int i = 0; i < 2; ++i) {
                 lwlog_info("placing goblin");
-                auto g = std::make_unique<goblin>();
-                g->id = entity_id{(int)level.residents.size()};  // bad cast, do something better
+                auto g = new goblin(i);
+                g->dm_cpt.decision = LEFT;
                 level.spawn_on_level(*g);
-                level.residents.emplace_back(std::move(g));
+                level.residents.emplace_back(g);
             }
-            auto e = std::make_unique<entity>();
-            lwlog_info("placing entity");
-            e->id = entity_id{(int)level.residents.size()};  // bad cast, do something better
-            level.spawn_on_level(*e);
-            level.residents.emplace_back(std::move(e));
+            lwlog_info("placing goblin");
+            auto g = new goblin(2);
+            g->dm_cpt.decision = DOWN;
+            level.spawn_on_level(*g);
+            level.residents.emplace_back(g);
 
-            auto p = std::make_unique<potion>();
+            auto e = new entity((int)level.residents.size());
+            lwlog_info("placing entity");
+            level.spawn_on_level(*e);
+            level.residents.emplace_back(e);
+
+            auto p = new potion((int)level.residents.size());
             lwlog_info("placing potion");
-            p->id = entity_id{(int)level.residents.size()};  // do better
             level.spawn_on_level(*p);
-            level.residents.emplace_back(std::move(p));
+            level.residents.emplace_back(p);
         }
 
         void receive_player_command(int player_id, cmd command) {
@@ -80,28 +90,26 @@ namespace roguelike {
                 std::visit(
                     [this](auto &ent_ptr) {
                         auto &ent_ref = *ent_ptr;
-                        mv_system.general_move<std::remove_reference_t<decltype(ent_ref)> >(ent_ref);
+                        mv_system.general_move<std::remove_reference_t<decltype(ent_ref)>>(ent_ref);
                     },
                     ent);
             }
         }
 
-        static std::pair<int, bool> unsafe_recover_id(general_id id) {
-            return std::visit(
-                [](auto &&id) -> std::pair<int, bool> {
-                    lwlog_info("recovering");
-                    if constexpr (std::is_same_v<decltype(id), entity_id>) {
-                        lwlog_info("entity");
-                        return std::make_pair(id.value, false);
-                    } else {
-                        lwlog_info("player");
-                        return std::make_pair(id.value, true);
-                    }
-                },
-                id);
+        void redraw_nonplayers() {
+            for (auto &var_ent : level.residents) {
+                drawing_system::general_draw(var_ent);
+            }
         }
 
-        void interact() { inter_system.resolve_all_interactions(); }
+        void redraw_players() {
+            for (auto &player : players) {
+                entity_type var_ent(&player);
+                drawing_system::general_draw(var_ent);
+            }
+        }
+
+        void resolve_all_interactions() { inter_system.resolve_all_interactions(); }
 
         void clean_dead() {}
 
@@ -114,7 +122,7 @@ namespace roguelike {
                     [](auto &ent_ptr) {
                         auto &ent_ref = *ent_ptr;
                         if constexpr (has_member_decision_making_component<
-                                          std::remove_reference_t<decltype(ent_ref)> >::value) {
+                                          std::remove_reference_t<decltype(ent_ref)>>::value) {
                             ent_ref.dm_cpt.decision = PASS;
                         }
                     },
@@ -133,9 +141,21 @@ namespace roguelike {
 
         gamestate(const gamestate &) = delete;
 
-        gamestate &operator=(gamestate &&) = default;
+        gamestate &operator=(gamestate &&rhs) noexcept {
+            std::swap(level, rhs.level);
+            std::swap(lvl_num, rhs.lvl_num);
+            std::swap(players, rhs.players);
 
-        gamestate(gamestate &&) = default;
+            std::swap(mv_system, rhs.mv_system);
+            std::swap(inter_system, rhs.inter_system);
+
+            rhs.mv_system.reset_owner(this);
+            rhs.inter_system.reset_owner(this);
+
+            return *this;
+        }
+
+        gamestate(gamestate &&rhs) noexcept : gamestate() { *this = std::move(rhs); }
 
        private:
         class move_system {
@@ -150,38 +170,45 @@ namespace roguelike {
                 // pattern match for id
                 // general_id@(Left entity_id)  <- take from player array
                 // general_id@(Right player_id) <- take from level.residents array
-                std::visit(overloaded{[this, pr, dest_tile](entity_id id) {
-                                          // if taken from residents array then check for
-                                          // all we need to check is existence of move component;
-                                          // entry_ptr : std::variant<player*, goblin*, ... etc>
-                                          std::visit(
-                                              [pr, dest_tile](auto &entity_ptr) {
-                                                  auto &ent = *entity_ptr;
-                                                  if constexpr (has_member_move_component<
-                                                                    std::remove_reference_t<decltype(ent)> >::value) {
-                                                      auto &ent_m_cpt = ent.m_cpt;
-                                                      ent_m_cpt.residency = dest_tile;
-                                                      ent_m_cpt.x = pr.first;
-                                                      ent_m_cpt.y = pr.second;
-                                                  }
-                                              },
-                                              game_ptr->level.residents[id.value]);
-                                      },
-                                      [this, dest_tile, pr](player_id id) {
-                                          auto &pl_m_cpt = game_ptr->players[id.value].m_cpt;
-                                          pl_m_cpt.residency = dest_tile;
-                                          pl_m_cpt.x = pr.first;
-                                          pl_m_cpt.y = pr.second;
-                                      }},
-                           id);
+                std::visit(
+                    overloaded{
+                        [this, pr, dest_tile](entity_id id) {
+                            // if taken from residents array then check for
+                            // all we need to check is existence of move component;
+                            // entry_ptr : std::variant<player*, goblin*, ... etc>
+                            std::visit(
+                                [this, pr, dest_tile](auto &entity_ptr) {
+                                    auto &ent = *entity_ptr;
+                                    if constexpr (has_member_move_component<
+                                                      std::remove_reference_t<decltype(ent)>>::value) {
+                                        auto &ent_m_cpt = ent.m_cpt;
+                                        auto &old_tile = game_ptr->level.tiles[ent_m_cpt.residency];
+                                        old_tile.resident.reset();
+                                        ent_m_cpt.residency = dest_tile;
+                                        ent_m_cpt.x = pr.first;
+                                        ent_m_cpt.y = pr.second;
+                                    }
+                                },
+                                game_ptr->level.residents[id.value]);
+                        },
+                        [this, dest_tile, pr](player_id id) {
+                            auto &pl_m_cpt = game_ptr->players[id.value].m_cpt;
+                            auto &old_tile = game_ptr->level.tiles[pl_m_cpt.residency];
+                            old_tile.resident.reset();
+                            pl_m_cpt.residency = dest_tile;
+                            pl_m_cpt.x = pr.first;
+                            pl_m_cpt.y = pr.second;
+                        }},
+                    id);
             }
 
             template <typename entityType>
             bool general_move(entityType &ent) {
                 assert(game_ptr);
                 bool moved = false;
-                if constexpr (has_member_decision_making_component<entityType>::value and
-                              has_member_move_component<entityType>::value) {
+                if constexpr (
+                    has_member_decision_making_component<entityType>::value and
+                    has_member_move_component<entityType>::value) {
                     auto v = ent.dm_cpt.get_velocity();
                     if (v.first == 0 and v.second == 0) {
                         return moved;
@@ -199,7 +226,7 @@ namespace roguelike {
                     } else {
                         general_id interacted_id = tle.resident.value();
                         general_id interacting_id = ent.id;
-                        game_ptr->interactions.push(std::make_pair(interacted_id, interacting_id));
+                        game_ptr->inter_system.push_interaction(interacted_id, interacting_id);
                     }
                     return moved;
                 }
@@ -208,7 +235,7 @@ namespace roguelike {
 
             move_system() = delete;
 
-            explicit move_system(gamestate *game_ptr) : game_ptr(game_ptr) {}
+            explicit move_system(gamestate *game_ptr) noexcept : game_ptr(game_ptr) {}
 
             move_system(const move_system &) = delete;
 
@@ -217,10 +244,13 @@ namespace roguelike {
             move_system &operator=(const move_system &) = delete;
 
             move_system &operator=(move_system &&) = default;
+
+            void reset_owner(gamestate *ptr) noexcept { game_ptr = ptr; }
         };
 
         class interaction_system {
             gamestate *game_ptr;
+            std::queue<entity_pair> interactions;
 
            public:
             static void perform_interaction(entity_type &interacted, entity_type &interacting) {
@@ -231,62 +261,63 @@ namespace roguelike {
                         assert(right_ptr);
                         auto &left = *left_ptr;
                         auto &right = *right_ptr;
-                        interacter<std::remove_reference_t<decltype(left)>,
-                                   std::remove_reference_t<decltype(right)> >::interact(left, right);
+                        interacter<std::remove_reference_t<decltype(left)>, std::remove_reference_t<decltype(right)>>::
+                            interact(left, right);
                     },
-                    interacted, interacting);
+                    interacted,
+                    interacting);
             }
+
+            void push_interaction(general_id inted, general_id inting) { interactions.emplace(inted, inting); }
 
             void resolve_all_interactions() {
                 lwlog_info("there are %lu interctions to perform", game_ptr->interactions.size());
-                while (not game_ptr->interactions.empty()) {
-                    entity_pair idx_pair = game_ptr->interactions.front();
-                    game_ptr->interactions.pop();
+                while (not interactions.empty()) {
+                    entity_pair idx_pair = interactions.front();
+                    interactions.pop();
                     //                      variational-------v---------------v
                     auto perform_interaction = [](auto &interacted, auto &interacting) {
                         std::visit(
                             [](auto &left_ptr, auto &right_ptr) {
                                 auto &left = *left_ptr;
                                 auto &right = *right_ptr;
-                                interacter<std::remove_reference_t<decltype(left)>,
-                                           std::remove_reference_t<decltype(right)> >::interact(left, right);
+                                interacter<
+                                    std::remove_reference_t<decltype(left)>,
+                                    std::remove_reference_t<decltype(right)>>::interact(left, right);
                             },
-                            interacted, interacting);
+                            interacted,
+                            interacting);
                     };
-
-                    auto unsafe_release_player = [](auto &plr_uniq) { (void)plr_uniq.release(); };
 
                     std::visit(
                         overloaded{
-                            [this, perform_interaction, unsafe_release_player](player_id left_id, player_id right_id) {
-                                entity_type left_player = std::unique_ptr<player>(&game_ptr->players[left_id.value]);
-                                entity_type right_player = std::unique_ptr<player>(&game_ptr->players[right_id.value]);
+                            [this, perform_interaction](player_id left_id, player_id right_id) {
+                                entity_type left_player = &game_ptr->players[left_id.value];
+                                entity_type right_player = &game_ptr->players[right_id.value];
                                 perform_interaction(left_player, right_player);
-                                std::visit(unsafe_release_player, left_player);
-                                std::visit(unsafe_release_player, right_player);
                             },
-                            [this, perform_interaction, unsafe_release_player](entity_id left_id, player_id right_id) {
-                                entity_type right_player = std::unique_ptr<player>(&game_ptr->players[right_id.value]);
+                            [this, perform_interaction](entity_id left_id, player_id right_id) {
+                                entity_type right_player = &game_ptr->players[right_id.value];
                                 perform_interaction(game_ptr->level.residents[left_id.value], right_player);
-                                std::visit(unsafe_release_player, right_player);
                             },
-                            [this, perform_interaction, unsafe_release_player](player_id left_id, entity_id right_id) {
-                                entity_type left_player = std::unique_ptr<player>(&game_ptr->players[left_id.value]);
+                            [this, perform_interaction](player_id left_id, entity_id right_id) {
+                                entity_type left_player = &game_ptr->players[left_id.value];
                                 perform_interaction(left_player, game_ptr->level.residents[right_id.value]);
-                                std::visit(unsafe_release_player, left_player);
                             },
                             [this, perform_interaction](entity_id left_id, entity_id right_id) {
-                                perform_interaction(game_ptr->level.residents[left_id.value],
-                                                    game_ptr->level.residents[right_id.value]);
+                                perform_interaction(
+                                    game_ptr->level.residents[left_id.value],
+                                    game_ptr->level.residents[right_id.value]);
                             },
                         },
-                        idx_pair.first, idx_pair.second);
+                        idx_pair.first,
+                        idx_pair.second);
                 }
             }
 
             interaction_system() = delete;
 
-            explicit interaction_system(gamestate *game_ptr) : game_ptr(game_ptr) {}
+            explicit interaction_system(gamestate *game_ptr) noexcept : game_ptr(game_ptr) {}
 
             interaction_system(const interaction_system &) = delete;
 
@@ -295,10 +326,31 @@ namespace roguelike {
             interaction_system &operator=(const interaction_system &) = delete;
 
             interaction_system &operator=(interaction_system &&) = default;
+
+            void reset_owner(gamestate *ptr) noexcept { game_ptr = ptr; }
         };
 
+        class drawing_system {
+            gamestate *game_ptr;
+
+           public:
+            static void general_draw(entity_type &var_ent) {
+                std::visit(
+                    overloaded{
+#define register_entity(entity_type_name, representation_function) representation_function,
+#include "../utility/register_for_entities.h"
+#undef register_entity
+                        [](entity *ptr) -> void {}},
+                    var_ent);
+            }
+
+            explicit drawing_system(gamestate *ptr) : game_ptr(ptr) {}
+
+            void reset_owner(gamestate *ptr) { game_ptr = ptr; }
+        };
         move_system mv_system;
         interaction_system inter_system;
+        drawing_system draw_system;
 
        public:
         friend void to_json(nlohmann::json &j, const gamestate &p);
@@ -315,25 +367,30 @@ namespace roguelike {
                 room_json.push_back(cur_tile_json);
                 continue;
             }
-            auto resident_json = std::visit(overloaded{[&p](player_id id) {
-                                                           auto j_local = nlohmann::json();
-                                                           nlohmann::to_json(j_local["player"], p.players[id.value]);
-                                                           return j_local;
-                                                       },
-                                                       [&p](entity_id id) {
-                                                           auto j_local = nlohmann::json();
-                                                           const auto &var_ent = p.level.residents[id.value];
-                                                           nlohmann::to_json(j_local["entity"], var_ent);
-                                                           // j_local["entity"]["repr_cpt"]["repr"] =
-                                                           // var_ent.repr_cpt.repr();
-                                                           //  ^--- only if entity has repr component.
-                                                           if (not j_local["entity"].contains("repr_cpt")) {
-                                                               j_local["entity"]["repr_cpt"]["repr"] = "?";
-                                                               return j_local;
-                                                           }
-                                                           return j_local;
-                                                       }},
-                                            tle.resident.value());
+            auto resident_json = std::visit(
+                overloaded{
+                    [&p](player_id id) {
+                        auto j_local = nlohmann::json();
+                        nlohmann::to_json(j_local["player"], p.players[id.value]);
+                        std::string str_repr = j_local["player"]["repr_cpt"]["repr"];
+                        return j_local;
+                    },
+                    [&p](entity_id id) {
+                        auto j_local = nlohmann::json();
+                        const auto &var_ent = p.level.residents[id.value];
+                        nlohmann::to_json(j_local["entity"], var_ent);
+                        bool has_repr = std::visit(
+                            [](auto *ent) {
+                                return has_member_repr_component<std::remove_pointer_t<decltype(ent)>>::value;
+                            },
+                            var_ent);
+                        if (not has_repr) {
+                            j_local["entity"]["repr_cpt"]["repr"] = "?";
+                            return j_local;
+                        }
+                        return j_local;
+                    }},
+                tle.resident.value());
             cur_tile_json["tile"] = resident_json;
             room_json.push_back(cur_tile_json);
         }
