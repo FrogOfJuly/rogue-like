@@ -7,7 +7,7 @@
 #include "../deps/json/single_include/nlohmann/json.hpp"
 #include "../deps/lwlog/lwlog.h"
 
-LOG_LEVEL(-1);
+#define LOG_LEVEL -1
 
 #ifndef ROGUE_LIKE_COMMON_H
 #define ROGUE_LIKE_COMMON_H
