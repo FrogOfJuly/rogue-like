@@ -104,6 +104,12 @@ namespace roguelike {
         p.log << j["log"];
     }
 
+#define register_component(cmpt_name, component_type) define_has_member(cmpt_name, component_type)
+
+#include "../utility/register_for_components.h"
+
+#undef register_component
+
     struct entity {
         entity_id id;
         int level = -1;

@@ -5,31 +5,30 @@
 #include <variant>
 #include <sstream>
 #include "../deps/json/single_include/nlohmann/json.hpp"
-#include "../deps/lwlog/lwlog.h"
 
 #define LOG_LEVEL -1
+
+#include "../deps/lwlog/lwlog.h"
+
 
 #ifndef ROGUE_LIKE_COMMON_H
 #define ROGUE_LIKE_COMMON_H
 
-#define define_has_member(member_name)                                         \
+#define define_has_member(member_name, member_type)                            \
     template <typename T>                                                      \
-    class has_member_##member_name                                             \
+    class has_member_##member_type                                             \
     {                                                                          \
         typedef char yes_type;                                                 \
         typedef long no_type;                                                  \
-        template <typename U> static yes_type test(decltype(&U::member_name)); \
-        template <typename U> static no_type  test(...);                       \
+        template <typename U>                                                  \
+        static typename std::enable_if_t<                                      \
+            std::is_same_v<member_type, decltype(U::member_name)>              \
+        , yes_type>  test(decltype(&U::member_name));                          \
+        template <typename U>                                                  \
+        static no_type  test(...);                                             \
     public:                                                                    \
         static constexpr bool value = sizeof(test<T>(0)) == sizeof(yes_type);  \
     };
-
-
-#define register_component(cmpt_name) define_has_member(cmpt_name)
-
-#include "utility/register_for_component.h"
-
-#undef register_component
 
 
 template<class... Ts>

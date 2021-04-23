@@ -92,7 +92,7 @@ namespace roguelike {
                 throw std::runtime_error("Can't spawn player. Tile" + std::to_string(tidx) + " occupied");
             }
             tiles[tidx].resident = ent.id;
-            if constexpr (has_member_m_cpt<SpawnType>::value) {
+            if constexpr (has_member_move_component<SpawnType>::value) {
                 ent.m_cpt.residency = tidx;
                 auto coords = pairFromIdx(tidx);
                 ent.m_cpt.x = coords.first;

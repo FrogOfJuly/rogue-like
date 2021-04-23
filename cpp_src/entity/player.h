@@ -39,7 +39,7 @@ namespace roguelike {
     template<typename entityType>
     struct interacter<player, entityType> {
         static void interact(player &inted, entityType &inting) {
-            if constexpr(has_member_a_cpt<entityType>::value) {
+            if constexpr(has_member_atk_component<entityType>::value) {
                 auto dmg = inting.a_cpt.damage;
                 inted.h_cpt.health -= dmg;
                 inted.lg_cpt.log << "you was attacked by the unknown\n";

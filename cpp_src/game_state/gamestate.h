@@ -117,7 +117,7 @@ namespace roguelike {
             for (auto &var_ent : level.residents) {
                 std::visit([](auto &ent_ptr) {
                     auto &ent_ref = *ent_ptr;
-                    if constexpr(has_member_dm_cpt<
+                    if constexpr(has_member_decision_making_component<
                             std::remove_reference_t<decltype(ent_ref)>
                     >::value) {
                         ent_ref.dm_cpt.decision = PASS;
@@ -162,7 +162,7 @@ namespace roguelike {
                             std::visit(
                                     [pr, dest_tile](auto &entity_ptr) {
                                         auto &ent = *entity_ptr;
-                                        if constexpr(has_member_m_cpt<
+                                        if constexpr(has_member_move_component<
                                                 std::remove_reference_t<decltype(ent)>
                                         >::value) {
                                             auto &ent_m_cpt = ent.m_cpt;
@@ -185,8 +185,8 @@ namespace roguelike {
                 assert(game_ptr);
                 bool moved = false;
                 if constexpr (
-                        has_member_dm_cpt<entityType>::value and
-                        has_member_m_cpt<entityType>::value) {
+                        has_member_decision_making_component<entityType>::value and
+                        has_member_move_component<entityType>::value) {
 
                     auto v = ent.dm_cpt.get_velocity();
                     if (v.first == 0 and v.second == 0) {
