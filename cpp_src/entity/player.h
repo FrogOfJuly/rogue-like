@@ -4,7 +4,6 @@
 
 #include "entity.hpp"
 
-
 #ifndef ROGUE_LIKE_PLAYER_H
 #define ROGUE_LIKE_PLAYER_H
 
@@ -36,10 +35,10 @@ namespace roguelike {
 
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(player, id, lvl, h_cpt, m_cpt, a_cpt, dm_cpt, lg_cpt, repr_cpt);
 
-    template<typename entityType>
+    template <typename entityType>
     struct interacter<player, entityType> {
         static void interact(player &inted, entityType &inting) {
-            if constexpr(has_member_atk_component<entityType>::value) {
+            if constexpr (has_member_atk_component<entityType>::value) {
                 auto dmg = inting.a_cpt.damage;
                 inted.h_cpt.health -= dmg;
                 inted.lg_cpt.log << "you was attacked by the unknown\n";
@@ -50,7 +49,7 @@ namespace roguelike {
         }
     };
 
-    template<>
+    template <>
     struct interacter<player, player> {
         static void interact(player &inted, player &inting) {
             auto dmg = inting.a_cpt.damage;
@@ -60,6 +59,6 @@ namespace roguelike {
             return;
         }
     };
-} //namespace roguelike
+}  // namespace roguelike
 
-#endif //ROGUE_LIKE_PLAYER_H
+#endif  // ROGUE_LIKE_PLAYER_H

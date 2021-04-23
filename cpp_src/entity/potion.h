@@ -13,11 +13,9 @@ namespace roguelike {
 
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(potion, id, repr_cpt);
 
-    template<>
+    template <>
     struct interacter<potion, player> {
-        static void interact(potion &inted, player &inting) {
-            inting.lg_cpt.log << "you interacted with potion\n";
-        }
+        static void interact(potion &inted, player &inting) { inting.lg_cpt.log << "you interacted with potion\n"; }
     };
-} // namespace roguelike
-#endif //ROGUE_LIKE_POTION_H
+}  // namespace roguelike
+#endif  // ROGUE_LIKE_POTION_H

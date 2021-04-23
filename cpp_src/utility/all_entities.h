@@ -5,8 +5,8 @@
 #ifndef ROGUE_LIKE_ENTITIES_H
 #define ROGUE_LIKE_ENTITIES_H
 
+#include "../entity/goblin.h"
 #include "../entity/player.h"
 #include "../entity/potion.h"
-#include "../entity/goblin.h"
 
-#endif //ROGUE_LIKE_ENTITIES_H
+#endif  // ROGUE_LIKE_ENTITIES_H

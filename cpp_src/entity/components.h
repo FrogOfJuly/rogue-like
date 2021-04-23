@@ -18,7 +18,6 @@ namespace roguelike {
     struct move_component : public component {
         int x = -1, y = -1;
         tile_idx residency = -1;
-
     };
 
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(move_component, x, y, residency, id);
@@ -27,7 +26,6 @@ namespace roguelike {
 
     struct atk_component : public component {
         int damage = -1;
-
     };
 
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(atk_component, damage, id);
@@ -36,7 +34,6 @@ namespace roguelike {
 
     struct health_component : public component {
         int health = -1;
-
     };
 
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(health_component, health, id);
@@ -44,21 +41,14 @@ namespace roguelike {
     //--------------end of health_component--------------------------------------
 
     struct repr_component : public component {
-
         explicit repr_component(std::string repr_string) {
-            repr = [repr_string]() -> std::string {
-                return repr_string;
-            };
+            repr = [repr_string]() -> std::string { return repr_string; };
         }
 
-        explicit repr_component(const std::function<std::string()> &repr_func) {
-            repr = repr_func;
-        };
+        explicit repr_component(const std::function<std::string()> &repr_func) { repr = repr_func; };
 
-    private:
-        std::function<std::string()> repr = []() -> std::string {
-            return "?";
-        };
+       private:
+        std::function<std::string()> repr = []() -> std::string { return "?"; };
 
         friend void to_json(nlohmann::json &j, const repr_component &p);
     };
@@ -93,7 +83,6 @@ namespace roguelike {
                     return std::make_pair(0, 0);
             }
         }
-
     };
 
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(decision_making_component, decision, id);
@@ -121,6 +110,6 @@ namespace roguelike {
 #include "../utility/register_for_components.h"
 
 #undef register_component
-}
+}  // namespace roguelike
 
-#endif //ROGUE_LIKE_COMPONENTS_H
+#endif  // ROGUE_LIKE_COMPONENTS_H

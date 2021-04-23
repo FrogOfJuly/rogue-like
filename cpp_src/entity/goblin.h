@@ -43,7 +43,7 @@ namespace roguelike {
 
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(goblin, id, dm_cpt, h_cpt, a_cpt, m_cpt, repr_cpt)
 
-    template<typename entityType>
+    template <typename entityType>
     struct interacter<goblin, entityType> {
         static void interact(goblin &inted, entityType &inting) {
             if constexpr (has_member_logging_component<entityType>::value) {
@@ -57,6 +57,6 @@ namespace roguelike {
             return;
         }
     };
-}
+}  // namespace roguelike
 
-#endif //ROGUE_LIKE_GOBLIN_H
+#endif  // ROGUE_LIKE_GOBLIN_H

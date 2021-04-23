@@ -2,44 +2,46 @@
 // Created by Kirill Golubev on 17.04.2021.
 //
 
-#include "tile.h"
-#include <variant>
 #include <optional>
+#include <variant>
 #include <vector>
+
 #include "../entity/entity.hpp"
 #include "../utility/all_entities.h"
+#include "tile.h"
 
 #ifndef ROGUE_LIKE_LEVEL_H
 #define ROGUE_LIKE_LEVEL_H
 namespace roguelike {
-#define register_entity(entity_name) std::unique_ptr<entity_name>,
-    //hehehehhehehehehe!! It works!!
     using entity_type = std::variant<
-
+#define register_entity(entity_type_name) std::unique_ptr<entity_type_name>,
+    // hehehehhehehehehe!! It works!!
 #include "../utility/register_for_entities.h"
 
-    std::unique_ptr<entity>>;
 #undef register_entity
+        std::unique_ptr<entity>>;
 
     void to_json(nlohmann::json &j, const entity_type &p) {
         j = std::visit(
-                [](auto &ent_ptr) {
-                    auto j_local = nlohmann::json();
-                    to_json(j_local, *ent_ptr);
-                    return j_local;
-                }, p);
+            [](auto &ent_ptr) {
+                auto j_local = nlohmann::json();
+                to_json(j_local, *ent_ptr);
+                return j_local;
+            },
+            p);
     }
 
     void from_json(const nlohmann::json &j, entity_type &p) {
         throw std::runtime_error("One CAN NOT construct entity type from it's serialization");
     }
 
-    template<int H, int W>
+    template <int H, int W>
     struct room {
         std::array<tile, H * W> tiles;
 
         std::vector<entity_type> residents;
-    public:
+
+       public:
         room() = default;
 
         std::optional<tile> get_tile_if_exists(int x, int y) noexcept {
@@ -63,13 +65,9 @@ namespace roguelike {
             return tiles[des_tile_idx];
         }
 
-        static tile_idx idxFromPair(int x, int y) {
-            return x + y*W;
-        }
+        static tile_idx idxFromPair(int x, int y) { return x + y * W; }
 
-        static std::pair<int, int> pairFromIdx(tile_idx idx) {
-            return std::make_pair(idx % W, idx / W);
-        }
+        static std::pair<int, int> pairFromIdx(tile_idx idx) { return std::make_pair(idx % W, idx / W); }
 
         tile_idx get_empty_tile() const {
             for (int i = 0; i < W * H; ++i) {
@@ -80,7 +78,7 @@ namespace roguelike {
             return -1;
         }
 
-        template<typename SpawnType>
+        template <typename SpawnType>
         void spawn_on_level(SpawnType &ent, tile_idx tidx = -1) {
             if (tidx == -1) {
                 tidx = get_empty_tile();
@@ -121,8 +119,8 @@ namespace roguelike {
          * generate_walls(int lvl_num)
          * generate_traps(int lvl_num)
          * generate_doors_and_keys(int lvl_num)
-        */
+         */
     };
-} //namespace roguelike
+}  // namespace roguelike
 
-#endif //ROGUE_LIKE_LEVEL_H
+#endif  // ROGUE_LIKE_LEVEL_H

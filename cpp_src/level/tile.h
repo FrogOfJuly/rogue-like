@@ -5,17 +5,15 @@
 #ifndef ROGUE_LIKE_TILE_H
 #define ROGUE_LIKE_TILE_H
 
-#include "../common.h"
 #include <optional>
+
+#include "../common.h"
 
 namespace roguelike {
     struct tile {
         std::optional<general_id> resident;
-        bool empty() const{
-            return not resident.has_value();
-        }
+        bool empty() const { return not resident.has_value(); }
     };
-} //namespace roguelike
+}  // namespace roguelike
 
-
-#endif //ROGUE_LIKE_TILE_H
+#endif  // ROGUE_LIKE_TILE_H
