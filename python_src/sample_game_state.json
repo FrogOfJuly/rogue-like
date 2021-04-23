@@ -1,1 +1,275 @@
-{"level":[{"tile":{"player":{"a_cpt":{"damage":1},"dm_cpt":{"decision":"pass"},"h_cpt":{"health":9},"id":{"value":0},"lg_cpt":{"log":"you was interacted by the player 1\n"},"lvl":0,"m_cpt":{"residency":0,"x":0,"y":0},"repr_cpt":{"repr":"0"}}}},{"tile":{"player":{"a_cpt":{"damage":1},"dm_cpt":{"decision":"pass"},"h_cpt":{"health":9},"id":{"value":1},"lg_cpt":{"log":"you interacted with player0\nyou was interacted by the player 2\n"},"lvl":0,"m_cpt":{"residency":1,"x":1,"y":0},"repr_cpt":{"repr":"1"}}}},{"tile":{"player":{"a_cpt":{"damage":1},"dm_cpt":{"decision":"pass"},"h_cpt":{"health":9},"id":{"value":2},"lg_cpt":{"log":"you interacted with player1\nyou was interacted by the player 3\n"},"lvl":0,"m_cpt":{"residency":2,"x":2,"y":0},"repr_cpt":{"repr":"2"}}}},{"tile":{"player":{"a_cpt":{"damage":1},"dm_cpt":{"decision":"pass"},"h_cpt":{"health":10},"id":{"value":3},"lg_cpt":{"log":"you interacted with player2\n"},"lvl":0,"m_cpt":{"residency":3,"x":3,"y":0},"repr_cpt":{"repr":"3"}}}},{"tile":{"player":{"a_cpt":{"damage":1},"dm_cpt":{"decision":"pass"},"h_cpt":{"health":9},"id":{"value":4},"lg_cpt":{"log":"you was attacked by the unknown\n"},"lvl":0,"m_cpt":{"residency":4,"x":0,"y":1},"repr_cpt":{"repr":"4"}}}},{"tile":{"entity":{"a_cpt":{"damage":1},"dm_cpt":{"decision":"pass"},"h_cpt":{"health":4},"id":{"value":0},"m_cpt":{"residency":5,"x":1,"y":1},"repr_cpt":{"repr":"x"}}}},{"tile":{"entity":{"a_cpt":{"damage":1},"dm_cpt":{"decision":"pass"},"h_cpt":{"health":5},"id":{"value":1},"m_cpt":{"residency":6,"x":2,"y":1},"repr_cpt":{"repr":"x"}}}},{"tile":null},{"tile":{"entity":{"id":{"value":3},"level":-1,"repr_cpt":{"repr":"?"}}}},{"tile":{"entity":{"id":{"value":4},"repr_cpt":{"repr":"p"}}}},{"tile":null},{"tile":{"entity":{"a_cpt":{"damage":1},"dm_cpt":{"decision":"pass"},"h_cpt":{"health":5},"id":{"value":2},"m_cpt":{"residency":11,"x":3,"y":2},"repr_cpt":{"repr":"x"}}}},{"tile":null},{"tile":null},{"tile":null},{"tile":null}]}
+{
+  "level": [
+    {
+      "tile": {
+        "player": {
+          "a_cpt": {
+            "damage": 1
+          },
+          "dm_cpt": {
+            "decision": "pass"
+          },
+          "h_cpt": {
+            "health": 9
+          },
+          "id": {
+            "value": 0
+          },
+          "lg_cpt": {
+            "log": "you was interacted by the player 1\n"
+          },
+          "lvl": 0,
+          "m_cpt": {
+            "residency": 0,
+            "x": 0,
+            "y": 0
+          },
+          "repr_cpt": {
+            "repr": "0"
+          }
+        }
+      }
+    },
+    {
+      "tile": {
+        "player": {
+          "a_cpt": {
+            "damage": 1
+          },
+          "dm_cpt": {
+            "decision": "pass"
+          },
+          "h_cpt": {
+            "health": 9
+          },
+          "id": {
+            "value": 1
+          },
+          "lg_cpt": {
+            "log": "you interacted with player0\nyou was interacted by the player 2\n"
+          },
+          "lvl": 0,
+          "m_cpt": {
+            "residency": 1,
+            "x": 1,
+            "y": 0
+          },
+          "repr_cpt": {
+            "repr": "1"
+          }
+        }
+      }
+    },
+    {
+      "tile": {
+        "player": {
+          "a_cpt": {
+            "damage": 1
+          },
+          "dm_cpt": {
+            "decision": "pass"
+          },
+          "h_cpt": {
+            "health": 9
+          },
+          "id": {
+            "value": 2
+          },
+          "lg_cpt": {
+            "log": "you interacted with player1\nyou was interacted by the player 3\n"
+          },
+          "lvl": 0,
+          "m_cpt": {
+            "residency": 2,
+            "x": 2,
+            "y": 0
+          },
+          "repr_cpt": {
+            "repr": "2"
+          }
+        }
+      }
+    },
+    {
+      "tile": {
+        "player": {
+          "a_cpt": {
+            "damage": 1
+          },
+          "dm_cpt": {
+            "decision": "pass"
+          },
+          "h_cpt": {
+            "health": 10
+          },
+          "id": {
+            "value": 3
+          },
+          "lg_cpt": {
+            "log": "you interacted with player2\n"
+          },
+          "lvl": 0,
+          "m_cpt": {
+            "residency": 3,
+            "x": 3,
+            "y": 0
+          },
+          "repr_cpt": {
+            "repr": "3"
+          }
+        }
+      }
+    },
+    {
+      "tile": {
+        "player": {
+          "a_cpt": {
+            "damage": 1
+          },
+          "dm_cpt": {
+            "decision": "pass"
+          },
+          "h_cpt": {
+            "health": 9
+          },
+          "id": {
+            "value": 4
+          },
+          "lg_cpt": {
+            "log": "you was attacked by the unknown\n"
+          },
+          "lvl": 0,
+          "m_cpt": {
+            "residency": 4,
+            "x": 0,
+            "y": 1
+          },
+          "repr_cpt": {
+            "repr": "4"
+          }
+        }
+      }
+    },
+    {
+      "tile": {
+        "entity": {
+          "a_cpt": {
+            "damage": 1
+          },
+          "dm_cpt": {
+            "decision": "pass"
+          },
+          "h_cpt": {
+            "health": 4
+          },
+          "id": {
+            "value": 0
+          },
+          "m_cpt": {
+            "residency": 5,
+            "x": 1,
+            "y": 1
+          },
+          "repr_cpt": {
+            "repr": "x"
+          }
+        }
+      }
+    },
+    {
+      "tile": {
+        "entity": {
+          "a_cpt": {
+            "damage": 1
+          },
+          "dm_cpt": {
+            "decision": "pass"
+          },
+          "h_cpt": {
+            "health": 5
+          },
+          "id": {
+            "value": 1
+          },
+          "m_cpt": {
+            "residency": 6,
+            "x": 2,
+            "y": 1
+          },
+          "repr_cpt": {
+            "repr": "x"
+          }
+        }
+      }
+    },
+    {
+      "tile": null
+    },
+    {
+      "tile": {
+        "entity": {
+          "id": {
+            "value": 3
+          },
+          "level": -1,
+          "repr_cpt": {
+            "repr": "?"
+          }
+        }
+      }
+    },
+    {
+      "tile": {
+        "entity": {
+          "id": {
+            "value": 4
+          },
+          "repr_cpt": {
+            "repr": "p"
+          }
+        }
+      }
+    },
+    {
+      "tile": null
+    },
+    {
+      "tile": {
+        "entity": {
+          "a_cpt": {
+            "damage": 1
+          },
+          "dm_cpt": {
+            "decision": "pass"
+          },
+          "h_cpt": {
+            "health": 5
+          },
+          "id": {
+            "value": 2
+          },
+          "m_cpt": {
+            "residency": 11,
+            "x": 3,
+            "y": 2
+          },
+          "repr_cpt": {
+            "repr": "x"
+          }
+        }
+      }
+    },
+    {
+      "tile": null
+    },
+    {
+      "tile": null
+    },
+    {
+      "tile": null
+    },
+    {
+      "tile": null
+    }
+  ]
+}
