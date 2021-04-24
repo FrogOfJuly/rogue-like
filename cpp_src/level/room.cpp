@@ -58,7 +58,7 @@ void roguelike::room::spawn_on_level(entity_type& var_ent, roguelike::tile_idx t
 }
 void roguelike::room::generate_level(int lvl_num) {}
 roguelike::room::~room() {
-    for (const auto& var_ent : residents) {
+    for (auto& var_ent : residents) {
         std::visit(
             [](auto* ent_ptr) {
                 if constexpr (std::is_same_v<player, std::decay_t<decltype(ent_ptr)>>) {

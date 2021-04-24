@@ -174,7 +174,7 @@ void roguelike::gamestate::initialize(int player_number) {
 }
 roguelike::gamestate::~gamestate() {
     for(int i = 0; i < player_num; ++i){
-        delete &players[i];
+        players[i].~player();
     }
     delete[](char *) players;
 }
