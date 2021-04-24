@@ -11,6 +11,7 @@
 
 namespace roguelike {
     struct tile {
+        tile() = default;
         std::optional<general_id> resident;
         bool empty() const { return not resident.has_value(); }
     };

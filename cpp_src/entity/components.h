@@ -1,6 +1,8 @@
 //
 // Created by Kirill Golubev on 23.04.2021.
 //
+#include "../../deps/json/single_include/nlohmann/json.hpp"
+#include "../common.h"
 
 #ifndef ROGUE_LIKE_COMPONENTS_H
 #define ROGUE_LIKE_COMPONENTS_H
@@ -44,7 +46,7 @@ namespace roguelike {
         std::string repr = "?";
 
         template <typename T>
-        static std::string compute_representation(const T *) {
+        static inline std::string compute_representation(const T *) {
             return "?";
         }
     };
@@ -56,7 +58,7 @@ namespace roguelike {
     struct decision_making_component : public component {
         cmd decision = cmd::PASS;
 
-        std::pair<int, int> get_velocity() {
+        [[nodiscard]] std::pair<int, int> get_velocity() const {
             switch (decision) {
                 case UP:
                     return std::make_pair(0, -1);
@@ -82,15 +84,9 @@ namespace roguelike {
         std::stringstream log{};
     };
 
-    void to_json(nlohmann::json &j, const logging_component &p) {
-        //        j["id"] = p.id;
-        j["log"] = p.log.str();
-    }
+    void to_json(nlohmann::json &j, const logging_component &p);
 
-    void from_json(const nlohmann::json &j, logging_component &p) {
-        p.id = j["id"];
-        p.log << j["log"];
-    }
+    void from_json(const nlohmann::json &j, logging_component &p);
 
     //--------------end of logging_component-------------------------------------
 

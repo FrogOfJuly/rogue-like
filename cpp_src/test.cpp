@@ -7,7 +7,7 @@
 #include "game_state/gamestate.h"
 
 int main() {
-    auto game = roguelike::gamestate();
+    roguelike::gamestate game;
     game.initialize(5);
     game.receive_player_command(1, roguelike::cmd::UP);
 

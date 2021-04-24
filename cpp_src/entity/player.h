@@ -31,13 +31,13 @@ namespace roguelike {
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(player, id, lvl, h_cpt, m_cpt, a_cpt, dm_cpt, lg_cpt, repr_cpt);
 
     template <>
-    std::string repr_component::compute_representation<player>(const player *p) {
+    inline std::string repr_component::compute_representation<player>(const player *p) {
         return std::to_string(p->id.value);
     }
 
     template <typename entityType>
     struct interacter<player, entityType> {
-        static void interact(player &inted, entityType &inting) {
+        static inline void interact(player &inted, entityType &inting) {
             if constexpr (has_member_atk_component<entityType>::value) {
                 auto dmg = inting.a_cpt.damage;
                 inted.h_cpt.health -= dmg;
@@ -51,7 +51,7 @@ namespace roguelike {
 
     template <>
     struct interacter<player, player> {
-        static void interact(player &inted, player &inting) {
+        static inline void interact(player &inted, player &inting) {
             auto dmg = inting.a_cpt.damage;
             inted.h_cpt.health -= dmg;
             inted.lg_cpt.log << "you was interacted by the player " << std::to_string(inting.id.value) << "\n";

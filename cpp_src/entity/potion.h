@@ -15,13 +15,13 @@ namespace roguelike {
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(potion, id, repr_cpt);
 
     template<>
-    std::string repr_component::compute_representation<potion>(const potion* p){
+    inline std::string repr_component::compute_representation<potion>(const potion* p){
         return "p";
     }
 
     template <>
     struct interacter<potion, player> {
-        static void interact(potion &inted, player &inting) { inting.lg_cpt.log << "you interacted with potion\n"; }
+        static inline void interact(potion &inted, player &inting) { inting.lg_cpt.log << "you interacted with potion\n"; }
     };
 }  // namespace roguelike
 #endif  // ROGUE_LIKE_POTION_H

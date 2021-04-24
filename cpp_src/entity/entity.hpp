@@ -9,7 +9,7 @@
 #define ROGUE_LIKE_ENTITY_HPP
 namespace roguelike {
     struct entity {
-        entity(int id) : id{id} {}
+        explicit entity(int id) : id{id} {}
 
         entity_id id{-1};
         int level = -1;
@@ -18,11 +18,10 @@ namespace roguelike {
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(entity, id, level);
 
     template <typename interacted, typename interacting>
-    struct interacter {  // bc C++ does not permit partial function specialization
-       public:
-        static void interact(interacted &inted, interacting &inting) {
+    struct interacter {  // C++ does not permit partial function template specialization
+      public:
+        static inline void interact(interacted &inted, interacting &inting) {
             //            std::cout << "unknown interacted by unknown" << std::endl;
-            return;
         }
     };
 }  // namespace roguelike

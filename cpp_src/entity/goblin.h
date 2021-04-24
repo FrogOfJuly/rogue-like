@@ -22,7 +22,7 @@ namespace roguelike {
     };
 
     template <>
-    std::string repr_component::compute_representation<goblin>(const goblin *g) {
+    inline std::string repr_component::compute_representation<goblin>(const goblin *g) {
         switch (g->dm_cpt.decision) {
             case LEFT:
                 return "<";
@@ -41,7 +41,7 @@ namespace roguelike {
 
     template <typename entityType>
     struct interacter<goblin, entityType> {
-        static void interact(goblin &inted, entityType &inting) {
+        static inline void interact(goblin &inted, entityType &inting) {
             if constexpr (has_member_logging_component<entityType>::value) {
                 inting.lg_cpt.log << "you interacted with goblin" << std::to_string(inted.id.value) << "\n";
             }

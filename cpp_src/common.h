@@ -4,6 +4,7 @@
 
 #include <sstream>
 #include <variant>
+#include <iostream>
 
 #include "../deps/json/single_include/nlohmann/json.hpp"
 
@@ -25,7 +26,7 @@
         template <typename U>                                                                                   \
         static no_type test(...);                                                                               \
                                                                                                                 \
-       public:                                                                                                  \
+      public:                                                                                                   \
         static constexpr bool value = sizeof(test<T>(0)) == sizeof(yes_type);                                   \
     };
 
@@ -41,15 +42,17 @@ namespace roguelike {
 
     enum cmd { UP = 0, DOWN, LEFT, RIGHT, ENTER, ESC, PASS };
 
-    NLOHMANN_JSON_SERIALIZE_ENUM(cmd, {
-                                          {UP, "up"},
-                                          {DOWN, "down"},
-                                          {LEFT, "left"},
-                                          {RIGHT, "right"},
-                                          {PASS, "pass"},
-                                          {ESC, "esc"},
-                                          {ENTER, "enter"},
-                                      })
+    NLOHMANN_JSON_SERIALIZE_ENUM(
+        cmd,
+        {
+            {UP, "up"},
+            {DOWN, "down"},
+            {LEFT, "left"},
+            {RIGHT, "right"},
+            {PASS, "pass"},
+            {ESC, "esc"},
+            {ENTER, "enter"},
+        })
 
     using tile_idx = int;
 
@@ -68,12 +71,29 @@ namespace roguelike {
 
     using general_id = std::variant<entity_id, player_id>;
 
-    void to_json(nlohmann::json &j, const general_id &p) {
-        auto res = std::visit([](auto ent) { return ent.value; }, p);
-        j = nlohmann::json{{"general_id", res}};
-    }
+    void to_json(nlohmann::json &j, const general_id &p);
 
-    void from_json(const nlohmann::json &j, general_id &p) { p = j.at("general_id").get_to(p); }
+    void from_json(const nlohmann::json &j, general_id &p);
+
+    enum entity_names {
+#define register_entity(entity_type_name) entity_type_name##_entity,
+#include "utility/register_for_entities.h"
+#undef register_entity
+    };
+
+#define register_entity(entity_type_name) struct entity_type_name;
+#include "utility/register_for_entities.h"
+#undef register_entity
+    struct entity;
+
+    using entity_type = std::variant<
+#define register_entity(entity_type_name) entity_type_name *,
+#include "utility/register_for_entities.h"
+#undef register_entity
+        entity *>;
+
+    void to_json(nlohmann::json &j, const entity_type &p);
+    void from_json(const nlohmann::json &j, entity_type &p);
 
 }  // namespace roguelike
 
