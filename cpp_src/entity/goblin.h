@@ -21,6 +21,22 @@ namespace roguelike {
         repr_component repr_cpt;
     };
 
+    template <>
+    std::string repr_component::compute_representation<goblin>(const goblin *g) {
+        switch (g->dm_cpt.decision) {
+            case LEFT:
+                return "<";
+            case RIGHT:
+                return ">";
+            case DOWN:
+                return "v";
+            case UP:
+                return "^";
+            default:
+                return "x";
+        }
+    }
+
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(goblin, id, dm_cpt, h_cpt, a_cpt, m_cpt, repr_cpt)
 
     template <typename entityType>

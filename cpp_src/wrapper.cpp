@@ -28,7 +28,7 @@ PYBIND11_MODULE(roguelike, m) {
         .def("receive_player_command", &roguelike::gamestate::receive_player_command);
 
     py::enum_<roguelike::entity_names>(m, "entity_names")
-#define register_entity(class_name, repr_function) .value(#class_name, roguelike::entity_names::class_name##_entity)
+#define register_entity(class_name) .value(#class_name, roguelike::entity_names::class_name##_entity)
 #include "./utility/register_for_entities.h"
 #undef register_entity
         .export_values();

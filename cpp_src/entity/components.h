@@ -42,6 +42,11 @@ namespace roguelike {
 
     struct repr_component : public component {
         std::string repr = "?";
+
+        template <typename T>
+        static std::string compute_representation(const T *) {
+            return "?";
+        }
     };
 
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(repr_component, repr);

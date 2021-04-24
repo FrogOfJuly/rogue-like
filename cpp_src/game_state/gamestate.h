@@ -15,7 +15,7 @@ namespace roguelike {
     constexpr int room_size = 4;
 
     enum entity_names {
-#define register_entity(entity_type_name, representation_function) entity_type_name##_entity,
+#define register_entity(entity_type_name) entity_type_name##_entity,
 #include "../utility/register_for_entities.h"
 #undef register_entity
     };
@@ -336,11 +336,12 @@ namespace roguelike {
            public:
             static void general_draw(entity_type &var_ent) {
                 std::visit(
-                    overloaded{
-#define register_entity(entity_type_name, representation_function) representation_function,
-#include "../utility/register_for_entities.h"
-#undef register_entity
-                        [](entity *ptr) -> void {}},
+                    [](auto* ent) {
+                        if constexpr (has_member_repr_component<std::remove_pointer_t<decltype(ent)>>::value) {
+                            ent->repr_cpt.repr = repr_component::compute_representation(ent);
+                            return;
+                        }
+                    },
                     var_ent);
             }
 

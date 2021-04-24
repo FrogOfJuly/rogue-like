@@ -30,6 +30,11 @@ namespace roguelike {
 
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(player, id, lvl, h_cpt, m_cpt, a_cpt, dm_cpt, lg_cpt, repr_cpt);
 
+    template <>
+    std::string repr_component::compute_representation<player>(const player *p) {
+        return std::to_string(p->id.value);
+    }
+
     template <typename entityType>
     struct interacter<player, entityType> {
         static void interact(player &inted, entityType &inting) {

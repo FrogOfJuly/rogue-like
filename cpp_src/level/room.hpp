@@ -14,7 +14,7 @@
 #define ROGUE_LIKE_LEVEL_H
 namespace roguelike {
     using entity_type = std::variant<
-#define register_entity(entity_type_name, repr_function) entity_type_name *,
+#define register_entity(entity_type_name) entity_type_name *,
     // hehehehhehehehehe!! It works!!
 #include "../utility/register_for_entities.h"
 
