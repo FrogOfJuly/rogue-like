@@ -172,4 +172,9 @@ void roguelike::gamestate::initialize(int player_number) {
         level.residents.emplace_back(p);
     }
 }
-roguelike::gamestate::~gamestate() { delete[](char *) players; }
+roguelike::gamestate::~gamestate() {
+    for(int i = 0; i < player_num; ++i){
+        delete &players[i];
+    }
+    delete[](char *) players;
+}
