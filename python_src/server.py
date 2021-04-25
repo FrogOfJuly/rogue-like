@@ -35,6 +35,7 @@ class Backend:
         # Currently the game is single player
         # We'll have to decide on the multiplayer model eventually
         # And most of this will be moved to the turn function.
+        print(f"received action {action} from player {player_id}")
         self.state.receive_player_command(0, action)
         self.state.move_players()
         self.state.resolve_all_interactions()
