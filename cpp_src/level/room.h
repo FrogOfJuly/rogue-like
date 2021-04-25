@@ -23,7 +23,9 @@ namespace roguelike {
       public:
         room() = default;
 
-        std::optional<tile> get_tile_if_exists(int x, int y) noexcept;
+        [[nodiscard]] std::optional<tile> get_tile_if_exists(int x, int y) const noexcept;
+
+        [[nodiscard]] std::array<tile_idx, 4> get_tile_neighbours(tile_idx idx) const noexcept;
 
         tile &get_tile(int x, int y);
 
@@ -38,6 +40,8 @@ namespace roguelike {
         void spawn_on_level(entity_type &ent, tile_idx tidx = -1);
 
         void generate_level(int lvl_num);
+
+//        std::vector<tile_idx> get_area_around_tile(tile_idx idx, int radius);
 
         room(const room &) = delete;
 

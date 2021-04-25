@@ -57,6 +57,8 @@ namespace roguelike {
 
     struct decision_making_component : public component {
         cmd decision = cmd::PASS;
+        int eye_sight = -1;
+        strategy strat = strategy::passive;
 
         [[nodiscard]] std::pair<int, int> get_velocity() const {
             switch (decision) {
@@ -76,7 +78,7 @@ namespace roguelike {
         }
     };
 
-    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(decision_making_component, decision);
+    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(decision_making_component, decision, eye_sight);
 
     //--------------end of decision_making_component-----------------------------
 

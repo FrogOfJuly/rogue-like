@@ -26,7 +26,8 @@ PYBIND11_MODULE(roguelike, m) {
         .def("clean_decisions", &roguelike::gamestate::clean_decisions)
         .def("get_serialization", &roguelike::gamestate::get_serialization)
         .def("receive_player_command", &roguelike::gamestate::receive_player_command)
-        .def("end_turn", &roguelike::gamestate::end_turn);
+        .def("end_turn", &roguelike::gamestate::end_turn)
+        .def("decide_next_move", &roguelike::gamestate::decide_next_move);
 
     py::enum_<roguelike::entity_names>(m, "entity_names")
 #define register_entity(class_name) .value(#class_name, roguelike::entity_names::class_name##_entity)

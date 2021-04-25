@@ -9,6 +9,7 @@
 #include "../entity/player.h"
 #include "../entity/potion.h"
 #include "../entity/goblin.h"
+#include "../entity/wall.h"
 #include "../entity/entity.hpp"
 
 #endif  // ROGUE_LIKE_ENTITIES_H

@@ -203,3 +203,8 @@ void roguelike::gamestate::end_turn() {
     clean_decisions();
     clean_logs();
 }
+void roguelike::gamestate::decide_next_move() {
+    for (auto &var_ent : level.residents) {
+        decision_making_system::make_decision<strategy::random>(var_ent);
+    }
+}

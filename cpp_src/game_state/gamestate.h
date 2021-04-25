@@ -10,6 +10,7 @@
 #include "systems/drawing_system.h"
 #include "systems/interaction_system.h"
 #include "systems/move_system.h"
+#include "systems/decision_making_system.hpp"
 
 #ifndef ROGUE_LIKE_GAMESTATE_H
 #define ROGUE_LIKE_GAMESTATE_H
@@ -30,12 +31,15 @@ namespace roguelike {
         move_system mv_system;
         interaction_system inter_system;
         /*drawing_system draw_system; -- all methods are static, so no need to create object*/
+        /*decision_making_system dm_system; -- all methods are static, so no need to create object*/
+
 
       public:
         void initialize(int player_num);
         int receive_player_command(int player_id, cmd command);
         void move_players();
         void move_nonplayers();
+        void decide_next_move();
         void redraw_nonplayers();
         void redraw_players();
         void resolve_all_interactions();

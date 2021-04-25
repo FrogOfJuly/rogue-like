@@ -4,10 +4,12 @@
 #include "room.h"
 
 #include <iostream>
+#include <queue>
+#include <unordered_set>
 
 #include "../utility/entity_info.h"
 
-std::optional<roguelike::tile> roguelike::room::get_tile_if_exists(int x, int y) noexcept {
+std::optional<roguelike::tile> roguelike::room::get_tile_if_exists(int x, int y) const noexcept {
     if (x < 0 or y < 0) {
         return std::optional<tile>();
     }
@@ -73,3 +75,54 @@ roguelike::room::~room() {
             var_ent);
     }
 }
+std::array<roguelike::tile_idx, 4> roguelike::room::get_tile_neighbours(roguelike::tile_idx idx) const noexcept {
+    std::array<tile_idx, 4> neighbours{-1, -1, -1, -1};
+    auto p = pairFromIdx(idx);
+    auto x = p.first, y = p.second;
+    {
+        auto opt_tile = get_tile_if_exists(x, y - 1);
+        if (opt_tile.has_value()) {
+            neighbours[0] = idxFromPair(x, y - 1);
+        }
+    }
+    {
+        auto opt_tile = get_tile_if_exists(x + 1, y);
+        if (opt_tile.has_value()) {
+            neighbours[1] = idxFromPair(x + 1, y);
+        }
+    }
+    {
+        auto opt_tile = get_tile_if_exists(x + 1, y + 1);
+        if (opt_tile.has_value()) {
+            neighbours[2] = idxFromPair(x + 1, y + 1);
+        }
+    }
+    {
+        auto opt_tile = get_tile_if_exists(x - 1, y);
+        if (opt_tile.has_value()) {
+            neighbours[3] = idxFromPair(x - 1, y);
+        }
+    }
+    return neighbours;
+}
+/*std::vector<roguelike::tile_idx> roguelike::room::get_area_around_tile(roguelike::tile_idx idx, int radius) {
+    std::vector<tile_idx> area;
+    assert(radius > 0);
+    if (idx >= tiles.size()) {
+        return area;
+    }
+    std::unordered_set<tile_idx> visited;
+    visited.insert(idx);
+    std::queue<tile_idx> to_visit;
+    auto neigh = get_tile_neighbours(idx);
+    for (const auto& n_idx : neigh) {
+        to_visit.push(n_idx);
+    }
+    while (not to_visit.empty()) {
+        auto cur_idx = to_visit.front();
+        if (visited.count(cur_idx) != 0) {
+            continue;
+        }
+        area.push_back(cur_idx);
+    }
+}*/

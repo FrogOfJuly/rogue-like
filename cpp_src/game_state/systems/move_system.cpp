@@ -2,13 +2,14 @@
 // Created by Kirill Golubev on 24.04.2021.
 //
 #include "move_system.h"
-#include "../gamestate.h"
+
 #include "../../utility/entity_info.h"
+#include "../gamestate.h"
 
 void roguelike::move_system::move_to_tile(general_id id, tile_idx dest_tile) {
     assert(game_ptr);
     auto pr = room ::pairFromIdx(dest_tile);
-    auto& tile = game_ptr->level.get_tile(pr.first, pr.second);
+    auto &tile = game_ptr->level.get_tile(pr.first, pr.second);
     tile.resident = id;
     // pattern match for id
     // general_id@(Left entity_id)  <- take from player array
@@ -22,8 +23,7 @@ void roguelike::move_system::move_to_tile(general_id id, tile_idx dest_tile) {
                 std::visit(
                     [this, pr, dest_tile](auto &entity_ptr) {
                         auto &ent = *entity_ptr;
-                        if constexpr (has_member_move_component<
-                                      std::remove_reference_t<decltype(ent)>>::value) {
+                        if constexpr (has_member_move_component<std::remove_reference_t<decltype(ent)>>::value) {
                             auto &ent_m_cpt = ent.m_cpt;
                             auto &old_tile = game_ptr->level.tiles[ent_m_cpt.residency];
                             old_tile.resident.reset();
@@ -49,10 +49,11 @@ bool roguelike::move_system::more_general_move(entity_type &var_ent) {
     return std::visit(
         [this](auto *ent_ptr) {
             bool moved = false;
-            constexpr bool able_to_move =
-                has_member_decision_making_component<std::remove_pointer_t<decltype(ent_ptr)>>::value and
-                has_member_move_component<std::remove_pointer_t<decltype(ent_ptr)>>::value;
-            if constexpr (able_to_move) {
+            constexpr bool able_to_dm =
+                has_member_decision_making_component<std::remove_pointer_t<decltype(ent_ptr)>>::value;
+            constexpr bool able_to_move = has_member_move_component<std::remove_pointer_t<decltype(ent_ptr)>>::value;
+
+            if constexpr (able_to_dm) {
                 auto v = ent_ptr->dm_cpt.get_velocity();
                 if (v.first == 0 and v.second == 0) {
                     return moved;
@@ -64,7 +65,7 @@ bool roguelike::move_system::more_general_move(entity_type &var_ent) {
                     return moved;
                 }
                 auto tle = opt_tile.value();
-                if (not tle.resident.has_value()) {
+                if (not tle.resident.has_value() and able_to_move) {
                     move_to_tile(ent_ptr->id, room::idxFromPair(des_x, des_y));
                     moved = true;
                 } else {

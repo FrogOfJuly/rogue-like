@@ -2,9 +2,9 @@
 // Created by Kirill Golubev on 17.04.2021.
 //
 
+#include <iostream>
 #include <sstream>
 #include <variant>
-#include <iostream>
 
 #include "../deps/json/single_include/nlohmann/json.hpp"
 
@@ -94,6 +94,8 @@ namespace roguelike {
 
     void to_json(nlohmann::json &j, const entity_type &p);
     void from_json(const nlohmann::json &j, entity_type &p);
+
+    enum strategy { random, passive, aggressive, fearful, external };
 
 }  // namespace roguelike
 

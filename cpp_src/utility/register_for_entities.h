@@ -5,3 +5,4 @@
 register_entity(goblin)
 register_entity(player)
 register_entity(potion)
+register_entity(wall)
