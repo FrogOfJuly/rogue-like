@@ -27,6 +27,8 @@ namespace roguelike {
 
         [[nodiscard]] std::array<tile_idx, 4> get_tile_neighbours(tile_idx idx) const noexcept;
 
+        [[nodiscard]] std::optional<tile_idx> get_random_empty_tile() const;
+
         tile &get_tile(int x, int y);
 
         [[nodiscard]] const tile &get_tile(int x, int y) const;
@@ -41,7 +43,7 @@ namespace roguelike {
 
         void generate_level(int lvl_num);
 
-//        std::vector<tile_idx> get_area_around_tile(tile_idx idx, int radius);
+        //        std::vector<tile_idx> get_area_around_tile(tile_idx idx, int radius);
 
         room(const room &) = delete;
 

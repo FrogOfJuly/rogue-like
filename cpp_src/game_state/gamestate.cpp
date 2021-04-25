@@ -7,7 +7,7 @@
 
 #include "../utility/entity_info.h"
 
-roguelike::gamestate::gamestate() noexcept : mv_system(this), inter_system(this) {}
+roguelike::gamestate::gamestate() noexcept : mv_system(this), inter_system(this) { srand(time(NULL)); }
 roguelike::gamestate::gamestate(gamestate &&rhs) noexcept : gamestate() { *this = std::move(rhs); }
 
 void roguelike::to_json(nlohmann::json &j, const gamestate &p) {
@@ -153,7 +153,8 @@ void roguelike::gamestate::initialize(int player_number) {
         new (&players[i]) player(i);
         players[i].dm_cpt.decision = LEFT;
         entity_type var_ent = &players[i];
-        level.spawn_on_level(var_ent);
+        auto rnd_tile = level.get_random_empty_tile();
+        level.spawn_on_level(var_ent, rnd_tile.value());
     }
     /*{
         for (int i = 0; i < 2; ++i) {
@@ -165,13 +166,14 @@ void roguelike::gamestate::initialize(int player_number) {
             level.residents.emplace_back(g);
         }
     }*/
-    {
+    for (int i = 0; i < 3; ++i) {
         lwlog_info("placing goblin");
         auto new_id = level.residents.size();
         auto g = new goblin(new_id);
         g->dm_cpt.decision = DOWN;
         entity_type var_ent = g;
-        level.spawn_on_level(var_ent);
+        auto rnd_tile = level.get_random_empty_tile();
+        level.spawn_on_level(var_ent, rnd_tile.value());
         level.residents.emplace_back(g);
     }
     /*{

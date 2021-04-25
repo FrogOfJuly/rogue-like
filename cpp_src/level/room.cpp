@@ -63,7 +63,6 @@ void roguelike::room::spawn_on_level(entity_type& var_ent, roguelike::tile_idx t
         var_ent);
 }
 void roguelike::room::generate_level(int lvl_num) {
-    srand (time(NULL));
     using chunkType = std::array<int, 25>;
     const static int chunk_size = 5;
 
@@ -175,6 +174,15 @@ std::array<roguelike::tile_idx, 4> roguelike::room::get_tile_neighbours(roguelik
         }
     }
     return neighbours;
+}
+std::optional<roguelike::tile_idx> roguelike::room::get_random_empty_tile() const {
+    tile_idx tile_num = rand() % (W * H);
+    for (; tile_num < 2 * W * H; ++tile_num) {
+        if (tiles[tile_num%(W*H)].empty()) {
+            return tile_num;
+        }
+    }
+    return std::optional<roguelike::tile_idx>();
 }
 /*std::vector<roguelike::tile_idx> roguelike::room::get_area_around_tile(roguelike::tile_idx idx, int radius) {
     std::vector<tile_idx> area;
