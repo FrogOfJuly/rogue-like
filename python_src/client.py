@@ -3,6 +3,7 @@ import pickle
 import select
 import socket
 import sys
+import json # for logging only
 from roguelike import cmd
 from enum import Enum
 import os
@@ -22,6 +23,21 @@ s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 s.connect((serverAddr, 4321))
 
 player_id = 0
+
+def init_log():
+    log_file = f'{player_id}.json'
+    with open(log_file, "w") as file:
+        file.write("[]")
+
+
+def dump_log(game_state : dict):
+    log_file = f'{player_id}.json'
+
+    with open(log_file, "r+") as file:
+        data = json.load(file)
+        data.append(game_state)
+        file.seek(0)
+        json.dump(data, file)
 
 
 def render(game_state: dict):
@@ -71,12 +87,15 @@ while True:
         gameEvent = pickle.loads(inm.recv(BUFFERSIZE))
         if gameEvent[0] == 'id':
             player_id = gameEvent[1]
+            init_log()
             print(player_id)
-        if gameEvent[0] == 'state':
-            render(gameEvent[1])
-        if gameEvent[0] == 'move':
+        else:
+            dump_log(gameEvent[1])
             render(gameEvent[1])
 
+        if gameEvent[0] == 'state':
+            pass
+        if gameEvent[0] == 'move':
             action = cmd.PASS
             key = input("Next action: ")
             if key is not None:
