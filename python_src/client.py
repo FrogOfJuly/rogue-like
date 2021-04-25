@@ -12,7 +12,7 @@ def cls():
     os.system('cls' if os.name == 'nt' else 'clear')
 
 
-BUFFERSIZE = 2048
+BUFFERSIZE = 8192
 
 serverAddr = '127.0.0.1'
 if len(sys.argv) == 2:
@@ -25,7 +25,6 @@ player_id = 0
 
 
 def render(game_state: dict):
-    global log
     cls()
     if game_state == {'start'}:
         return
@@ -42,9 +41,9 @@ def render(game_state: dict):
             break
     print(f"# Room: {1}/10")  # TODO
     print(f"# Score: {123:5}")  # TODO
-    print('#' * (H + 2))  # TODO
+    # print('#' * (H + 2))  # TODO
     for i in range(H):
-        print('#', end='')
+        # print('#', end='')
         for j in range(W):
             tile = game_state[i * W + j]['tile']
             if tile is None:
@@ -53,8 +52,9 @@ def render(game_state: dict):
                 print(tile['player']['repr_cpt']['repr'], end='')
             elif 'entity' in tile:
                 print(tile['entity']['repr_cpt']['repr'], end='')
-        print('#')
-    print('#' * (H + 2))
+        # print('#')
+        print()
+    # print('#' * (H + 2))
     print(f'Level: {player["lvl"]:3}, Health: {player["h_cpt"]["health"]:3}, Damage: {player["a_cpt"]["damage"]}')
     if not newlog:
         return

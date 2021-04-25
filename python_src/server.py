@@ -17,7 +17,7 @@ class Action(Enum):
     ENTER = 7
 
 
-BUFFERSIZE = 2048
+BUFFERSIZE = 8192
 
 outgoing = []
 
