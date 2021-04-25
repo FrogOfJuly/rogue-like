@@ -39,10 +39,12 @@ class Backend:
         self.state.receive_player_command(0, action)
         self.state.move_players()
         self.state.resolve_all_interactions()
+        self.state.decide_next_move()
         self.state.move_nonplayers()
         self.state.resolve_all_interactions()
         self.state.redraw_players()
         self.state.redraw_nonplayers()
+        self.state.end_turn()
         data = json.loads(self.state.get_serialization())
         return data, player_id
 
