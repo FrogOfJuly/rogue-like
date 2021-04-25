@@ -24,15 +24,32 @@ Rough starting point for the rogue-like game
   you should get ``.so`` file which can be used as python module.
 - install:
   ```bash
-  > pip install ./rouglelike
+  > cd ../.. # you should be outside of project directory 
+  > pip install ./roguelike # install project folder
   ```
   after this you should be able to import this module from anywhere.
 
 After installation, you can test if everything is ok:
 
 ```bash
-> python ./python_src/main.py 
+> python
+> import roguelike
 ```
+
+- run:
+
+For server
+```bash
+> python server.py
+```
+
+For client
+```bash
+> python client.py
+```
+
+Currently, you can walk around a labyrinth with interactable immortal goblins.
+Don't worry, you're immortal too!
 
 ### Dependencies
 
