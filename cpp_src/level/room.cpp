@@ -3,11 +3,15 @@
 //
 #include "room.h"
 
-#include "../utility/entity_info.h"
 #include <iostream>
+
+#include "../utility/entity_info.h"
 
 std::optional<roguelike::tile> roguelike::room::get_tile_if_exists(int x, int y) noexcept {
     if (x < 0 or y < 0) {
+        return std::optional<tile>();
+    }
+    if (x >= W or y >= H) {
         return std::optional<tile>();
     }
     auto des_tile_idx = x + y * W;

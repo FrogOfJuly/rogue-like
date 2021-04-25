@@ -41,7 +41,7 @@ namespace roguelike {
             if constexpr (has_member_atk_component<entityType>::value) {
                 auto dmg = inting.a_cpt.damage;
                 inted.h_cpt.health -= dmg;
-                inted.lg_cpt.log << "you was attacked by the unknown\n";
+                inted.lg_cpt.log << "you received " << dmg << " damage\n";
                 return;
             }
             inted.lg_cpt.log << "you was interacted by the unknown\n";

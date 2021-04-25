@@ -117,13 +117,26 @@ void roguelike::gamestate::move_players() {
         mv_system.more_general_move(var_ent);
     }
 }
-void roguelike::gamestate::receive_player_command(int player_id, roguelike::cmd command) {
+int roguelike::gamestate::receive_player_command(int player_id, roguelike::cmd command) {
     lwlog_info("getting player command");
     if (player_id >= player_num) {
         throw std::runtime_error("No such player id: " + std::to_string(player_id));
     }
-
+    received_command.insert(player_id);
     players[player_id].dm_cpt.decision = command;
+    while (not command_to_receive.empty()) {
+        auto next_player_id = command_to_receive.front();
+        if (received_command.count(next_player_id) == 0) {
+            return next_player_id;
+        }
+        command_to_receive.pop();
+    }
+    // if you are here that means that all players received their commands
+    received_command.clear();  // clean list of players who received command
+    for (int i = 0; i < player_num; ++i) {
+        command_to_receive.push(i);  // enqueue all players for commands
+    }
+    return -1;
 }
 void roguelike::gamestate::initialize(int player_number) {
     lwlog_info("Initializning gamestate object");
@@ -131,6 +144,9 @@ void roguelike::gamestate::initialize(int player_number) {
     lvl_num = 0;
     level.generate_level(lvl_num);
     player_num = player_number;
+    if (player_num > 0) {
+        cur_player = 0;
+    }
     players = (player *)new char[sizeof(player) * player_num];
     for (int i = 0; i < player_num; ++i) {
         lwlog_info("placing player");
@@ -139,7 +155,7 @@ void roguelike::gamestate::initialize(int player_number) {
         entity_type var_ent = &players[i];
         level.spawn_on_level(var_ent);
     }
-    {
+    /*{
         for (int i = 0; i < 2; ++i) {
             lwlog_info("placing goblin");
             auto g = new goblin(i);
@@ -148,16 +164,16 @@ void roguelike::gamestate::initialize(int player_number) {
             level.spawn_on_level(var_ent);
             level.residents.emplace_back(g);
         }
-    }
+    }*/
     {
         lwlog_info("placing goblin");
-        auto g = new goblin(2);
+        auto g = new goblin(0);
         g->dm_cpt.decision = DOWN;
         entity_type var_ent = g;
         level.spawn_on_level(var_ent);
         level.residents.emplace_back(g);
     }
-    {
+    /*{
         auto e = new entity((int)level.residents.size());
         lwlog_info("placing entity");
         entity_type var_ent = e;
@@ -170,11 +186,20 @@ void roguelike::gamestate::initialize(int player_number) {
         entity_type var_ent = p;
         level.spawn_on_level(var_ent);
         level.residents.emplace_back(p);
-    }
+    }*/
 }
 roguelike::gamestate::~gamestate() {
-    for(int i = 0; i < player_num; ++i){
+    for (int i = 0; i < player_num; ++i) {
         players[i].~player();
     }
     delete[](char *) players;
+}
+void roguelike::gamestate::clean_logs() {
+    for (int i = 0; i < player_num; ++i) {
+        players[i].lg_cpt.log.clear();
+    }
+}
+void roguelike::gamestate::end_turn() {
+    clean_decisions();
+    clean_logs();
 }

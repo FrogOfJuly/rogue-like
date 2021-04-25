@@ -3,6 +3,7 @@
 //
 #include <iostream>
 #include <queue>
+#include <unordered_set>
 
 #include "../common.h"
 #include "../level/room.h"
@@ -22,13 +23,17 @@ namespace roguelike {
         int player_num = -1;
         int lvl_num = -1;
 
+        int cur_player = -1;
+        std::unordered_set<int> received_command;
+        std::queue<int> command_to_receive;
+
         move_system mv_system;
         interaction_system inter_system;
-        /*drawing_system draw_system; -- all methods are static so no need*/
+        /*drawing_system draw_system; -- all methods are static, so no need to create object*/
 
       public:
         void initialize(int player_num);
-        void receive_player_command(int player_id, cmd command);
+        int receive_player_command(int player_id, cmd command);
         void move_players();
         void move_nonplayers();
         void redraw_nonplayers();
@@ -36,6 +41,8 @@ namespace roguelike {
         void resolve_all_interactions();
         void clean_dead();
         void clean_decisions();
+        void clean_logs();
+        void end_turn();
 
         [[nodiscard]] std::string get_serialization() const;
 
