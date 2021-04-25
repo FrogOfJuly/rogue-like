@@ -3,18 +3,18 @@ import asyncore
 import random
 import pickle
 import json
-import time
+import roguelike as rl
 from enum import Enum
-from typing import List
-
-
+from roguelike import cmd
 
 class Action(Enum):
     UP = 1
     DOWN = 2
     LEFT = 3
     RIGHT = 4
-    USE = 5
+    ESC = 5
+    PASS = 6
+    ENTER = 7
 
 
 BUFFERSIZE = 2048
@@ -24,15 +24,26 @@ outgoing = []
 
 class Backend:
     def __init__(self, difficulty: str="normal"):
+        self.state = rl.GameState()
+        self.state.initialize(1)
+        self.actions = []
+
+    def turn(self):
         pass
 
-    def request(self, player_id: int):
-        pass
-
-    def player_action(self, player_id: int, action: Action):
-        with open('sample_game_state.json') as json_file:
-            data = json.load(json_file)
-            return data, player_id
+    def player_action(self, player_id: int, action: cmd):
+        # Currently the game is single player
+        # We'll have to decide on the multiplayer model eventually
+        # And most of this will be moved to the turn function.
+        self.state.receive_player_command(0, action)
+        self.state.move_players()
+        self.state.resolve_all_interactions()
+        self.state.move_nonplayers()
+        self.state.resolve_all_interactions()
+        self.state.redraw_players()
+        self.state.redraw_nonplayers()
+        data = json.loads(self.state.get_serialization())
+        return data, player_id
 
 
 backend = Backend()
@@ -64,7 +75,6 @@ minionmap = {}
 
 def updateWorld(message):
     arr = pickle.loads(message)
-    print(str(arr))
     player_id = arr[1]
     action = arr[2]
 

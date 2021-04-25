@@ -28,7 +28,7 @@ Rough starting point for the rogue-like game
   ```
   after this you should be able to import this module from anywhere.
 
-After installation you can test if everything is ok:
+After installation, you can test if everything is ok:
 
 ```bash
 > python ./python_src/main.py 

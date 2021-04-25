@@ -1,8 +1,9 @@
+import math
 import pickle
 import select
 import socket
 import sys
-import json
+from roguelike import cmd
 from enum import Enum
 import os
 
@@ -23,22 +24,35 @@ s.connect((serverAddr, 4321))
 player_id = 0
 
 
-class Action(Enum):
-    UP = 1
-    DOWN = 2
-    LEFT = 3
-    RIGHT = 4
-    USE = 5
-
-
 def render(game_state: dict):
     cls()
     if(game_state == {'start'}):
         return
-    game_state = game_state['GameState']
-    print("#------------------------------------------------------------------------#")
-    print(f"# current room: {game_state['lvl_num']}/10             |stats: --------------------------------#")
-    print(f"# score: {game_state['score']}                     | lvl         : {game_state['player']['level']}                       #")
+    game_state = game_state['level']
+    H = int(math.sqrt(len(game_state)))
+    W = H
+    player = None
+    for tile_ in game_state:
+        tile = tile_["tile"]
+        if "player" in tile:
+            player = tile["player"]
+            break
+    print(f"# Room: {1}/10") # TODO
+    print(f"# Score: {123:5}") # TODO
+    print('#'*(H+2)) # TODO
+    for i in range(H):
+        print('#', end='')
+        for j in range(W):
+            tile = game_state[i*W+j]['tile']
+            if tile is None:
+                print(" ", end='')
+            elif 'player' in tile:
+                print(tile['player']['repr_cpt']['repr'], end='')
+            elif 'entity' in tile:
+                print(tile['entity']['repr_cpt']['repr'], end='')
+        print('#')
+    print('#'*(H+2))
+    print(f'Level: {player["lvl"]:3}, Health: {player["h_cpt"]["health"]:3}, Damage: {player["a_cpt"]["damage"]}')
 
 
 while True:
@@ -53,17 +67,17 @@ while True:
         if gameEvent[0] == 'move':
             render(gameEvent[1])
 
-            action = Action.USE
+            action = cmd.PASS
             key = input("Next action: ")
             if key is not None:
                 if key == 'w':
-                    action = Action.UP
+                    action = cmd.UP
                 elif key == 's':
-                    action = Action.DOWN
+                    action = cmd.DOWN
                 elif key == 'a':
-                    action = Action.LEFT
+                    action = cmd.LEFT
                 elif key == 'd':
-                    action = Action.RIGHT
+                    action = cmd.RIGHT
                 elif key == 'x':
                     s.close()
                     exit()
