@@ -1,44 +1,58 @@
 ### Rogue-like 
 Rough starting point for the rogue-like game
-- get:
+- clone:
   ```bash
-  
-  > git clone url/rogue-like.git
+  > git clone https://github.com/FrogOfJuly/roguelike.git
+  ```
+- get dependencies:
+  ```bash
+  > cd rogue-like
+  > mkdir deps
   > cd deps
   > git clone https://github.com/pybind/pybind11.git
-  > git clone git clone https://github.com/Neargye/magic_enum
+  > git clone https://github.com/Neargye/magic_enum.git
+  > git clone https://github.com/nlohmann/json.git
+  > git clone https://github.com/Akagi201/lwlog.git
   > cd ..
   ```
 - build:
   ```bash
-   > git clone url/rogue-like.git 
-   > cd rogue-like
-   > cd deps
-   > git clone https://github.com/pybind/pybind11.git
-   > git clone git clone https://github.com/Neargye/magic_enum
-   > cd .. 
+   > cd rogue-like 
    > mkdir build && cd build
    > cmake .. && make 
   ```
   you should get ``.so`` file which can be used as python module.
 - install:
   ```bash
-  > git clone url/rogue-like.git
-  > cd rogue-like/deps
-  > git clone https://github.com/pybind/pybind11.git
-  > git clone git clone https://github.com/Neargye/magic_enum
-  > cd .. 
-  > pip install ./rougle-like
+  > cd ../.. # you should be outside of project directory 
+  > pip install ./roguelike # install project folder
   ```
   after this you should be able to import this module from anywhere.
 
-After installation you can test if everything is ok:
+After installation, you can test if everything is ok:
 
 ```bash
-> python ./python_src/main.py 
+> python
+> import roguelike
 ```
+
+- run:
+
+For server
+```bash
+> python server.py
+```
+
+For client
+```bash
+> python client.py
+```
+
+Currently, you can walk around a labyrinth with interactable immortal goblins.
+Don't worry, you're immortal too!
 
 ### Dependencies
 
  - [pybind11](https://github.com/pybind/pybind11)
  - [magic enum](https://github.com/Neargye/magic_enum)
+ - [awesome json](https://github.com/nlohmann/json)
