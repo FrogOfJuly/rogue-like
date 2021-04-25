@@ -34,7 +34,7 @@ def render(game_state: dict):
     player = None
     for tile_ in game_state:
         tile = tile_["tile"]
-        if "player" in tile:
+        if tile and "player" in tile:
             player = tile["player"]
             break
     print(f"# Room: {1}/10") # TODO
