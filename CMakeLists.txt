@@ -17,6 +17,7 @@ set(LIB_SOURCES
         cpp_src/common.h
         cpp_src/entity/goblin.h
         cpp_src/entity/potion.h
+        cpp_src/entity/wall.h
         cpp_src/game_state/systems/base_system.h
         cpp_src/game_state/systems/drawing_system.h
         cpp_src/game_state/systems/interaction_system.h
@@ -28,6 +29,7 @@ set(LIB_SOURCES
         cpp_src/level/room.cpp
         cpp_src/game_state/systems/drawing_system.cpp
         cpp_src/game_state/systems/interaction_system.cpp
+        cpp_src/game_state/systems/decision_making_system.hpp
         )
 
 pybind11_add_module(roguelike
