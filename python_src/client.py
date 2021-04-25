@@ -62,11 +62,15 @@ def render(game_state: dict):
         for j in range(W):
             tile = game_state[i * W + j]['tile']
             if tile is None:
-                print(" ", end='')
+                print("   ", end='')
             elif 'player' in tile:
-                print(tile['player']['repr_cpt']['repr'], end='')
+                print(f" {tile['player']['repr_cpt']['repr']} ", end='')
             elif 'entity' in tile:
-                print(tile['entity']['repr_cpt']['repr'], end='')
+                repr = tile['entity']['repr_cpt']['repr']
+                if repr == '#':
+                    print('###', end='')
+                else:
+                    print(f' {repr} ', end='')
         print()
     print(f'Level: {player["lvl"]:3}, Health: {player["h_cpt"]["health"]:3}, Damage: {player["a_cpt"]["damage"]}')
     if not newlog:
