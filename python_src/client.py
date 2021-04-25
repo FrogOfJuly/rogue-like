@@ -41,9 +41,7 @@ def render(game_state: dict):
             break
     print(f"# Room: {1}/10")  # TODO
     print(f"# Score: {123:5}")  # TODO
-    # print('#' * (H + 2))  # TODO
     for i in range(H):
-        # print('#', end='')
         for j in range(W):
             tile = game_state[i * W + j]['tile']
             if tile is None:
@@ -52,15 +50,16 @@ def render(game_state: dict):
                 print(tile['player']['repr_cpt']['repr'], end='')
             elif 'entity' in tile:
                 print(tile['entity']['repr_cpt']['repr'], end='')
-        # print('#')
         print()
-    # print('#' * (H + 2))
     print(f'Level: {player["lvl"]:3}, Health: {player["h_cpt"]["health"]:3}, Damage: {player["a_cpt"]["damage"]}')
     if not newlog:
         return
     print(f'log:')
-    for entry in newlog:
+    for entry in newlog[-5:]:
         print(f'> {entry}')
+    if len(newlog) < 5:
+        for i in range(5 - len(newlog)):
+            print('>')
 
 
 
