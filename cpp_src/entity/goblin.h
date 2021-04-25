@@ -38,6 +38,11 @@ namespace roguelike {
         }
     }
 
+    template <>
+    inline bool health_component::is_alive<goblin>(const goblin *g) {
+        return g->h_cpt.health > 0;
+    }
+
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(goblin, id, dm_cpt, h_cpt, a_cpt, m_cpt, repr_cpt)
 
     template <typename entityType>

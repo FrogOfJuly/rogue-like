@@ -36,6 +36,11 @@ namespace roguelike {
         return std::to_string(p->id.value);
     }
 
+    template <>
+    inline bool health_component::is_alive<player>(const player *p) {
+        return p->h_cpt.health > 0;
+    }
+
     template <typename entityType>
     struct interacter<player, entityType> {
         static inline void interact(player &inted, entityType &inting) {
