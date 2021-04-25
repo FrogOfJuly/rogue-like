@@ -9,6 +9,19 @@
 
 roguelike::gamestate::gamestate() noexcept : mv_system(this), inter_system(this) { srand(time(NULL)); }
 roguelike::gamestate::gamestate(gamestate &&rhs) noexcept : gamestate() { *this = std::move(rhs); }
+roguelike::gamestate &roguelike::gamestate::operator=(roguelike::gamestate &&rhs) noexcept {
+    std::swap(level, rhs.level);
+    std::swap(lvl_num, rhs.lvl_num);
+    std::swap(players, rhs.players);
+
+    std::swap(mv_system, rhs.mv_system);
+    std::swap(inter_system, rhs.inter_system);
+
+    mv_system.reset_owner(this);
+    inter_system.reset_owner(this);
+
+    return *this;
+}
 
 void roguelike::to_json(nlohmann::json &j, const gamestate &p) {
     auto room_json = nlohmann::json();
@@ -52,20 +65,6 @@ void roguelike::from_json(const nlohmann::json &j, roguelike::gamestate &p) {
     throw std::runtime_error("One CAN NOT construct game state form it's serialization!!");
 }
 
-roguelike::gamestate &roguelike::gamestate::operator=(roguelike::gamestate &&rhs) noexcept {
-    std::cout << "doing swapping " << std::endl;
-    std::swap(level, rhs.level);
-    std::swap(lvl_num, rhs.lvl_num);
-    std::swap(players, rhs.players);
-
-    std::swap(mv_system, rhs.mv_system);
-    std::swap(inter_system, rhs.inter_system);
-
-    mv_system.reset_owner(this);
-    inter_system.reset_owner(this);
-
-    return *this;
-}
 std::string roguelike::gamestate::get_serialization() const {
     lwlog_info("getting serialization");
     auto j = nlohmann::json();
@@ -147,14 +146,14 @@ void roguelike::gamestate::initialize(int player_number) {
     if (player_num > 0) {
         cur_player = 0;
     }
-    players = (player *)new char[sizeof(player) * player_num];
+    players = (player *)new char[sizeof(player) * player_num];  // they do not have default constructor
     for (int i = 0; i < player_num; ++i) {
         lwlog_info("placing player");
         new (&players[i]) player(i);
         players[i].dm_cpt.decision = LEFT;
         entity_type var_ent = &players[i];
         auto rnd_tile = level.get_random_empty_tile();
-        level.spawn_on_level(var_ent, rnd_tile.value());
+        level.spawn_on_level(var_ent, rnd_tile);
     }
     /*{
         for (int i = 0; i < 2; ++i) {
@@ -173,7 +172,7 @@ void roguelike::gamestate::initialize(int player_number) {
         g->dm_cpt.decision = DOWN;
         entity_type var_ent = g;
         auto rnd_tile = level.get_random_empty_tile();
-        level.spawn_on_level(var_ent, rnd_tile.value());
+        level.spawn_on_level(var_ent, rnd_tile);
         level.residents.emplace_back(g);
     }
     /*{
@@ -191,12 +190,6 @@ void roguelike::gamestate::initialize(int player_number) {
         level.residents.emplace_back(p);
     }*/
 }
-roguelike::gamestate::~gamestate() {
-    for (int i = 0; i < player_num; ++i) {
-        players[i].~player();
-    }
-    delete[](char *) players;
-}
 void roguelike::gamestate::clean_logs() {
     for (int i = 0; i < player_num; ++i) {
         players[i].lg_cpt.log.clear();
@@ -210,4 +203,11 @@ void roguelike::gamestate::decide_next_move() {
     for (auto &var_ent : level.residents) {
         decision_making_system::make_decision<strategy::random>(var_ent);
     }
+}
+
+roguelike::gamestate::~gamestate() {
+    for (int i = 0; i < player_num; ++i) {
+        players[i].~player();
+    }
+    delete[](char *) players;
 }

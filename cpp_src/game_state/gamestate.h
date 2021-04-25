@@ -24,7 +24,6 @@ namespace roguelike {
         int player_num = -1;
         int lvl_num = -1;
 
-        int cur_player = -1;
         std::unordered_set<int> received_command;
         std::queue<int> command_to_receive;
 

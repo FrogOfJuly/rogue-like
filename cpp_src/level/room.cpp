@@ -175,14 +175,14 @@ std::array<roguelike::tile_idx, 4> roguelike::room::get_tile_neighbours(roguelik
     }
     return neighbours;
 }
-std::optional<roguelike::tile_idx> roguelike::room::get_random_empty_tile() const {
+roguelike::tile_idx roguelike::room::get_random_empty_tile() const {
     tile_idx tile_num = rand() % (W * H);
     for (; tile_num < 2 * W * H; ++tile_num) {
         if (tiles[tile_num%(W*H)].empty()) {
-            return tile_num;
+            return tile_num%(W*H);
         }
     }
-    return std::optional<roguelike::tile_idx>();
+    return -1;
 }
 /*std::vector<roguelike::tile_idx> roguelike::room::get_area_around_tile(roguelike::tile_idx idx, int radius) {
     std::vector<tile_idx> area;
