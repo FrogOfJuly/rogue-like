@@ -8,8 +8,8 @@
 
 int main() {
     roguelike::gamestate game;
-    game.initialize(5);
-    game.receive_player_command(1, roguelike::cmd::UP);
+    game.initialize(1);
+    game.receive_player_command(0, roguelike::cmd::UP);
 
     game.move_players();
     game.resolve_all_interactions();

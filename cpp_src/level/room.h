@@ -11,7 +11,7 @@
 #ifndef ROGUE_LIKE_LEVEL_H
 #define ROGUE_LIKE_LEVEL_H
 namespace roguelike {
-    constexpr int room_size = 4;
+    constexpr int room_size = 15;
 
     struct room {
         static constexpr int H = room_size;

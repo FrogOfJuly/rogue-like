@@ -167,7 +167,8 @@ void roguelike::gamestate::initialize(int player_number) {
     }*/
     {
         lwlog_info("placing goblin");
-        auto g = new goblin(0);
+        auto new_id = level.residents.size();
+        auto g = new goblin(new_id);
         g->dm_cpt.decision = DOWN;
         entity_type var_ent = g;
         level.spawn_on_level(var_ent);

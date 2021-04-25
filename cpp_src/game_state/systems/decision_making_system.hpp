@@ -30,9 +30,7 @@ namespace roguelike {
     inline void decision_making_system::make_decision<strategy::random>(entity_type& var_ent) {
         std::visit(
             [](auto* ent_ptr) {
-                std::cout << "trying to make decision" << std::endl;
                 if constexpr (has_member_decision_making_component<std::remove_pointer_t<decltype(ent_ptr)>>::value) {
-                    std::cout << "making decision" << std::endl;
                     switch (abs(rand()) % 5) {
                         case 0:
                             ent_ptr->dm_cpt.decision = cmd::PASS;
