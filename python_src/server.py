@@ -31,6 +31,11 @@ class Backend:
     def turn(self):
         pass
 
+    def get_state(self):
+        self.state.redraw_players()
+        self.state.redraw_nonplayers()
+        return json.loads(self.state.get_serialization())
+
     def player_action(self, player_id: int, action: cmd):
         # Currently the game is single player
         # We'll have to decide on the multiplayer model eventually
@@ -109,7 +114,7 @@ class MainServer(asyncore.dispatcher):
         outgoing.append(RemoteDrawClient(conn, addr, player_id))
         conn.send(pickle.dumps(['id', player_id]))
         SecondaryServer(conn)
-        conn.send(pickle.dumps(['move', {'start'}]))
+        conn.send(pickle.dumps(['move', backend.get_state()]))
 
 
 class SecondaryServer(asyncore.dispatcher_with_send):

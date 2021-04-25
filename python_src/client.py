@@ -26,6 +26,7 @@ player_id = 0
 
 def render(game_state: dict):
     cls()
+    # print(game_state)
     if game_state == {'start'}:
         return
     game_state = game_state['level']
