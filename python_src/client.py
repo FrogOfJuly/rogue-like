@@ -72,6 +72,8 @@ def render(game_state: dict):
                 else:
                     print(f' {repr} ', end='')
         print()
+    if not player:
+        return
     print(f'Level: {player["lvl"]:3}, Health: {player["h_cpt"]["health"]:3}, Damage: {player["a_cpt"]["damage"]}')
     if not newlog:
         return
