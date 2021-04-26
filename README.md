@@ -51,6 +51,8 @@ For client
 Currently, you can walk around a labyrinth with interactable immortal goblins.
 Don't worry, you're immortal too! But that will change soon.
 
+Sike!! Not anymore. But goblins are mortal too :)
+
 ### Dependencies
 
  - [pybind11](https://github.com/pybind/pybind11)
