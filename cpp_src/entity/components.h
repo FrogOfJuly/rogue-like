@@ -36,6 +36,10 @@ namespace roguelike {
 
     struct health_component : public component {
         int health = -1;
+        template <typename T>
+        static inline bool is_alive(const T *) {
+            return false;
+        }
     };
 
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(health_component, health);

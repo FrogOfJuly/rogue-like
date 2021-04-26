@@ -4,6 +4,7 @@
 
 #include <optional>
 #include <vector>
+#include <unordered_set>
 
 #include "../common.h"
 #include "tile.h"
@@ -19,6 +20,7 @@ namespace roguelike {
 
         std::array<tile, H * W> tiles;
         std::vector<entity_type> residents;
+        std::unordered_set<int> dead;
 
       public:
         room() = default;
@@ -28,6 +30,8 @@ namespace roguelike {
         [[nodiscard]] std::array<tile_idx, 4> get_tile_neighbours(tile_idx idx) const noexcept;
 
         [[nodiscard]] tile_idx get_random_empty_tile() const;
+
+        void remove_resident(tile_idx idx);
 
         tile &get_tile(int x, int y);
 

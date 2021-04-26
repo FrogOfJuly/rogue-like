@@ -8,8 +8,8 @@
 namespace roguelike {
     struct goblin : entity {
         goblin(int id) : entity(id) {
-            h_cpt.health = 5;
-            a_cpt.damage = 1;
+            h_cpt.health = 2;
+            a_cpt.damage = 4;
             m_cpt.y = -1;
             m_cpt.x = -1;
             dm_cpt.strat = strategy::random;
@@ -36,6 +36,11 @@ namespace roguelike {
             default:
                 return "x";
         }
+    }
+
+    template <>
+    inline bool health_component::is_alive<goblin>(const goblin *g) {
+        return g->h_cpt.health > 0;
     }
 
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(goblin, id, dm_cpt, h_cpt, a_cpt, m_cpt, repr_cpt)

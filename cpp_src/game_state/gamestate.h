@@ -21,6 +21,7 @@ namespace roguelike {
     class gamestate {
         room level;
         player *players = nullptr;
+        std::unordered_set<int> dead_players;
         int player_num = -1;
         int lvl_num = -1;
 

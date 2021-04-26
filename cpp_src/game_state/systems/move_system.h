@@ -11,6 +11,8 @@ namespace roguelike {
 
         bool more_general_move(entity_type &var_ent);
 
+        static tile_idx desired_tile_idx(entity_type &var_ent);
+
         move_system() = delete;
 
         using base_system::base_system;
@@ -24,6 +26,7 @@ namespace roguelike {
         move_system &operator=(move_system &&) = default;
 
         friend gamestate;
+
     };
 }  // namespace roguelike
 
