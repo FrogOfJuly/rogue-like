@@ -59,6 +59,14 @@ namespace roguelike {
             return;
         }
     };
+
+    template <>
+    struct interacter<goblin, goblin> {
+        static inline void interact(goblin &inted, goblin &inting) {
+            // no friendly fire
+            return;
+        }
+    };
 }  // namespace roguelike
 
 #endif  // ROGUE_LIKE_GOBLIN_H
