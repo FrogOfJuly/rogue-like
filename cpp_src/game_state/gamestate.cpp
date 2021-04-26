@@ -99,13 +99,21 @@ void roguelike::gamestate::redraw_players() {
 }
 void roguelike::gamestate::redraw_nonplayers() {
     for (auto &var_ent : level.residents) {
+        bool is_dead = std::visit([this](auto *ent_ptr) { return level.dead.count(ent_ptr->id.value) != 0; }, var_ent);
+        if (is_dead) {
+            continue;
+        }
         drawing_system::general_draw(var_ent);
     }
 }
 void roguelike::gamestate::move_nonplayers() {
-    for (auto &ent : level.residents) {
+    for (auto &var_ent : level.residents) {
+        bool is_dead = std::visit([this](auto *ent_ptr) { return level.dead.count(ent_ptr->id.value) != 0; }, var_ent);
+        if (is_dead) {
+            continue;
+        }
         lwlog_info("moving nonplayer");
-        mv_system.more_general_move(ent);
+        mv_system.more_general_move(var_ent);
     }
 }
 void roguelike::gamestate::move_players() {
@@ -122,10 +130,12 @@ int roguelike::gamestate::receive_player_command(int player_id, roguelike::cmd c
         throw std::runtime_error("No such player id: " + std::to_string(player_id));
     }
     received_command.insert(player_id);
-    players[player_id].dm_cpt.decision = command;
+    if (dead_players.count(player_id) == 0) {
+        players[player_id].dm_cpt.decision = command;
+    }
     while (not command_to_receive.empty()) {
         auto next_player_id = command_to_receive.front();
-        if (received_command.count(next_player_id) == 0) {
+        if (received_command.count(next_player_id) == 0 and dead_players.count(next_player_id) == 0) {
             return next_player_id;
         }
         command_to_receive.pop();
@@ -143,9 +153,6 @@ void roguelike::gamestate::initialize(int player_number) {
     lvl_num = 0;
     level.generate_level(lvl_num);
     player_num = player_number;
-    if (player_num > 0) {
-        cur_player = 0;
-    }
     players = (player *)new char[sizeof(player) * player_num];  // they do not have default constructor
     for (int i = 0; i < player_num; ++i) {
         lwlog_info("placing player");
@@ -201,6 +208,10 @@ void roguelike::gamestate::end_turn() {
 }
 void roguelike::gamestate::decide_next_move() {
     for (auto &var_ent : level.residents) {
+        bool is_dead = std::visit([this](auto *ent_ptr) { return level.dead.count(ent_ptr->id.value) != 0; }, var_ent);
+        if (is_dead) {
+            continue;
+        }
         decision_making_system::make_decision<strategy::random>(var_ent);
     }
 }

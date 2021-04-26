@@ -8,8 +8,8 @@
 namespace roguelike {
     struct goblin : entity {
         goblin(int id) : entity(id) {
-            h_cpt.health = 5;
-            a_cpt.damage = 1;
+            h_cpt.health = 2;
+            a_cpt.damage = 4;
             m_cpt.y = -1;
             m_cpt.x = -1;
             dm_cpt.strat = strategy::random;

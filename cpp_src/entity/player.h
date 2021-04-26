@@ -44,6 +44,7 @@ namespace roguelike {
     template <typename entityType>
     struct interacter<player, entityType> {
         static inline void interact(player &inted, entityType &inting) {
+            std::cout << "type of interacting: " << typeid(entityType).name() << std::endl;
             if constexpr (has_member_atk_component<entityType>::value) {
                 auto dmg = inting.a_cpt.damage;
                 inted.h_cpt.health -= dmg;

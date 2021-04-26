@@ -6,6 +6,7 @@
 #include <iostream>
 #include <queue>
 #include <unordered_set>
+#include <variant>
 
 #include "../utility/entity_info.h"
 
@@ -178,11 +179,18 @@ std::array<roguelike::tile_idx, 4> roguelike::room::get_tile_neighbours(roguelik
 roguelike::tile_idx roguelike::room::get_random_empty_tile() const {
     tile_idx tile_num = rand() % (W * H);
     for (; tile_num < 2 * W * H; ++tile_num) {
-        if (tiles[tile_num%(W*H)].empty()) {
-            return tile_num%(W*H);
+        if (tiles[tile_num % (W * H)].empty()) {
+            return tile_num % (W * H);
         }
     }
     return -1;
+}
+void roguelike::room::remove_resident(roguelike::tile_idx idx) {
+    auto res_id = tiles[idx].resident;
+    if (not res_id.has_value()) {
+        return;
+    }
+    tiles[idx].resident = std::optional<general_id>();
 }
 /*std::vector<roguelike::tile_idx> roguelike::room::get_area_around_tile(roguelike::tile_idx idx, int radius) {
     std::vector<tile_idx> area;

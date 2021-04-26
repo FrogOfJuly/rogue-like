@@ -45,27 +45,51 @@ void roguelike::move_system::move_to_tile(general_id id, tile_idx dest_tile) {
         id);
 }
 
-bool roguelike::move_system::more_general_move(entity_type &var_ent) {
+roguelike::tile_idx roguelike::move_system::desired_tile_idx(entity_type &var_ent) {
     return std::visit(
-        [this](auto *ent_ptr) {
+        [](const auto *ent_ptr) {
+            constexpr bool able_to_dm = has_member_decision_making_component<
+                std::remove_pointer_t<std::remove_const_t<decltype(ent_ptr)>>>::value;
+            constexpr bool able_to_move =
+                has_member_move_component<std::remove_pointer_t<std::remove_const_t<decltype(ent_ptr)>>>::value;
+            if constexpr (able_to_move and able_to_dm) {
+                auto v = ent_ptr->dm_cpt.get_velocity();
+                if (v.first == 0 and v.second == 0) {
+                    return -1;
+                }
+                auto des_x = ent_ptr->m_cpt.x + v.first;
+                auto des_y = ent_ptr->m_cpt.y + v.second;
+                return room::idxFromPair(des_x, des_y);
+            } else {
+                return -1;
+            }
+        },
+        var_ent);
+}
+
+bool roguelike::move_system::more_general_move(entity_type &var_ent) {
+    auto des_idx = desired_tile_idx(var_ent);
+    if (des_idx < 0) {
+        return false;
+    }
+
+    return std::visit(
+        [this, des_idx](auto *ent_ptr) {
             bool moved = false;
             constexpr bool able_to_dm =
                 has_member_decision_making_component<std::remove_pointer_t<decltype(ent_ptr)>>::value;
             constexpr bool able_to_move = has_member_move_component<std::remove_pointer_t<decltype(ent_ptr)>>::value;
 
-            if constexpr (able_to_dm) {
-                auto v = ent_ptr->dm_cpt.get_velocity();
-                if (v.first == 0 and v.second == 0) {
-                    return moved;
-                }
-                auto des_x = ent_ptr->m_cpt.x + v.first;
-                auto des_y = ent_ptr->m_cpt.y + v.second;
+            if constexpr (able_to_dm and able_to_move) {
+                auto des_xy = room::pairFromIdx(des_idx);
+                auto des_x = des_xy.first;
+                auto des_y = des_xy.second;
                 auto opt_tile = game_ptr->level.get_tile_if_exists(des_x, des_y);
                 if (not opt_tile.has_value()) {
                     return moved;
                 }
                 auto tle = opt_tile.value();
-                if (not tle.resident.has_value() and able_to_move) {
+                if (not tle.resident.has_value()) {
                     move_to_tile(ent_ptr->id, room::idxFromPair(des_x, des_y));
                     moved = true;
                 } else {
