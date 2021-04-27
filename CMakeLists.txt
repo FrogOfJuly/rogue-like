@@ -24,12 +24,13 @@ set(LIB_SOURCES
         cpp_src/game_state/systems/move_system.cpp
         cpp_src/game_state/systems/move_system.h
         cpp_src/game_state/gamestate.cpp
-        cpp_src/common.cpp
-        cpp_src/entity/components.cpp
         cpp_src/level/room.cpp
         cpp_src/game_state/systems/drawing_system.cpp
         cpp_src/game_state/systems/interaction_system.cpp
         cpp_src/game_state/systems/decision_making_system.hpp
+        cpp_src/serializers/non_default_serialize.h
+        cpp_src/serializers/non_default_serialize.cpp
+        cpp_src/serializers/default_serializers.h
         )
 
 pybind11_add_module(roguelike
