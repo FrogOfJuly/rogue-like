@@ -12,8 +12,6 @@ namespace roguelike {
         repr_component repr_cpt;
     };
 
-    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(potion, id, repr_cpt);
-
     template<>
     inline std::string repr_component::compute_representation<potion>(const potion* p){
         return "p";

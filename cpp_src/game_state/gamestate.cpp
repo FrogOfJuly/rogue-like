@@ -2,10 +2,8 @@
 // Created by Kirill Golubev on 24.04.2021.
 //
 #include "gamestate.h"
-
 #include <variant>
-
-#include "../utility/entity_info.h"
+#include "../serializers/serialize_info.h"
 
 roguelike::gamestate::gamestate() noexcept : mv_system(this), inter_system(this) { srand(time(NULL)); }
 roguelike::gamestate::gamestate(gamestate &&rhs) noexcept : gamestate() { *this = std::move(rhs); }
@@ -21,48 +19,6 @@ roguelike::gamestate &roguelike::gamestate::operator=(roguelike::gamestate &&rhs
     inter_system.reset_owner(this);
 
     return *this;
-}
-
-void roguelike::to_json(nlohmann::json &j, const gamestate &p) {
-    auto room_json = nlohmann::json();
-    for (const auto &tle : p.level.tiles) {
-        auto cur_tile_json = nlohmann::json();
-        if (tle.empty()) {
-            cur_tile_json["tile"] = nlohmann::json();
-            room_json.push_back(cur_tile_json);
-            continue;
-        }
-        auto resident_json = std::visit(
-            overloaded{
-                [&p](player_id id) {
-                    auto j_local = nlohmann::json();
-                    nlohmann::to_json(j_local["player"], p.players[id.value]);
-                    std::string str_repr = j_local["player"]["repr_cpt"]["repr"];
-                    return j_local;
-                },
-                [&p](entity_id id) {
-                    auto j_local = nlohmann::json();
-                    const auto &var_ent = p.level.residents[id.value];
-                    nlohmann::to_json(j_local["entity"], var_ent);
-                    bool has_repr = std::visit(
-                        [](auto *ent) {
-                            return has_member_repr_component<std::remove_pointer_t<decltype(ent)>>::value;
-                        },
-                        var_ent);
-                    if (not has_repr) {
-                        j_local["entity"]["repr_cpt"]["repr"] = "?";
-                        return j_local;
-                    }
-                    return j_local;
-                }},
-            tle.resident.value());
-        cur_tile_json["tile"] = resident_json;
-        room_json.push_back(cur_tile_json);
-    }
-    j["level"] = room_json;
-}
-void roguelike::from_json(const nlohmann::json &j, roguelike::gamestate &p) {
-    throw std::runtime_error("One CAN NOT construct game state form it's serialization!!");
 }
 
 std::string roguelike::gamestate::get_serialization() const {

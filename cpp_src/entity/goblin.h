@@ -43,8 +43,6 @@ namespace roguelike {
         return g->h_cpt.health > 0;
     }
 
-    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(goblin, id, dm_cpt, h_cpt, a_cpt, m_cpt, repr_cpt)
-
     template <typename entityType>
     struct interacter<goblin, entityType> {
         static inline void interact(goblin &inted, entityType &inting) {

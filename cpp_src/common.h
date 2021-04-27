@@ -71,15 +71,18 @@ namespace roguelike {
 
     using general_id = std::variant<entity_id, player_id>;
 
-    void to_json(nlohmann::json &j, const general_id &p);
-
-    void from_json(const nlohmann::json &j, general_id &p);
+    //--------------enumerations----------------------
 
     enum entity_names {
 #define register_entity(entity_type_name) entity_type_name##_entity,
 #include "utility/register_for_entities.h"
 #undef register_entity
     };
+
+    enum strategy { random, passive, aggressive, fearful, external };
+
+    //--------------end of enumerations----------------------
+    //--------------forward declarations---------------------
 
 #define register_entity(entity_type_name) struct entity_type_name;
 #include "utility/register_for_entities.h"
@@ -92,10 +95,14 @@ namespace roguelike {
 #undef register_entity
         entity *>;
 
-    void to_json(nlohmann::json &j, const entity_type &p);
-    void from_json(const nlohmann::json &j, entity_type &p);
+#define register_component(cpt_name, component_type) struct component_type;
+#include "utility/register_for_components.h"
+#undef register_component
+    //--------------end of forward declarations---------------------
 
-    enum strategy { random, passive, aggressive, fearful, external };
+#define register_component(cmpt_name, component_type) define_has_member(cmpt_name, component_type)
+#include "utility/register_for_components.h"
+#undef register_component
 
 }  // namespace roguelike
 

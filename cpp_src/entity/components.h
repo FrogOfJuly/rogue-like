@@ -1,7 +1,6 @@
 //
 // Created by Kirill Golubev on 23.04.2021.
 //
-#include "../../deps/json/single_include/nlohmann/json.hpp"
 #include "../common.h"
 
 #ifndef ROGUE_LIKE_COMPONENTS_H
@@ -15,14 +14,10 @@ namespace roguelike {
 
     //--------------end of component---------------------------------------------
 
-    //    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(component);
-
     struct move_component : public component {
         int x = -1, y = -1;
         tile_idx residency = -1;
     };
-
-    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(move_component, x, y, residency);
 
     //--------------end of move_component----------------------------------------
 
@@ -30,7 +25,6 @@ namespace roguelike {
         int damage = -1;
     };
 
-    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(atk_component, damage);
 
     //--------------end of atk_component-----------------------------------------
 
@@ -42,8 +36,6 @@ namespace roguelike {
         }
     };
 
-    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(health_component, health);
-
     //--------------end of health_component--------------------------------------
 
     struct repr_component : public component {
@@ -54,8 +46,6 @@ namespace roguelike {
             return "?";
         }
     };
-
-    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(repr_component, repr);
 
     //--------------end of repr_component----------------------------------------
 
@@ -82,25 +72,14 @@ namespace roguelike {
         }
     };
 
-    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(decision_making_component, decision, eye_sight);
-
     //--------------end of decision_making_component-----------------------------
 
     struct logging_component : public component {
         std::stringstream log{};
     };
 
-    void to_json(nlohmann::json &j, const logging_component &p);
-
-    void from_json(const nlohmann::json &j, logging_component &p);
-
     //--------------end of logging_component-------------------------------------
 
-#define register_component(cmpt_name, component_type) define_has_member(cmpt_name, component_type)
-
-#include "../utility/register_for_components.h"
-
-#undef register_component
 }  // namespace roguelike
 
 #endif  // ROGUE_LIKE_COMPONENTS_H

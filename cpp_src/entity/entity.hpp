@@ -15,8 +15,6 @@ namespace roguelike {
         int level = -1;
     };
 
-    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(entity, id, level);
-
     template <typename interacted, typename interacting>
     struct interacter {  // C++ does not permit partial function template specialization
       public:
