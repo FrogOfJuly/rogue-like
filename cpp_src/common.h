@@ -6,8 +6,6 @@
 #include <sstream>
 #include <variant>
 
-#include "../deps/json/single_include/nlohmann/json.hpp"
-
 #define LOG_LEVEL -1
 
 #include "../deps/lwlog/lwlog.h"
@@ -42,18 +40,6 @@ namespace roguelike {
 
     enum cmd { UP = 0, DOWN, LEFT, RIGHT, ENTER, ESC, PASS };
 
-    NLOHMANN_JSON_SERIALIZE_ENUM(
-        cmd,
-        {
-            {UP, "up"},
-            {DOWN, "down"},
-            {LEFT, "left"},
-            {RIGHT, "right"},
-            {PASS, "pass"},
-            {ESC, "esc"},
-            {ENTER, "enter"},
-        })
-
     using tile_idx = int;
 
     // type aliasing is not enough, thus they deserve their own structs
@@ -61,13 +47,9 @@ namespace roguelike {
         int value = -1;
     };
 
-    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(entity_id, value);
-
     struct player_id {
         int value = -1;
     };
-
-    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(player_id, value);
 
     using general_id = std::variant<entity_id, player_id>;
 

@@ -19,14 +19,30 @@ namespace roguelike {
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(decision_making_component, decision, eye_sight);
 
     //--------------end of components default serializers-----------------
-    //--------------entity default serializers----------------------------
+    //---------------------------------------------------------------------------
 
+    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(entity_id, value);
+    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(player_id, value);
+    NLOHMANN_JSON_SERIALIZE_ENUM(
+        cmd,
+        {
+            {UP, "up"},
+            {DOWN, "down"},
+            {LEFT, "left"},
+            {RIGHT, "right"},
+            {PASS, "pass"},
+            {ESC, "esc"},
+            {ENTER, "enter"},
+        });
+
+    //---------------------------------------------------------------------------
+
+    //--------------entity default serializers-----------------------------------
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(entity, id, level);
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(player, id, lvl, h_cpt, m_cpt, a_cpt, dm_cpt, lg_cpt, repr_cpt);
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(potion, id, repr_cpt);
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(goblin, id, dm_cpt, h_cpt, a_cpt, m_cpt, repr_cpt);
-    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(wall, id, repr_cpt);
-
+    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(wall  , id, repr_cpt);
     //--------------end of entity default serializers----------------------------
 
 

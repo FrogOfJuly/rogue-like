@@ -12,6 +12,8 @@
 #include "systems/move_system.h"
 #include "systems/decision_making_system.hpp"
 
+#include "../serializers/serialize_info.h"
+
 #ifndef ROGUE_LIKE_GAMESTATE_H
 #define ROGUE_LIKE_GAMESTATE_H
 
