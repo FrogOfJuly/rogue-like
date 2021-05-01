@@ -13,6 +13,7 @@ namespace roguelike {
             a_cpt.damage = 4;
             m_cpt.y = -1;
             m_cpt.x = -1;
+            dm_cpt.eye_sight = 5;
             dm_cpt.strat = std::make_unique<random_strategy>();
         }
 
