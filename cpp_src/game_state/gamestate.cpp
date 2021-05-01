@@ -168,7 +168,7 @@ void roguelike::gamestate::decide_next_move() {
         if (is_dead) {
             continue;
         }
-        decision_making_system::make_decision<strategy::random>(var_ent);
+        decision_making_system::make_decision<simple_strategy::random>(var_ent);
     }
 }
 

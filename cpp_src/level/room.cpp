@@ -9,6 +9,8 @@
 #include <variant>
 
 #include "../utility/entity_info.h"
+#include "../utility/utils.h"
+#include "room_view.h"
 
 std::optional<roguelike::tile> roguelike::room::get_tile_if_exists(int x, int y) const noexcept {
     if (x < 0 or y < 0) {
@@ -192,24 +194,35 @@ void roguelike::room::remove_resident(roguelike::tile_idx idx) {
     }
     tiles[idx].resident = std::optional<general_id>();
 }
-/*std::vector<roguelike::tile_idx> roguelike::room::get_area_around_tile(roguelike::tile_idx idx, int radius) {
-    std::vector<tile_idx> area;
-    assert(radius > 0);
-    if (idx >= tiles.size()) {
-        return area;
-    }
-    std::unordered_set<tile_idx> visited;
-    visited.insert(idx);
-    std::queue<tile_idx> to_visit;
-    auto neigh = get_tile_neighbours(idx);
-    for (const auto& n_idx : neigh) {
-        to_visit.push(n_idx);
-    }
-    while (not to_visit.empty()) {
-        auto cur_idx = to_visit.front();
-        if (visited.count(cur_idx) != 0) {
-            continue;
+roguelike::room_view roguelike::room::get_area_around_tile(roguelike::tile_idx idx, int radius) const {
+    auto p = pairFromIdx(idx);
+    std::vector<room_view::cell> view;
+    room_view::cell point_of_view{p.first, p.second, room_view::observation()};
+
+    for (int i = 1; i < radius + 1; ++i) {
+        auto idxes = utils::get_circle(i, p.first, p.second);
+        for (const auto& idx_pair : idxes) {
+            auto maybe_tl = get_tile_if_exists(idx_pair.first, idx_pair.second);
+            if (not maybe_tl.has_value()) {
+                continue;
+            }
+            auto tl = maybe_tl.value();
+            if (tl.empty()) {
+                view.push_back(room_view::make_cell(room_view::observation(), idx_pair.first, idx_pair.second));
+            } else {
+                auto cell = std::visit(
+                    overloaded{
+                        [this, idx_pair](entity_id id) {
+                            return room_view::make_cell(residents[id.value], idx_pair.first, idx_pair.second);
+                        },
+                        [idx_pair](player_id id) {
+                            entity_type player_proxy = (player*)(nullptr);
+                            return room_view::make_cell(player_proxy, idx_pair.first, idx_pair.second);
+                        }},
+                    tl.resident.value());
+                view.push_back(cell);
+            }
         }
-        area.push_back(cur_idx);
     }
-}*/
+    return roguelike::room_view(view, point_of_view);
+}

@@ -61,7 +61,7 @@ namespace roguelike {
 #undef register_entity
     };
 
-    enum strategy { random, passive, aggressive, fearful, external };
+    enum simple_strategy { random, passive, aggressive, fearful, external };
 
     //--------------end of enumerations----------------------
     //--------------forward declarations---------------------

@@ -12,7 +12,7 @@ namespace roguelike {
             a_cpt.damage = 4;
             m_cpt.y = -1;
             m_cpt.x = -1;
-            dm_cpt.strat = strategy::random;
+            dm_cpt.strat = simple_strategy::random;
         }
 
         decision_making_component dm_cpt;

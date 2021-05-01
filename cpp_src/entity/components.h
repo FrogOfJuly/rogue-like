@@ -52,7 +52,7 @@ namespace roguelike {
     struct decision_making_component : public component {
         cmd decision = cmd::PASS;
         int eye_sight = -1;
-        strategy strat = strategy::passive;
+        simple_strategy strat = simple_strategy::passive;
 
         [[nodiscard]] std::pair<int, int> get_velocity() const {
             switch (decision) {

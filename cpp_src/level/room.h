@@ -3,8 +3,8 @@
 //
 
 #include <optional>
-#include <vector>
 #include <unordered_set>
+#include <vector>
 
 #include "../common.h"
 #include "tile.h"
@@ -13,7 +13,7 @@
 #define ROGUE_LIKE_LEVEL_H
 namespace roguelike {
     constexpr int room_size = 15;
-
+    struct room_view;
     struct room {
         static constexpr int H = room_size;
         static constexpr int W = room_size;
@@ -47,7 +47,7 @@ namespace roguelike {
 
         void generate_level(int lvl_num);
 
-        //        std::vector<tile_idx> get_area_around_tile(tile_idx idx, int radius);
+        [[nodiscard]] room_view get_area_around_tile(tile_idx idx, int radius) const;
 
         room(const room &) = delete;
 
