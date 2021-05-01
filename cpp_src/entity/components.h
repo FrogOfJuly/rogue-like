@@ -26,14 +26,16 @@ namespace roguelike {
         int damage = -1;
     };
 
-
     //--------------end of atk_component-----------------------------------------
 
     struct health_component : public component {
         int health = -1;
         template <typename T>
-        static inline bool is_alive(const T *) {
-            return false;
+        static inline bool is_alive(const T *ent) {
+            if constexpr (has_member_health_component<std::remove_pointer_t<decltype(ent)>>::value) {
+                return false;
+            }
+            return true;
         }
     };
 
