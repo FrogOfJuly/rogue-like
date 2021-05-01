@@ -10,7 +10,7 @@
 #include "systems/drawing_system.h"
 #include "systems/interaction_system.h"
 #include "systems/move_system.h"
-#include "systems/decision_making_system.hpp"
+#include "systems/decision_making_system.h"
 
 #include "../serializers/serialize_info.h"
 
@@ -33,7 +33,7 @@ namespace roguelike {
         move_system mv_system;
         interaction_system inter_system;
         /*drawing_system draw_system; -- all methods are static, so no need to create object*/
-        /*decision_making_system dm_system; -- all methods are static, so no need to create object*/
+        decision_making_system dm_system;
 
 
       public:
@@ -61,6 +61,7 @@ namespace roguelike {
 
         friend class move_system;
         friend class interaction_system;
+        friend class decision_making_system;
 
         friend void to_json(nlohmann::json &j, const gamestate &p);
         friend void from_json(const nlohmann::json &j, gamestate &p);

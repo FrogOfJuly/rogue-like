@@ -16,7 +16,6 @@ namespace roguelike {
             m_cpt.x = -1;
             m_cpt.y = -1;
             dm_cpt.decision = PASS;
-            dm_cpt.strat = simple_strategy::external;
         }
 
         player_id id = player_id{-1};

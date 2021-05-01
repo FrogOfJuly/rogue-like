@@ -1,6 +1,7 @@
 //
 // Created by Kirill Golubev on 18.04.2021.
 //
+#include "../strategies/random_strategy/random_strategy.h"
 #include "entity.hpp"
 
 #ifndef ROGUE_LIKE_GOBLIN_H
@@ -12,7 +13,7 @@ namespace roguelike {
             a_cpt.damage = 4;
             m_cpt.y = -1;
             m_cpt.x = -1;
-            dm_cpt.strat = simple_strategy::random;
+            dm_cpt.strat = std::make_unique<random_strategy>();
         }
 
         decision_making_component dm_cpt;

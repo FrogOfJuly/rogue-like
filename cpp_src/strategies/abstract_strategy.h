@@ -10,16 +10,17 @@ namespace roguelike {
     struct room_view;
 
     class strategy {
+      protected:
         cmd decision = cmd::PASS;
         std::unique_ptr<room_view> view;
 
       public:
-        void set_view(const room_view& view);
+        void set_view(const room_view& _view);
         void discard_view();
         [[nodiscard]] cmd get_decision() const;
 
-
         virtual void form_decision() = 0;
+        virtual ~strategy() = default;
     };
 }  // namespace roguelike
 

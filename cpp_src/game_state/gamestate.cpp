@@ -5,7 +5,7 @@
 #include <variant>
 #include "../serializers/serialize_info.h"
 
-roguelike::gamestate::gamestate() noexcept : mv_system(this), inter_system(this) { srand(time(NULL)); }
+roguelike::gamestate::gamestate() noexcept : mv_system(this), inter_system(this), dm_system(this) { srand(time(NULL)); }
 roguelike::gamestate::gamestate(gamestate &&rhs) noexcept : gamestate() { *this = std::move(rhs); }
 roguelike::gamestate &roguelike::gamestate::operator=(roguelike::gamestate &&rhs) noexcept {
     std::swap(level, rhs.level);
@@ -168,7 +168,7 @@ void roguelike::gamestate::decide_next_move() {
         if (is_dead) {
             continue;
         }
-        decision_making_system::make_decision<simple_strategy::random>(var_ent);
+        dm_system.make_decision(var_ent);
     }
 }
 

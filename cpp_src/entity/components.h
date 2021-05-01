@@ -2,6 +2,7 @@
 // Created by Kirill Golubev on 23.04.2021.
 //
 #include "../common.h"
+#include "../strategies/abstract_strategy.h"
 
 #ifndef ROGUE_LIKE_COMPONENTS_H
 #define ROGUE_LIKE_COMPONENTS_H
@@ -52,7 +53,7 @@ namespace roguelike {
     struct decision_making_component : public component {
         cmd decision = cmd::PASS;
         int eye_sight = -1;
-        simple_strategy strat = simple_strategy::passive;
+        std::unique_ptr<strategy> strat;
 
         [[nodiscard]] std::pair<int, int> get_velocity() const {
             switch (decision) {

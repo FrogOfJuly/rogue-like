@@ -18,9 +18,7 @@ namespace roguelike {
     template <typename interacted, typename interacting>
     struct interacter {  // C++ does not permit partial function template specialization
       public:
-        static inline void interact(interacted &inted, interacting &inting) {
-            //            std::cout << "unknown interacted by unknown" << std::endl;
-        }
+        static inline void interact(interacted &inted, interacting &inting) {}
     };
 }  // namespace roguelike
 
