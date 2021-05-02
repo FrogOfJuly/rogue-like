@@ -138,6 +138,16 @@ void roguelike::gamestate::initialize(int player_number) {
         level.spawn_on_level(var_ent, rnd_tile);
         level.residents.emplace_back(g);
     }
+    for (int i = 3; i < 5; ++i) {
+        lwlog_info("placing goblin");
+        auto new_id = level.residents.size();
+        auto gg = new goblin_guard(new_id);
+        gg->dm_cpt.decision = DOWN;
+        entity_type var_ent = gg;
+        auto rnd_tile = level.get_random_empty_tile();
+        level.spawn_on_level(var_ent, rnd_tile);
+        level.residents.emplace_back(gg);
+    }
     /*{
         auto e = new entity((int)level.residents.size());
         lwlog_info("placing entity");

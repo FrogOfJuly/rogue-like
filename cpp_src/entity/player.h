@@ -48,7 +48,12 @@ namespace roguelike {
                 inted.lg_cpt.log << "you received " << dmg << " damage\n";
                 return;
             }
-            inted.lg_cpt.log << "you was interacted by the unknown\n";
+            if constexpr (has_member_name_component<entityType>::value) {
+                inted.lg_cpt.log << "you was interacted by " << inting.nm_cpt.name << std::endl;
+            }else{
+                inted.lg_cpt.log << "you was interacted by the unknown\n";
+            }
+
             return;
         }
     };

@@ -6,9 +6,12 @@
 #define ROGUE_LIKE_WALL_H
 namespace roguelike {
     struct wall {
-        wall(int id) : id{id} {}
+        wall(int id) : id{id} {
+            nm_cpt.name = "wall";
+        }
         entity_id id;
         repr_component repr_cpt;
+        name_component nm_cpt;
     };
 
     template<>

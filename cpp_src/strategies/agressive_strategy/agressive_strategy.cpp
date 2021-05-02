@@ -38,5 +38,5 @@ void roguelike::agressive_strategy::form_decision() {
         }
         return;
     }
-    decision = utils::get_random_active_action();
+    decision = cmd::PASS;
 }

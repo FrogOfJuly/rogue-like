@@ -58,22 +58,7 @@ namespace roguelike {
         room &operator=(room &&) = default;
 
         ~room();
-        /*
-        void spawn_enemy(int tile_idx) {
-            if (not tiles[tile_idx].empty()) {
-                throw std::runtime_error("Can't spawn enemy here: " + std::to_string(tile_idx));
-            }
-        }*/
-        /*
-         * generate_enemies(int lvl_num)
-         * generate_loot(int lvl_num)
-         * generate_walls(int lvl_num)
-         * generate_traps(int lvl_num)
-         * generate_doors_and_keys(int lvl_num)
-         */
     };
-
-    //    using default_room = room<room_size, room_size>;
 }  // namespace roguelike
 
 #endif  // ROGUE_LIKE_LEVEL_H

@@ -7,6 +7,7 @@
 #include "../entity/player.h"
 #include "../entity/potion.h"
 #include "../entity/goblin.h"
+#include "../entity/goblin_guard.h"
 #include "../entity/wall.h"
 #include "../entity/entity.hpp"
 

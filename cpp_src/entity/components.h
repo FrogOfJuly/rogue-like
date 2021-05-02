@@ -55,7 +55,8 @@ namespace roguelike {
     struct decision_making_component : public component {
         cmd decision = cmd::PASS;
         int eye_sight = -1;
-        std::unique_ptr<strategy> strat;
+        std::unique_ptr<strategy> idle_strategy;
+        std::unique_ptr<strategy> active_strategy;
 
         [[nodiscard]] std::pair<int, int> get_velocity() const {
             switch (decision) {
@@ -82,6 +83,12 @@ namespace roguelike {
     };
 
     //--------------end of logging_component-------------------------------------
+
+    struct name_component : public component {
+        std::string name = "";
+    };
+
+    //--------------end of name_component----------------------------------------
 
 }  // namespace roguelike
 
