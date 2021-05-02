@@ -226,3 +226,42 @@ roguelike::room_view roguelike::room::get_area_around_tile(roguelike::tile_idx i
     }
     return roguelike::room_view(view, point_of_view, this);
 }
+std::optional<roguelike::tile> roguelike::room::get_target_tile(
+    roguelike::tile_idx idx, roguelike::cmd direction) const {
+    auto p = pairFromIdx(idx);
+    auto x = p.first, y = p.second;
+    switch (direction) {
+        case UP:
+            return get_tile_if_exists(x, y - 1);
+        case DOWN:
+            return get_tile_if_exists(x, y + 1);
+        case LEFT:
+            return get_tile_if_exists(x - 1, y);
+        case RIGHT:
+            return get_tile_if_exists(x + 1, y);
+        case ENTER:
+        case ESC:
+        case PASS:
+            return get_tile_if_exists(x, y);
+    }
+}
+bool roguelike::room::do_target_tile_have_wall(roguelike::tile_idx idx, roguelike::cmd direction) const {
+    auto maybe_tile = get_target_tile(idx, direction);
+    if (not maybe_tile.has_value()) {
+        return false;
+    }
+    if (not maybe_tile.value().resident.has_value()) {
+        return false;
+    }
+    auto maybe_ent_idx = std::visit(
+        overloaded{
+            [](player_id) { return std::optional<int>(); }, [](entity_id id) { return std::optional<int>(id.value); }},
+        maybe_tile.value().resident.value());
+
+    if (not maybe_ent_idx.has_value()) {
+        return false;
+    }
+    auto var_ent = residents[maybe_ent_idx.value()];
+    bool is_wall = std::visit([](auto* entity_ptr) { return std::is_same_v<decltype(entity_ptr), wall*>; }, var_ent);
+    return is_wall;
+}

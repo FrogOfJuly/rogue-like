@@ -29,6 +29,10 @@ namespace roguelike {
 
         [[nodiscard]] std::array<tile_idx, 4> get_tile_neighbours(tile_idx idx) const noexcept;
 
+        [[nodiscard]] std::optional<tile> get_target_tile(tile_idx idx, cmd direction) const;
+
+        [[nodiscard]] bool do_target_tile_have_wall(tile_idx idx, cmd direction) const;
+
         [[nodiscard]] tile_idx get_random_empty_tile() const;
 
         void remove_resident(tile_idx idx);

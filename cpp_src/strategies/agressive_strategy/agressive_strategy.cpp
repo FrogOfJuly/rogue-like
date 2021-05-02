@@ -65,6 +65,7 @@ void roguelike::agressive_strategy::form_decision(roguelike::decision_making_com
 
         if (not dm_cpt.charges_into.has_value() or dm_cpt.charges_into != charges_into) {
             std::cout << "Kill the enemy!!" << std::endl;
+            // todo: do proper logging to oracle
         }
         dm_cpt.charges_into = charges_into;
         // no pathfinding yet
@@ -81,6 +82,16 @@ void roguelike::agressive_strategy::form_decision(roguelike::decision_making_com
                 dm_cpt.decision = cmd::UP;
             } else {
                 dm_cpt.decision = cmd::DOWN;
+            }
+        }
+        auto wall_ahead = view->oracle->do_target_tile_have_wall(
+            room::idxFromPair(view->point_of_view.x, view->point_of_view.y), dm_cpt.decision);
+
+        if (wall_ahead) {
+            if (dm_cpt.decision == cmd::UP or dm_cpt.decision == cmd::DOWN) {
+                dm_cpt.decision = rand() % 2 == 0 ? cmd::LEFT : cmd::RIGHT;
+            } else {
+                dm_cpt.decision = rand() % 2 == 0 ? cmd::UP : cmd::DOWN;
             }
         }
         return;
