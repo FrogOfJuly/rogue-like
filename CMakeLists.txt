@@ -45,6 +45,12 @@ set(LIB_SOURCES
 
         cpp_src/strategies/random_strategy/random_strategy.cpp
         cpp_src/strategies/random_strategy/random_strategy.h
+
+        cpp_src/strategies/passive_strategy/passive_strategy.cpp
+        cpp_src/strategies/passive_strategy/passive_strategy.h
+
+        cpp_src/strategies/agressive_strategy/agressive_strategy.cpp
+        cpp_src/strategies/agressive_strategy/agressive_strategy.h
         )
 
 pybind11_add_module(roguelike
