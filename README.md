@@ -53,6 +53,8 @@ Don't worry, you're immortal too! But that will change soon.
 
 Sike!! Not anymore. But goblins are mortal too :)
 
+And they are hunting you now
+
 ### Dependencies
 
  - [pybind11](https://github.com/pybind/pybind11)
