@@ -11,7 +11,7 @@
 namespace roguelike {
     class random_strategy : public strategy {
       public:
-        void form_decision() override;
+        void form_decision(decision_making_component& dm_cpt) override;
     };
 }  // namespace roguelike
 

@@ -4,4 +4,8 @@
 
 #include "passive_strategy.h"
 
-void roguelike::passive_strategy::form_decision() { decision = cmd::PASS; }
+#include "../../utility/entity_info.h"
+
+void roguelike::passive_strategy::form_decision(roguelike::decision_making_component& dm_cpt) {
+    dm_cpt.decision = cmd::PASS;
+}

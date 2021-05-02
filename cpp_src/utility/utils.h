@@ -26,9 +26,19 @@ namespace roguelike::utils {
 
     std::vector<std::pair<int, int>> get_circle(int radius, int x_start, int y_start);
 
+    std::vector<std::pair<int, int>> get_los(std::pair<int, int> start, std::pair<int, int> end);
+
     cmd get_random_active_action();
 
     cmd get_random_action();
 }  // namespace roguelike::utils
+
+namespace roguelike{
+    bool operator==(const entity_id& lhs, const entity_id& rhs);
+    bool operator==(const player_id& lhs, const player_id& rhs);
+
+    bool operator!=(const entity_id& lhs, const entity_id& rhs);
+    bool operator!=(const player_id& lhs, const player_id& rhs);
+}
 
 #endif  // ROGUE_LIKE_UTILS_H

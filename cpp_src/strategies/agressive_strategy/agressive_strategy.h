@@ -10,7 +10,7 @@
 namespace roguelike {
     class agressive_strategy : public strategy {
       public:
-        void form_decision() override;
+        void form_decision(decision_making_component& ) override;
     };
 }  // namespace roguelike
 

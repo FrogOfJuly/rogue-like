@@ -11,7 +11,7 @@
 namespace roguelike {
     class passive_strategy : public strategy {
       public:
-        void form_decision() override;
+        void form_decision(decision_making_component& ) override;
     };
 }  // namespace roguelike
 

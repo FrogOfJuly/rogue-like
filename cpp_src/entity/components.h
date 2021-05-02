@@ -3,6 +3,7 @@
 //
 #include "../common.h"
 #include "../strategies/abstract_strategy.h"
+#include <optional>
 
 #ifndef ROGUE_LIKE_COMPONENTS_H
 #define ROGUE_LIKE_COMPONENTS_H
@@ -57,6 +58,7 @@ namespace roguelike {
         int eye_sight = -1;
         std::unique_ptr<strategy> idle_strategy;
         std::unique_ptr<strategy> active_strategy;
+        std::optional<general_id> charges_into;
 
         [[nodiscard]] std::pair<int, int> get_velocity() const {
             switch (decision) {

@@ -20,8 +20,7 @@ void roguelike::decision_making_system::make_decision(entity_type& var_ent) {
                     return;
                 }
                 ent_ptr->dm_cpt.active_strategy->set_view(view);
-                ent_ptr->dm_cpt.active_strategy->form_decision();
-                ent_ptr->dm_cpt.decision = ent_ptr->dm_cpt.active_strategy->get_decision();
+                ent_ptr->dm_cpt.active_strategy->form_decision(ent_ptr->dm_cpt);
                 ent_ptr->dm_cpt.active_strategy->discard_view();
                 if (ent_ptr->dm_cpt.decision != cmd::PASS) {
                     return;
@@ -31,8 +30,7 @@ void roguelike::decision_making_system::make_decision(entity_type& var_ent) {
                     return;
                 }
                 ent_ptr->dm_cpt.idle_strategy->set_view(view);
-                ent_ptr->dm_cpt.idle_strategy->form_decision();
-                ent_ptr->dm_cpt.decision = ent_ptr->dm_cpt.idle_strategy->get_decision();
+                ent_ptr->dm_cpt.idle_strategy->form_decision(ent_ptr->dm_cpt);
                 ent_ptr->dm_cpt.idle_strategy->discard_view();
             }
         },
