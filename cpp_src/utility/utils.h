@@ -5,6 +5,8 @@
 #include <array>
 #include <vector>
 
+#include "../common.h"
+
 #ifndef ROGUE_LIKE_UTILS_H
 #define ROGUE_LIKE_UTILS_H
 
@@ -23,6 +25,10 @@ namespace roguelike::utils {
     int operator*(const vec2d& rhs, const vec2d& lhs);
 
     std::vector<std::pair<int, int>> get_circle(int radius, int x_start, int y_start);
+
+    cmd get_random_active_action();
+
+    cmd get_random_action();
 }  // namespace roguelike::utils
 
 #endif  // ROGUE_LIKE_UTILS_H

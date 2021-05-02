@@ -9,6 +9,7 @@
 #ifndef ROGUE_LIKE_ROOM_VIEW_H
 #define ROGUE_LIKE_ROOM_VIEW_H
 namespace roguelike {
+    class room;
     struct room_view {
         room_view() = delete;
         room_view(const room_view&) = default;
@@ -25,8 +26,9 @@ namespace roguelike {
         };
 
         static cell make_cell(const observation& obs, int x, int y);
-        room_view(std::vector<cell> view, const cell& point_of_view);
+        room_view(std::vector<cell> view, const cell& point_of_view, const room* oacle);
 
+        const room* oracle = nullptr;
         cell point_of_view;
         std::vector<cell> view;
         bool centered = false;

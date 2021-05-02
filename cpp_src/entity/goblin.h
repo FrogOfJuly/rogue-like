@@ -1,7 +1,7 @@
 //
 // Created by Kirill Golubev on 18.04.2021.
 //
-#include "../strategies/random_strategy/random_strategy.h"
+#include "../strategies/agressive_strategy/agressive_strategy.h"
 #include "entity.hpp"
 
 #ifndef ROGUE_LIKE_GOBLIN_H
@@ -14,7 +14,7 @@ namespace roguelike {
             m_cpt.y = -1;
             m_cpt.x = -1;
             dm_cpt.eye_sight = 5;
-            dm_cpt.strat = std::make_unique<random_strategy>();
+            dm_cpt.strat = std::make_unique<agressive_strategy>();
         }
 
         decision_making_component dm_cpt;

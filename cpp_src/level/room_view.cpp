@@ -3,6 +3,8 @@
 //
 
 #include "room_view.h"
+#include "room.h"
+
 void roguelike::room_view::center() {
     if (centered) {
         return;
@@ -25,8 +27,11 @@ void roguelike::room_view::decenter() {
     }
     centered = false;
 }
-roguelike::room_view::room_view(std::vector<cell> view, const roguelike::room_view::cell& point_of_view)
-    : view(std::move(view)), point_of_view(point_of_view) {}
+roguelike::room_view::room_view(
+    std::vector<cell> view, const roguelike::room_view::cell& point_of_view, const roguelike::room* oracle)
+    : view(std::move(view)), point_of_view(point_of_view), oracle(oracle) {
+    assert(oracle);
+}
 roguelike::room_view::cell roguelike::room_view::make_cell(const roguelike::room_view::observation& obs, int x, int y) {
     if (not obs.has_value()) {
         return cell{x, y, observation()};

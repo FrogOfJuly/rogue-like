@@ -224,5 +224,5 @@ roguelike::room_view roguelike::room::get_area_around_tile(roguelike::tile_idx i
             }
         }
     }
-    return roguelike::room_view(view, point_of_view);
+    return roguelike::room_view(view, point_of_view, this);
 }

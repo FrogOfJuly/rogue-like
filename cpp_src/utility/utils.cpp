@@ -51,4 +51,38 @@ roguelike::utils::vec2d roguelike::utils::operator+(
     const roguelike::utils::vec2d& lhs, const roguelike::utils::vec2d& rhs) {
     return {lhs.x + rhs.x, lhs.y + rhs.y};
 }
+roguelike::cmd roguelike::utils::get_random_active_action() {
+    switch (rand() % 5) {
+        case 0:
+            return cmd::PASS;
+        case 1:
+            return cmd::UP;
+        case 2:
+            return cmd::DOWN;
+        case 3:
+            return cmd::LEFT;
+        case 4:
+            return cmd::RIGHT;
+    }
+    return cmd::PASS;
+}
+roguelike::cmd roguelike::utils::get_random_action() {
+    switch (rand() % 7) {
+        case 0:
+            return cmd::PASS;
+        case 1:
+            return cmd::UP;
+        case 2:
+            return cmd::DOWN;
+        case 3:
+            return cmd::RIGHT;
+        case 4:
+            return cmd::LEFT;
+        case 5:
+            return cmd::ESC;
+        case 6:
+            return cmd::ENTER;
+    }
+    return cmd::PASS;
+}
 std::pair<int, int> roguelike::utils::vec2d::to_pair() const { return std::make_pair(x, y); }
