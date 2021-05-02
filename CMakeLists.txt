@@ -13,43 +13,43 @@ set(LIB_SOURCES
         cpp_src/level/room.h
         cpp_src/level/tile.h
         cpp_src/level/tile.cpp
+        cpp_src/common.h
+        cpp_src/game_state/gamestate.cpp
+        cpp_src/level/room.cpp
+        cpp_src/level/room_view.cpp
+        cpp_src/level/room_view.h
+
         cpp_src/entity/entity.hpp
         cpp_src/entity/player.h
-        cpp_src/common.h
         cpp_src/entity/goblin.h
         cpp_src/entity/goblin_guard.h
         cpp_src/entity/potion.h
         cpp_src/entity/wall.h
+        cpp_src/entity/trap.h
+
         cpp_src/game_state/systems/base_system.h
         cpp_src/game_state/systems/drawing_system.h
         cpp_src/game_state/systems/interaction_system.h
         cpp_src/game_state/systems/move_system.cpp
         cpp_src/game_state/systems/move_system.h
-        cpp_src/game_state/gamestate.cpp
-        cpp_src/level/room.cpp
         cpp_src/game_state/systems/drawing_system.cpp
         cpp_src/game_state/systems/interaction_system.cpp
         cpp_src/game_state/systems/decision_making_system.h
         cpp_src/game_state/systems/decision_making_system.cpp
+
         cpp_src/serializers/non_default_serialize.h
         cpp_src/serializers/non_default_serialize.cpp
         cpp_src/serializers/default_serializers.h
-
-        cpp_src/level/room_view.cpp
-        cpp_src/level/room_view.h
 
         cpp_src/utility/utils.cpp
         cpp_src/utility/utils.h
 
         cpp_src/strategies/abstract_strategy.h
         cpp_src/strategies/abstract_strategy.cpp
-
         cpp_src/strategies/random_strategy/random_strategy.cpp
         cpp_src/strategies/random_strategy/random_strategy.h
-
         cpp_src/strategies/passive_strategy/passive_strategy.cpp
         cpp_src/strategies/passive_strategy/passive_strategy.h
-
         cpp_src/strategies/agressive_strategy/agressive_strategy.cpp
         cpp_src/strategies/agressive_strategy/agressive_strategy.h
         )

@@ -61,8 +61,6 @@ namespace roguelike {
 #undef register_entity
     };
 
-    enum simple_strategy { random, passive, aggressive, fearful, external };
-
     //--------------end of enumerations----------------------
     //--------------forward declarations---------------------
 
@@ -82,9 +80,11 @@ namespace roguelike {
 #undef register_component
     //--------------end of forward declarations---------------------
 
-#define register_component(cmpt_name, component_type) define_has_member(cmpt_name, component_type)
+#define register_component(cmpt_name, component_type) define_has_member(cmpt_name, component_type);
 #include "utility/register_for_components.h"
 #undef register_component
+
+    define_has_member(id, entity_id);
 
 }  // namespace roguelike
 

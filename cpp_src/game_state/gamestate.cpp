@@ -2,7 +2,9 @@
 // Created by Kirill Golubev on 24.04.2021.
 //
 #include "gamestate.h"
+
 #include <variant>
+
 #include "../serializers/serialize_info.h"
 
 roguelike::gamestate::gamestate() noexcept : mv_system(this), inter_system(this), dm_system(this) { srand(time(NULL)); }
@@ -14,9 +16,11 @@ roguelike::gamestate &roguelike::gamestate::operator=(roguelike::gamestate &&rhs
 
     std::swap(mv_system, rhs.mv_system);
     std::swap(inter_system, rhs.inter_system);
+    std::swap(dm_system, rhs.dm_system);
 
     mv_system.reset_owner(this);
     inter_system.reset_owner(this);
+    dm_system.reset_owner(this);
 
     return *this;
 }
@@ -139,10 +143,18 @@ void roguelike::gamestate::initialize(int player_number) {
         level.residents.emplace_back(g);
     }
     for (int i = 3; i < 5; ++i) {
-        lwlog_info("placing goblin");
+        lwlog_info("placing goblin guard");
         auto new_id = level.residents.size();
         auto gg = new goblin_guard(new_id);
-        gg->dm_cpt.decision = DOWN;
+        entity_type var_ent = gg;
+        auto rnd_tile = level.get_random_empty_tile();
+        level.spawn_on_level(var_ent, rnd_tile);
+        level.residents.emplace_back(gg);
+    }
+    for (int i = 5; i < 7; ++i) {
+        lwlog_info("placing trap");
+        auto new_id = level.residents.size();
+        auto gg = new trap(new_id);
         entity_type var_ent = gg;
         auto rnd_tile = level.get_random_empty_tile();
         level.spawn_on_level(var_ent, rnd_tile);

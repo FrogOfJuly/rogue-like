@@ -4,11 +4,12 @@
 #ifndef ROGUE_LIKE_ENTITIES_H
 #define ROGUE_LIKE_ENTITIES_H
 
-#include "../entity/player.h"
-#include "../entity/potion.h"
+#include "../entity/entity.hpp"
 #include "../entity/goblin.h"
 #include "../entity/goblin_guard.h"
+#include "../entity/player.h"
+#include "../entity/potion.h"
+#include "../entity/trap.h"
 #include "../entity/wall.h"
-#include "../entity/entity.hpp"
 
 #endif  // ROGUE_LIKE_ENTITIES_H

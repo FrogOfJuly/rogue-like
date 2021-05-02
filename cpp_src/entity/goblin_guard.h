@@ -56,7 +56,12 @@ namespace roguelike {
             if constexpr (has_member_logging_component<entityType>::value) {
                 inting.lg_cpt.log << "you interacted with goblin guard" << std::to_string(inted.id.value) << "\n";
             }
+            std::string inting_name = "unknown";
+            if constexpr (has_member_name_component<entityType>::value) {
+                inting_name = inting.nm_cpt.name;
+            }
             if constexpr (has_member_atk_component<entityType>::value) {
+                std::cout << inted.nm_cpt.name << " was damaged by " << inting_name << std::endl;
                 auto dmg = inting.a_cpt.damage;
                 inted.h_cpt.health -= dmg;
                 return;

@@ -11,11 +11,12 @@ namespace roguelike {
     struct player {
         player(int pl_id) {
             id = player_id{pl_id};
-            h_cpt.health = 10;
-            a_cpt.damage = 1;
+            h_cpt.health = 50;
+            a_cpt.damage = 2;
             m_cpt.x = -1;
             m_cpt.y = -1;
             dm_cpt.decision = PASS;
+            nm_cpt.name = "player" + std::to_string(pl_id);
         }
 
         player_id id = player_id{-1};
@@ -26,6 +27,7 @@ namespace roguelike {
         atk_component a_cpt;
         decision_making_component dm_cpt;
         repr_component repr_cpt;
+        name_component nm_cpt;
     };
 
     template <>
@@ -50,7 +52,7 @@ namespace roguelike {
             }
             if constexpr (has_member_name_component<entityType>::value) {
                 inted.lg_cpt.log << "you was interacted by " << inting.nm_cpt.name << std::endl;
-            }else{
+            } else {
                 inted.lg_cpt.log << "you was interacted by the unknown\n";
             }
 

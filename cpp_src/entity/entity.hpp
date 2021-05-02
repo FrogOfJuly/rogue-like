@@ -19,6 +19,7 @@ namespace roguelike {
     struct interacter {  // C++ does not permit partial function template specialization
       public:
         static inline void interact(interacted &inted, interacting &inting) {
+            std::cout << "---------default interaction info-----------" << std::endl;
             std::string inted_name = "unknown";
             std::string inting_name = "unknown";
             std::cout << "interacted type: " << typeid(interacted).name() << std::endl;
@@ -36,6 +37,7 @@ namespace roguelike {
                 std::cout << "interacting has no name" << std::endl;
             }
             std::cout << inted_name << " interacted by " << inting_name << std::endl;
+            std::cout << "---------end of default interaction info-----------" << std::endl;
         }
     };
 }  // namespace roguelike

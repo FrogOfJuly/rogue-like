@@ -45,6 +45,7 @@ namespace roguelike {
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(goblin, id, dm_cpt, h_cpt, a_cpt, m_cpt, repr_cpt, nm_cpt);
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(goblin_guard, id, dm_cpt, h_cpt, a_cpt, m_cpt, repr_cpt, nm_cpt);
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(wall, id, repr_cpt);
+    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(trap, id, repr_cpt, a_cpt, activated, nm_cpt, h_cpt);
     //--------------end of entity default serializers----------------------------
 
 }  // namespace roguelike
