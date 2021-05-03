@@ -24,40 +24,9 @@ void roguelike::agressive_strategy::form_decision(roguelike::decision_making_com
             continue;
         }
 
-        bool has_line_of_sight = true;
-        auto loc = utils::get_los({0, 0}, {c.x, c.y});
-        for (const auto& p : loc) {
-            auto maybe_tile =
-                view->oracle->get_tile_if_exists(p.first + view->point_of_view.x, p.second + view->point_of_view.y);
-            if (not maybe_tile.has_value()) {
-                has_line_of_sight = false;
-                break;
-            }
-            if (not maybe_tile.value().resident.has_value()) {
-                continue;
-            }
-            auto maybe_ent_idx = std::visit(
-                overloaded{
-                    [](player_id id) { return std::optional<int>(); },
-                    [](entity_id id) { return std::optional<int>(id.value); }},
-                maybe_tile->resident.value());
-            if (not maybe_ent_idx.has_value()) {
-                continue;
-            }
-            const auto& var_ent = view->oracle->residents[maybe_ent_idx.value()];
-            bool is_wall = std::visit(
-                [](auto* entity_ptr) {
-                    if constexpr (std::is_same_v<decltype(entity_ptr), wall*>) {
-                        return true;
-                    }
-                    return false;
-                },
-                var_ent);
-            if (is_wall) {
-                has_line_of_sight = false;
-                break;
-            }
-        }
+        bool has_line_of_sight = view->oracle->do_tiles_have_loc(
+            {view->point_of_view.x, view->point_of_view.y}, {c.x + view->point_of_view.x, c.y + view->point_of_view.y});
+
         if (not has_line_of_sight) {
             continue;
         }

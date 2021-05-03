@@ -33,6 +33,8 @@ namespace roguelike {
 
         [[nodiscard]] bool do_target_tile_have_wall(tile_idx idx, cmd direction) const;
 
+        [[nodiscard]] bool do_tiles_have_loc(std::pair<int, int> p0, std::pair<int, int> p1) const;
+
         [[nodiscard]] tile_idx get_random_empty_tile() const;
 
         void remove_resident(tile_idx idx);
