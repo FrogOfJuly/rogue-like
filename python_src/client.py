@@ -23,6 +23,8 @@ s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 s.connect((serverAddr, 4321))
 
 player_id = 0
+log = []
+printed_log_len = 7
 
 def init_log():
     log_file = f'{player_id}.json'
@@ -42,6 +44,7 @@ def dump_log(game_state : dict):
 
 def render(game_state: dict):
     cls()
+    global log
     # print(game_state)
     if game_state == {'start'}:
         return
@@ -49,12 +52,12 @@ def render(game_state: dict):
     H = int(math.sqrt(len(game_state)))
     W = H
     player = None
-    newlog = None
     for tile_ in game_state:
         tile = tile_["tile"]
         if tile and "player" in tile:
             player = tile["player"]
-            newlog = player["lg_cpt"]["log"].split("\n")
+            newlog = player["lg_cpt"]["log"].split("\n")[:-1]
+            log += newlog
             break
     print(f"# Room: {1}/10")  # TODO
     print(f"# Score: {123:5}")  # TODO
@@ -76,13 +79,12 @@ def render(game_state: dict):
         print("You died!")
         return
     print(f'Level: {player["lvl"]:3}, Health: {player["h_cpt"]["health"]:3}, Damage: {player["a_cpt"]["damage"]}')
-    if not newlog:
-        return
     print(f'log:')
-    for entry in newlog[-5:]:
+
+    for entry in log[-printed_log_len:]:
         print(f'> {entry}')
-    if len(newlog) < 5:
-        for i in range(5 - len(newlog)):
+    if len(log) < printed_log_len:
+        for i in range(printed_log_len - len(log)):
             print('>')
 
 
