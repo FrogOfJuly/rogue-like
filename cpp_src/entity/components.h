@@ -1,10 +1,9 @@
 //
 // Created by Kirill Golubev on 23.04.2021.
 //
-#include <optional>
-
 #include "../common.h"
 #include "../strategies/abstract_strategy.h"
+#include <optional>
 
 #ifndef ROGUE_LIKE_COMPONENTS_H
 #define ROGUE_LIKE_COMPONENTS_H
@@ -34,11 +33,10 @@ namespace roguelike {
         int health = -1;
         template <typename T>
         static inline bool is_alive(const T *ent) {
-            return ent->h_cpt.health > 0;
-        }
-        template <typename T>
-        static inline void receive_damage(T *ent, int damage) {
-            ent->h_cpt.health -= damage;
+            if constexpr (has_member_health_component<std::remove_pointer_t<decltype(ent)>>::value) {
+                return false;
+            }
+            return true;
         }
     };
 
