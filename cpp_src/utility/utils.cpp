@@ -124,3 +124,14 @@ bool roguelike::operator!=(const roguelike::player_id& lhs, const roguelike::pla
     return lhs.value != rhs.value;
 }
 std::pair<int, int> roguelike::utils::vec2d::to_pair() const { return std::make_pair(x, y); }
+
+#define register_entity(entity_type_name)                                                                             \
+    bool roguelike::is_entity_a_##entity_type_name(const roguelike::entity_type& var_ent) {                                    \
+        return std::visit(                                                                                            \
+            [](auto* ent_ptr) { return std::is_same_v<std::remove_pointer_t<decltype(ent_ptr)>, entity_type_name>; }, \
+            var_ent);                                                                                                 \
+    }
+#include "register_for_entities.h"
+#undef register_entity
+
+

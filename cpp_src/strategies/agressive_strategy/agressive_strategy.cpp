@@ -18,13 +18,12 @@ void roguelike::agressive_strategy::form_decision(roguelike::decision_making_com
         if (not c.observed_entity.has_value()) {
             continue;
         }
-        bool is_player = std::visit(
-            overloaded{[](player*) { return true; }, [](auto*) { return false; }}, c.observed_entity.value());
-        if (not is_player) {
+
+        if (is_entity_a_player(c.observed_entity.value())) {
             continue;
         }
 
-        bool has_line_of_sight = view->oracle->do_tiles_have_loc(
+        bool has_line_of_sight = view->oracle->do_tiles_have_los(
             {view->point_of_view.x, view->point_of_view.y}, {c.x + view->point_of_view.x, c.y + view->point_of_view.y});
 
         if (not has_line_of_sight) {
