@@ -35,15 +35,9 @@ namespace roguelike {
 
         [[nodiscard]] bool do_target_tile_have_wall(tile_idx idx, cmd direction) const;
 
-        [[nodiscard]] bool do_tiles_have_los(std::pair<int, int> p0, std::pair<int, int> p1) const;
+        [[nodiscard]] bool do_tiles_have_loc(std::pair<int, int> p0, std::pair<int, int> p1) const;
 
         [[nodiscard]] tile_idx get_random_empty_tile() const;
-
-        std::optional<entity_type> get_resident(entity_id id) const;  // copy bc the pointer to entity in entity type
-        std::optional<entity_type> get_resident(player_id id) const;
-        std::optional<entity_type> get_resident(general_id id) const;
-        std::optional<entity_type> get_resident(const tile &tl) const;
-        std::optional<entity_type> get_resident(int x, int y) const;
 
         void remove_resident(tile_idx idx);
 

@@ -33,16 +33,12 @@ namespace roguelike::utils {
     cmd get_random_action();
 }  // namespace roguelike::utils
 
-namespace roguelike {
+namespace roguelike{
     bool operator==(const entity_id& lhs, const entity_id& rhs);
     bool operator==(const player_id& lhs, const player_id& rhs);
 
     bool operator!=(const entity_id& lhs, const entity_id& rhs);
     bool operator!=(const player_id& lhs, const player_id& rhs);
-
-#define register_entity(entity_type_name) bool is_entity_a_##entity_type_name(const entity_type& var_ent);
-#include "register_for_entities.h"
-#undef register_entity
-}  // namespace roguelike
+}
 
 #endif  // ROGUE_LIKE_UTILS_H

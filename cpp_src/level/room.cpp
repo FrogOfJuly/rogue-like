@@ -211,7 +211,6 @@ roguelike::room_view roguelike::room::get_area_around_tile(roguelike::tile_idx i
                 view.push_back(room_view::make_cell(room_view::observation(), idx_pair.first, idx_pair.second));
             } else {
                 auto cell = std::visit(
-                    //preserving type information but discarding everything else
                     overloaded{
                         [this, idx_pair](entity_id id) {
                             return room_view::make_cell(residents[id.value], idx_pair.first, idx_pair.second);
@@ -251,13 +250,22 @@ bool roguelike::room::do_target_tile_have_wall(roguelike::tile_idx idx, roguelik
     if (not maybe_tile.has_value()) {
         return false;
     }
-    auto maybe_var_ent = get_resident(maybe_tile.value());
-    if (not maybe_var_ent) {
+    if (not maybe_tile.value().resident.has_value()) {
         return false;
     }
-    return is_entity_a_wall(maybe_var_ent.value());
+    auto maybe_ent_idx = std::visit(
+        overloaded{
+            [](player_id) { return std::optional<int>(); }, [](entity_id id) { return std::optional<int>(id.value); }},
+        maybe_tile.value().resident.value());
+
+    if (not maybe_ent_idx.has_value()) {
+        return false;
+    }
+    auto var_ent = residents[maybe_ent_idx.value()];
+    bool is_wall = std::visit([](auto* entity_ptr) { return std::is_same_v<decltype(entity_ptr), wall*>; }, var_ent);
+    return is_wall;
 }
-bool roguelike::room::do_tiles_have_los(std::pair<int, int> p0, std::pair<int, int> p1) const {
+bool roguelike::room::do_tiles_have_loc(std::pair<int, int> p0, std::pair<int, int> p1) const {
     utils::vec2d point_of_view{p0.first, p0.second};
     utils::vec2d tgt_point{p1.first, p1.second};
     tgt_point = tgt_point - point_of_view;
@@ -269,42 +277,30 @@ bool roguelike::room::do_tiles_have_los(std::pair<int, int> p0, std::pair<int, i
             has_line_of_sight = false;
             break;
         }
-
-        auto maybe_var_ent = get_resident(maybe_tile.value());
-        if (not maybe_var_ent.has_value()) {
+        if (not maybe_tile.value().resident.has_value()) {
             continue;
         }
-
-        if (is_entity_a_wall(maybe_var_ent.value())) {
+        auto maybe_ent_idx = std::visit(
+            overloaded{
+                [](player_id id) { return std::optional<int>(); },
+                [](entity_id id) { return std::optional<int>(id.value); }},
+            maybe_tile->resident.value());
+        if (not maybe_ent_idx.has_value()) {
+            continue;
+        }
+        const auto& var_ent = residents[maybe_ent_idx.value()];
+        bool is_wall = std::visit(
+            [](auto* entity_ptr) {
+                if constexpr (std::is_same_v<decltype(entity_ptr), wall*>) {
+                    return true;
+                }
+                return false;
+            },
+            var_ent);
+        if (is_wall) {
             has_line_of_sight = false;
             break;
         }
     }
     return has_line_of_sight;
-}
-
-std::optional<roguelike::entity_type> roguelike::room::get_resident(roguelike::entity_id id) const {
-    return std::optional<entity_type>(residents.at(id.value));
-}
-std::optional<roguelike::entity_type> roguelike::room::get_resident(roguelike::player_id id) const {
-    return std::optional<entity_type>();
-}
-std::optional<roguelike::entity_type> roguelike::room::get_resident(roguelike::general_id id) const {
-    return std::optional<entity_type>(std::visit(
-        overloaded{
-            [this](player_id id) { return get_resident(id); }, [this](entity_id id) { return get_resident(id); }},
-        id));
-}
-std::optional<roguelike::entity_type> roguelike::room::get_resident(const roguelike::tile& tl) const {
-    if (not tl.resident.has_value()) {
-        return std::optional<entity_type>();
-    }
-    return get_resident(tl.resident.value());
-}
-std::optional<roguelike::entity_type> roguelike::room::get_resident(int x, int y) const {
-    auto tl = get_tile_if_exists(x, y);
-    if (not tl.has_value()) {
-        return std::optional<entity_type>();
-    }
-    return get_resident(tl->resident.value());
 }
