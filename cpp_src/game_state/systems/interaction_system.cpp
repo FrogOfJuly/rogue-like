@@ -55,7 +55,7 @@ void roguelike::interaction_system::resolve_all_interactions() {
             idx_pair.second);
 
         std::visit(
-            [](auto* left_ptr, auto* right_ptr) {
+            [](auto *left_ptr, auto *right_ptr) {
                 interacter<std::remove_pointer_t<decltype(left_ptr)>, std::remove_pointer_t<decltype(right_ptr)>>::
                     interact(*left_ptr, *right_ptr);
             },
@@ -75,12 +75,23 @@ void roguelike::interaction_system::resolve_all_interactions() {
                                     game_ptr->dead_players.insert(id.value);
                                     game_ptr->players[id.value].lg_cpt.log << "you are dead!\n";
                                 },
-                                [this](entity_id id) {
-                                    game_ptr->level.dead.insert(id.value);
-                                }},
+                                [this](entity_id id) { game_ptr->level.dead.insert(id.value); }},
                             inted_id);
-
-                        game_ptr->mv_system.more_general_move(interacting_pair.second);
+                        auto &inting_ent = interacting_pair.second;
+                        game_ptr->mv_system.more_general_move(inting_ent);
+                        std::visit(
+                            [inted_ent_ptr](auto *entity_ptr) {
+                                if constexpr (has_member_logging_component<
+                                                  std::remove_pointer_t<decltype(entity_ptr)>>::value) {
+                                    std::string inted_ent_name = "an enemy";
+                                    if constexpr (has_member_name_component<
+                                                      std::remove_pointer_t<decltype(inted_ent_ptr)>>::value) {
+                                        inted_ent_name = "the " + inted_ent_ptr->nm_cpt.name;
+                                    }
+                                    entity_ptr->lg_cpt.log << "you have killed " << inted_ent_name;
+                                }
+                            },
+                            inting_ent);
                     }
                 }
             },
