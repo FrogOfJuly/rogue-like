@@ -46,9 +46,9 @@ class Backend:
         self.state.resolve_all_interactions()
         self.state.move_nonplayers()
         self.state.resolve_all_interactions()
+        self.state.redraw_players()
         self.state.end_turn()
         self.state.decide_next_move()
-        self.state.redraw_players()
         self.state.redraw_nonplayers()
 
         data = json.loads(self.state.get_serialization())
