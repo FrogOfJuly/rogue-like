@@ -45,11 +45,6 @@ namespace roguelike {
         }
     }
 
-    template <>
-    inline bool health_component::is_alive<goblin_guard>(const goblin_guard *g) {
-        return g->h_cpt.health > 0;
-    }
-
     template <typename entityType>
     struct interacter<goblin_guard, entityType> {
         static inline void interact(goblin_guard &inted, entityType &inting) {
@@ -64,6 +59,7 @@ namespace roguelike {
                 std::cout << inted.nm_cpt.name << " was damaged by " << inting_name << std::endl;
                 auto dmg = inting.a_cpt.damage;
                 inted.h_cpt.health -= dmg;
+                health_component::receive_damage(&inted, dmg);
                 return;
             }
             return;
