@@ -33,8 +33,13 @@ void roguelike::agressive_strategy::form_decision(roguelike::decision_making_com
         auto charges_into = view->oracle->get_tile(c.x + view->point_of_view.x, c.y + view->point_of_view.y).resident;
 
         if (not dm_cpt.charges_into.has_value() or dm_cpt.charges_into != charges_into) {
-            std::cout << "Kill the enemy!!" << std::endl;
-            // todo: do proper logging to oracle
+            std::visit(
+                overloaded{
+                    [this](player_id id) {
+                        view->oracle->common_log << "player" << id.value << " is charged by an enemy" << std::endl;
+                    },
+                    [](entity_id id) {}},
+                charges_into.value());
         }
         dm_cpt.charges_into = charges_into;
         // no pathfinding yet
@@ -66,4 +71,5 @@ void roguelike::agressive_strategy::form_decision(roguelike::decision_making_com
         return;
     }
     dm_cpt.decision = cmd::PASS;
+    dm_cpt.charges_into.reset();
 }

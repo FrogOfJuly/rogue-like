@@ -22,6 +22,8 @@ namespace roguelike {
         std::vector<entity_type> residents;
         std::unordered_set<int> dead;
 
+        mutable std::stringstream common_log;
+
       public:
         room() = default;
 
