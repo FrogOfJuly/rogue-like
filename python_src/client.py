@@ -3,7 +3,7 @@ import pickle
 import select
 import socket
 import sys
-import json # for logging only
+import json  # for logging only
 from roguelike import cmd
 from enum import Enum
 import os
@@ -26,13 +26,14 @@ player_id = 0
 log = []
 printed_log_len = 7
 
+
 def init_log():
     log_file = f'{player_id}.json'
     with open(log_file, "w") as file:
         file.write("[]")
 
 
-def dump_log(game_state : dict):
+def dump_log(game_state: dict):
     log_file = f'{player_id}.json'
 
     with open(log_file, "r+") as file:
@@ -56,8 +57,8 @@ def render(game_state: dict):
         tile = tile_["tile"]
         if tile and "player" in tile:
             player = tile["player"]
-            newlog = player["lg_cpt"]["log"].split("\n")[:-1]
-            log += newlog
+            newlog = player["lg_cpt"]["log"].split("\n")
+            log += list(filter(lambda x: x != '', newlog))
             break
     print(f"# Room: {1}/10")  # TODO
     print(f"# Score: {123:5}")  # TODO
@@ -86,8 +87,6 @@ def render(game_state: dict):
     if len(log) < printed_log_len:
         for i in range(printed_log_len - len(log)):
             print('>')
-
-
 
 
 while True:
