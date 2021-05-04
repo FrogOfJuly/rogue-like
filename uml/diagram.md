@@ -4,6 +4,10 @@
 
 ```
 @startuml componentDigram
+    class component{
+        {field} int id
+    }
+    
     class move_component {
         {field} int x
         {field} int y
@@ -17,6 +21,7 @@
     class health_component {
         {field} int health
         {method} bool is_alive(T *)
+        {method} void receive_damage(T *, int damage)
     }
 
     class repr_component {
@@ -50,6 +55,14 @@
         {method} form_decision
     }
     
+    component <|-- move_component
+    component <|-- atk_component
+    component <|-- health_component
+    component <|-- repr_component
+    component <|-- decision_making_component
+    component <|-- logging_component
+    
+    
     decision_making_component *-- strategy
     
     strategy <|-- random_strategy
@@ -63,24 +76,34 @@
 
 ```
 @startuml entityDigram
-    note "entity  is not abstract class it is used for convinience.\n In principle there might be entity that do not extend it" as N
-
-    class entity {
-        {field} entity_id id
+    package "Components" #DDDDDD {
+        class move_component 
+        class atk_component
+        class health_component
+        class repr_component
+        class decision_making_component
+        class logging_component
     }
-    entity .. N
-
-    class player 
-    class potion
-    class goblin
-    class wall
+    package "Entities" #DDDDDD {
+        class entity {
+            {field} entity_id id
+        }
     
-    class move_component 
-    class atk_component
-    class health_component
-    class repr_component
-    class decision_making_component
-    class logging_component
+        class player 
+        class potion
+        class wall
+        class trap {
+            {field} entity_id id
+            {field} bool disarmed
+        }
+        package "Goblins" #005300{
+            class goblin
+            class goblin_guard
+            class goblin_worker
+        }
+    }
+    
+    
     
 
     entity <|-- player
@@ -88,6 +111,9 @@
     entity <|-- potion
     entity <|-- wall
     entity <|-- trap
+    
+    goblin <|-- goblin_guard
+    goblin <|-- goblin_worker
     
     player *-- health_component
     player *-- atk_component
@@ -174,9 +200,14 @@ struct entity_id{
     int value;
 };
 
-using entity_type = std::variant<entity*, player*, .... etc>;
+using entity_type = std::variant<entity*, player*, goblin*, .... etc>;
 using general_id = std::variant<entity_id, player_id>;
 ```
+
+Note that there are no abstract classes except for strategies. If one want to 
+implement entity or component outside of such hierarchy. The only condition for entities is that 
+class that want to be treated like entity must provide `id` field of type `entity_id`. There is no such
+condition for components.
 
 ## Components
 
