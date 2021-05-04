@@ -1,5 +1,10 @@
 # Diagrams
-
+For diagram rendering one need to run
+```bash
+    > pwd
+    > <project_folder>/uml
+    > plantuml -tsvg diagram.md 
+```
 <div hidden>
 
 ```
@@ -151,26 +156,28 @@ class level{
 class tile{
     {field} optional<general_id> resident
 }
+package "systems" #DDDDDD{
+    class move_system{
+        {method} void general_move(entity_type&)
+    }
+    class interaction_system{
+        {field} queue<general_id, general_id>interactions
+        {method} void resolve_all_interations()
+    }
+    
+    class representation_system{
+        {method} void general_draw(entity_type& var_ent)
+    }
+    
+    class decision_making_system{
+        {method} void make_decision(entity_type& var_ent)
+    }
+    
+    class general_system{
+        {field} gmestate* game_ptr
+    }
+}
 
-class move_system{
-    {method} void general_move(entity_type&)
-}
-class interaction_system{
-    {field} queue<general_id, general_id>interactions
-    {method} void resolve_all_interations()
-}
-
-class representation_system{
-    {method} void general_draw(entity_type& var_ent)
-}
-
-class decision_making_system{
-    {method} void make_decision(entity_type& var_ent)
-}
-
-class general_system{
-    {field} gmestate* game_ptr
-}
 
 gamestate *-- level
 gamestate *-- move_system
