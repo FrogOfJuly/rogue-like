@@ -4,6 +4,7 @@
 
 register_entity(goblin)
 register_entity(goblin_guard)
+register_entity(goblin_worker)
 register_entity(player)
 register_entity(potion)
 register_entity(wall)

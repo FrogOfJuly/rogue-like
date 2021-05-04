@@ -160,6 +160,15 @@ void roguelike::gamestate::initialize(int player_number) {
         level.spawn_on_level(var_ent, rnd_tile);
         level.residents.emplace_back(gg);
     }
+    for (int i = 7; i < 10; ++i) {
+        lwlog_info("placing goblin worker");
+        auto new_id = level.residents.size();
+        auto gg = new goblin_worker(new_id);
+        entity_type var_ent = gg;
+        auto rnd_tile = level.get_random_empty_tile();
+        level.spawn_on_level(var_ent, rnd_tile);
+        level.residents.emplace_back(gg);
+    }
     /*{
         auto e = new entity((int)level.residents.size());
         lwlog_info("placing entity");
