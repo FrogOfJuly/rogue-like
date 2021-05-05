@@ -71,8 +71,8 @@ def render(game_state: dict):
                 print(f" {tile['player']['repr_cpt']['repr']} ", end='')
             elif 'entity' in tile:
                 repr = tile['entity']['repr_cpt']['repr']
-                if repr == '#':
-                    print('###', end='')
+                if repr == '█':
+                    print('███', end='')
                 else:
                     print(f' {repr} ', end='')
         print()
