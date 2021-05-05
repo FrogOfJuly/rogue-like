@@ -32,27 +32,8 @@ void roguelike::interaction_system::resolve_all_interactions() {
         entity_pair idx_pair = interactions.front();
         interactions.pop();
 
-        auto interacting_pair = std::visit(
-            overloaded{
-                [&players](player_id left_id, player_id right_id) {
-                    entity_type left_player = &players[left_id.value];
-                    entity_type right_player = &players[right_id.value];
-                    return std::make_pair(left_player, right_player);
-                },
-                [&players, &residents](entity_id left_id, player_id right_id) {
-                    entity_type right_player = &players[right_id.value];
-                    return std::make_pair(residents[left_id.value], right_player);
-                },
-                [&players, &residents](player_id left_id, entity_id right_id) {
-                    entity_type left_player = &players[left_id.value];
-                    return std::make_pair(left_player, residents[right_id.value]);
-                },
-                [&residents](entity_id left_id, entity_id right_id) {
-                    return std::make_pair(residents[left_id.value], residents[right_id.value]);
-                },
-            },
-            idx_pair.first,
-            idx_pair.second);
+        auto interacting_pair =
+            std::make_pair(game_ptr->get_entity(idx_pair.first), game_ptr->get_entity(idx_pair.second));
 
         std::visit(
             [](auto *left_ptr, auto *right_ptr) {
@@ -63,39 +44,19 @@ void roguelike::interaction_system::resolve_all_interactions() {
             interacting_pair.second);
 
         auto des_idx = move_system::desired_tile_idx(interacting_pair.second);
-        std::visit(
-            [this, &interacting_pair, des_idx](auto *inted_ent_ptr) {
+        bool is_dead = std::visit(
+            [](auto *inted_ent_ptr) {
                 if constexpr (has_member_health_component<std::remove_pointer_t<decltype(inted_ent_ptr)>>::value) {
-                    if (not health_component::is_alive(inted_ent_ptr)) {
-                        game_ptr->level.remove_resident(des_idx);
-                        general_id inted_id = inted_ent_ptr->id;
-                        std::visit(
-                            overloaded{
-                                [this](player_id id) {
-                                    game_ptr->dead_players.insert(id.value);
-                                    game_ptr->players[id.value].lg_cpt.log << "you are dead!\n";
-                                },
-                                [this](entity_id id) { game_ptr->level.dead.insert(id.value); }},
-                            inted_id);
-                        auto &inting_ent = interacting_pair.second;
-                        game_ptr->mv_system.more_general_move(inting_ent);
-                        std::visit(
-                            [inted_ent_ptr](auto *entity_ptr) {
-                                if constexpr (has_member_logging_component<
-                                                  std::remove_pointer_t<decltype(entity_ptr)>>::value) {
-                                    std::string inted_ent_name = "an enemy";
-                                    if constexpr (has_member_name_component<
-                                                      std::remove_pointer_t<decltype(inted_ent_ptr)>>::value) {
-                                        inted_ent_name = "the " + inted_ent_ptr->nm_cpt.name;
-                                    }
-                                    entity_ptr->lg_cpt.log << "you have killed " << inted_ent_name;
-                                }
-                            },
-                            inting_ent);
-                    }
+                    return not health_component::is_alive(inted_ent_ptr);
                 }
+                return false;
             },
             interacting_pair.first);
-        // game_ptr->mv_system.more_general_move()
+        if (is_dead) {
+            game_ptr->level.remove_resident(des_idx);
+            game_ptr->report_murder(idx_pair.first, idx_pair.second);
+            auto &inting_ent = interacting_pair.second;
+            game_ptr->mv_system.more_general_move(inting_ent);
+        }
     }
 }

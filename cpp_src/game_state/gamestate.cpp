@@ -113,7 +113,9 @@ void roguelike::gamestate::initialize(int player_number) {
     lvl_num = 0;
     level.generate_level(lvl_num);
     player_num = player_number;
-    players = (player *)new char[sizeof(player) * player_num];  // they do not have default constructor
+    players = (player *)new char[sizeof(player) * player_num];
+    // They do not have default constructor and
+    // I can't declare vector of them in header bc it requires complete type
     for (int i = 0; i < player_num; ++i) {
         lwlog_info("placing player");
         new (&players[i]) player(i);
@@ -122,16 +124,6 @@ void roguelike::gamestate::initialize(int player_number) {
         auto rnd_tile = level.get_random_empty_tile();
         level.spawn_on_level(var_ent, rnd_tile);
     }
-    /*{
-        for (int i = 0; i < 2; ++i) {
-            lwlog_info("placing goblin");
-            auto g = new goblin(i);
-            g->dm_cpt.decision = LEFT;
-            entity_type var_ent = g;
-            level.spawn_on_level(var_ent);
-            level.residents.emplace_back(g);
-        }
-    }*/
     for (int i = 0; i < 3; ++i) {
         lwlog_info("placing goblin");
         auto new_id = level.residents.size();
@@ -169,20 +161,6 @@ void roguelike::gamestate::initialize(int player_number) {
         level.spawn_on_level(var_ent, rnd_tile);
         level.residents.emplace_back(gg);
     }
-    /*{
-        auto e = new entity((int)level.residents.size());
-        lwlog_info("placing entity");
-        entity_type var_ent = e;
-        level.spawn_on_level(var_ent);
-        level.residents.emplace_back(e);
-    }
-    {
-        auto p = new potion((int)level.residents.size());
-        lwlog_info("placing potion");
-        entity_type var_ent = p;
-        level.spawn_on_level(var_ent);
-        level.residents.emplace_back(p);
-    }*/
 }
 void roguelike::gamestate::clean_logs() {
     for (int i = 0; i < player_num; ++i) {
@@ -214,4 +192,43 @@ roguelike::gamestate::~gamestate() {
         players[i].~player();
     }
     delete[](char *) players;
+}
+roguelike::player *roguelike::gamestate::get_player(roguelike::player_id id) { return &players[id.value]; }
+roguelike::entity_type roguelike::gamestate::get_entity(roguelike::general_id id) {
+    return std::visit(
+        overloaded{
+            [this](player_id id) {
+                entity_type plr = get_player(id);
+                return plr;
+            },
+            [this](entity_id id) { return level.get_resident(id); }},
+        id);
+}
+void roguelike::gamestate::report_murder(roguelike::general_id mdred_id, roguelike::general_id mdrer_id) {
+    std::visit(
+        overloaded{
+            [this](player_id id) {
+                dead_players.insert(id.value);
+                get_player(id)->lg_cpt.log << "you are dead!\n";
+            },
+            [this](entity_id id) { level.dead.insert(id.value); }},
+        mdred_id);
+
+    entity_type mdred_ent = get_entity(mdred_id);
+    entity_type mdrer_ent = get_entity(mdrer_id);
+
+    std::visit(
+        [](auto *mdred_ent_ptr, auto *mdrer_ent_ptr) {
+            using mdrerT = std::remove_pointer_t<decltype(mdrer_ent_ptr)>;
+            using mdredT = std::remove_pointer_t<decltype(mdred_ent_ptr)>;
+            std::string victim_name = "your victim";
+            if constexpr (has_member_name_component<mdredT>::value) {
+                victim_name = mdred_ent_ptr->nm_cpt.name;
+            }
+            if constexpr (has_member_logging_component<mdrerT>::value) {
+                mdrer_ent_ptr->lg_cpt.log << "you have killed " << victim_name << std::endl;
+            }
+        },
+        mdred_ent,
+        mdrer_ent);
 }

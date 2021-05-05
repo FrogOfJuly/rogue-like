@@ -7,12 +7,11 @@
 
 #include "../common.h"
 #include "../level/room.h"
+#include "../serializers/serialize_info.h"
+#include "systems/decision_making_system.h"
 #include "systems/drawing_system.h"
 #include "systems/interaction_system.h"
 #include "systems/move_system.h"
-#include "systems/decision_making_system.h"
-
-#include "../serializers/serialize_info.h"
 
 #ifndef ROGUE_LIKE_GAMESTATE_H
 #define ROGUE_LIKE_GAMESTATE_H
@@ -34,6 +33,11 @@ namespace roguelike {
         interaction_system inter_system;
         /*drawing_system draw_system; -- all methods are static, so no need to create object*/
         decision_making_system dm_system;
+
+        player* get_player(player_id id);
+        entity_type get_entity(general_id id);
+
+        void report_murder(general_id mdred_id, general_id mdrer_id);
 
 
       public:

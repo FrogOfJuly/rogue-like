@@ -39,6 +39,8 @@ namespace roguelike {
 
         [[nodiscard]] tile_idx get_random_empty_tile() const;
 
+        [[nodiscard]] entity_type get_resident(entity_id id);
+
         void remove_resident(tile_idx idx);
 
         tile &get_tile(int x, int y);

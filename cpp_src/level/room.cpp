@@ -304,3 +304,4 @@ bool roguelike::room::do_tiles_have_loc(std::pair<int, int> p0, std::pair<int, i
     }
     return has_line_of_sight;
 }
+roguelike::entity_type roguelike::room::get_resident(roguelike::entity_id id) { return residents.at(id.value); }
