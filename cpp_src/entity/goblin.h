@@ -56,7 +56,7 @@ namespace roguelike {
             }
             if constexpr (has_member_atk_component<entityType>::value and not std::is_base_of_v<goblin, entityType>) {
                 std::cout << inted.nm_cpt.name << " was damaged by " << inting_name << std::endl;
-                auto dmg = inting.a_cpt.damage;
+                auto dmg = atk_component::calculate_damage(&inting);
                 health_component::receive_damage(&inted, dmg);
                 return;
             }

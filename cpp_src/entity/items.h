@@ -3,8 +3,8 @@
 //
 #include "entity.hpp"
 
-#ifndef ROGUE_LIKE_POTION_H
-#define ROGUE_LIKE_POTION_H
+#ifndef ROGUE_LIKE_ITEMS_H
+#define ROGUE_LIKE_ITEMS_H
 namespace roguelike {
     struct potion {
         potion(int id) : id{id} {}
@@ -12,9 +12,9 @@ namespace roguelike {
         repr_component repr_cpt;
     };
 
-    template<>
-    inline std::string repr_component::compute_representation<potion>(const potion* p){
-        return "p";
+    template <>
+    inline std::string repr_component::compute_representation<potion>(const potion *p) {
+        return u8"☩";
     }
 
     template <>
@@ -22,4 +22,4 @@ namespace roguelike {
         static inline void interact(potion &inted, player &inting) { inting.lg_cpt.log << "you interacted with potion\n"; }
     };
 }  // namespace roguelike
-#endif  // ROGUE_LIKE_POTION_H
+#endif  // ROGUE_LIKE_ITEMS_H

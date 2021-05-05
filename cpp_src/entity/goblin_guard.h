@@ -19,7 +19,7 @@ namespace roguelike {
         }
     };
 
-    template<>
+    template <>
     inline std::string repr_component::compute_representation<goblin_guard>(const goblin_guard *g) {
         switch (g->dm_cpt.decision) {
             case LEFT:
@@ -35,7 +35,7 @@ namespace roguelike {
         }
     }
 
-    template<typename entityType>
+    template <typename entityType>
     struct interacter<goblin_guard, entityType> {
         static inline void interact(goblin_guard &inted, entityType &inting) {
             if constexpr (has_member_logging_component<entityType>::value) {
@@ -47,8 +47,7 @@ namespace roguelike {
             }
             if constexpr (has_member_atk_component<entityType>::value and not std::is_base_of_v<goblin, entityType>) {
                 std::cout << inted.nm_cpt.name << " was damaged by " << inting_name << std::endl;
-                auto dmg = inting.a_cpt.damage;
-                inted.h_cpt.health -= dmg;
+                auto dmg = atk_component::calculate_damage(&inting);
                 health_component::receive_damage(&inted, dmg);
                 return;
             }
@@ -56,7 +55,7 @@ namespace roguelike {
         }
     };
 
-    template<>
+    template <>
     struct interacter<goblin_guard, goblin_guard> {
         static inline void interact(goblin_guard &inted, goblin_guard &inting) {}
     };

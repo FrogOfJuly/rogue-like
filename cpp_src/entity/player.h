@@ -38,9 +38,8 @@ namespace roguelike {
     template <typename entityType>
     struct interacter<player, entityType> {
         static inline void interact(player &inted, entityType &inting) {
-            std::cout << "type of interacting: " << typeid(entityType).name() << std::endl;
             if constexpr (has_member_atk_component<entityType>::value) {
-                auto dmg = inting.a_cpt.damage;
+                auto dmg = atk_component::calculate_damage(&inting);
                 health_component::receive_damage(&inted, dmg);
                 inted.lg_cpt.log << "you received " << dmg << " damage\n";
                 return;
@@ -58,8 +57,8 @@ namespace roguelike {
     template <>
     struct interacter<player, player> {
         static inline void interact(player &inted, player &inting) {
-            auto dmg = inting.a_cpt.damage;
-            inted.h_cpt.health -= dmg;
+            auto dmg = atk_component::calculate_damage(&inting);
+            health_component::receive_damage(&inted, dmg);
             inted.lg_cpt.log << "you was interacted by the player " << std::to_string(inting.id.value) << "\n";
             inting.lg_cpt.log << "you interacted with player" << std::to_string(inted.id.value) << "\n";
             return;
