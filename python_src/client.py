@@ -115,6 +115,8 @@ while True:
                     action = cmd.LEFT
                 elif key == 'd':
                     action = cmd.RIGHT
+                elif key == 'q':
+                    action = cmd.ENTER
                 elif key == 'x':
                     s.close()
                     exit()
