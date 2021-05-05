@@ -18,9 +18,7 @@ void roguelike::agressive_strategy::form_decision(roguelike::decision_making_com
         if (not c.observed_entity.has_value()) {
             continue;
         }
-        bool is_player = std::visit(
-            overloaded{[](player*) { return true; }, [](auto*) { return false; }}, c.observed_entity.value());
-        if (not is_player) {
+        if (not std::holds_alternative<player*>(c.observed_entity.value())) {
             continue;
         }
 
