@@ -69,17 +69,39 @@ roguelike::tile_idx roguelike::move_system::desired_tile_idx(entity_type &var_en
 
 bool roguelike::move_system::more_general_move(entity_type &var_ent) {
     auto des_idx = desired_tile_idx(var_ent);
-    if (des_idx < 0) {
-        return false;
-    }
-
     return std::visit(
         [this, des_idx](auto *ent_ptr) {
             bool moved = false;
-            constexpr bool able_to_dm =
-                has_member_decision_making_component<std::remove_pointer_t<decltype(ent_ptr)>>::value;
-            constexpr bool able_to_move = has_member_move_component<std::remove_pointer_t<decltype(ent_ptr)>>::value;
+            using entT = std::remove_pointer_t<decltype(ent_ptr)>;
+            constexpr bool able_to_dm = has_member_decision_making_component<entT>::value;
+            constexpr bool able_to_move = has_member_move_component<entT>::value;
+            constexpr bool has_inventory = has_member_simple_inventory_component<entT>::value;
 
+            if constexpr (able_to_dm and has_inventory) {
+                std::cout << "Somebody has dm and inventory" << std::endl;
+                if (ent_ptr->dm_cpt.decision == cmd::ENTER and ent_ptr->s_inv_cpt.spot.has_value()) {
+                    std::cout << "received enter command with nonempty spot" << std::endl;
+                    auto var_spot_cnt = ent_ptr->s_inv_cpt.spot.value();
+                    bool used = std::visit(
+                        [ent_ptr](auto *spot_cnt_ptr) {
+                            using cntT = std::remove_pointer_t<decltype(spot_cnt_ptr)>;
+                            if constexpr (has_member_one_time_effect_component<cntT>::value) {
+                                std::cout << "applying effect" << std::endl;
+                                return one_time_effect_component::apply_effect(spot_cnt_ptr, ent_ptr);
+                            }
+                            return false;
+                        },
+                        var_spot_cnt);
+                    if (used) {
+                        ent_ptr->s_inv_cpt.spot.reset();
+                    }
+                    return moved;
+                }
+            }
+
+            if (des_idx < 0) {
+                return false;
+            }
             if constexpr (able_to_dm and able_to_move) {
                 auto des_xy = room::pairFromIdx(des_idx);
                 auto des_x = des_xy.first;

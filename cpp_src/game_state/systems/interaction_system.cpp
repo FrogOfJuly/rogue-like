@@ -58,5 +58,18 @@ void roguelike::interaction_system::resolve_all_interactions() {
             auto &inting_ent = interacting_pair.second;
             game_ptr->mv_system.more_general_move(inting_ent);
         }
+        bool is_picked = std::visit(
+            [](auto *inted_ent_ptr) {
+                if constexpr (has_member_pickable_component<std::remove_pointer_t<decltype(inted_ent_ptr)>>::value) {
+                    return inted_ent_ptr->pk_cpt.picked;
+                }
+                return false;
+            },
+            interacting_pair.first);
+        if (is_picked) {
+            game_ptr->level.remove_resident(des_idx);
+            auto &inting_ent = interacting_pair.second;
+            game_ptr->mv_system.more_general_move(inting_ent);
+        }
     }
 }

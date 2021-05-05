@@ -18,6 +18,9 @@ namespace roguelike {
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(repr_component, repr);
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(decision_making_component, decision, eye_sight);
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(name_component, name);
+    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(one_time_effect_component, msg_on_effect);
+
+    //    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(simple_inventory_component);
 
     //--------------end of components default serializers-----------------
     //---------------------------------------------------------------------------

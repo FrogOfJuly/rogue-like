@@ -27,7 +27,7 @@ namespace roguelike {
     struct atk_component : public component {
         int damage = -1;
 
-        template<typename T>
+        template <typename T>
         static inline int calculate_damage(const T *ent) {
             return ent->a_cpt.damage;
         }
@@ -38,12 +38,12 @@ namespace roguelike {
     struct health_component : public component {
         int health = -1;
 
-        template<typename T>
+        template <typename T>
         static inline bool is_alive(const T *ent) {
             return ent->h_cpt.health > 0;
         }
 
-        template<typename T>
+        template <typename T>
         static inline void receive_damage(T *ent, int damage) {
             ent->h_cpt.health -= damage;
         }
@@ -54,7 +54,7 @@ namespace roguelike {
     struct repr_component : public component {
         std::string repr = "?";
 
-        template<typename T>
+        template <typename T>
         static inline std::string compute_representation(const T *) {
             return "?";
         }
@@ -100,6 +100,24 @@ namespace roguelike {
     };
 
     //--------------end of name_component----------------------------------------
+
+    struct simple_inventory_component : public component {
+        std::optional<entity_type> spot;
+    };
+
+    //--------------end of simple inventory component----------------------------------------
+
+    struct pickable_component : public component {
+        bool picked = false;
+    };
+
+    struct one_time_effect_component : public component {
+        std::string msg_on_effect = "?";
+        template <typename U, typename T>
+        static inline bool apply_effect(U* src, T *tgt) {
+            return false;
+        }
+    };
 
 }  // namespace roguelike
 

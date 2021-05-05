@@ -80,6 +80,7 @@ void roguelike::gamestate::move_players() {
     for (int i = 0; i < player_num; ++i) {
         auto &plr = players[i];
         lwlog_info("moving player %d", plr.id);
+        std::cout << "moving player with decision: " << players->dm_cpt.decision << std::endl;
         entity_type var_ent = &plr;
         mv_system.more_general_move(var_ent);
     }
@@ -156,6 +157,15 @@ void roguelike::gamestate::initialize(int player_number) {
         lwlog_info("placing goblin worker");
         auto new_id = level.residents.size();
         auto gg = new goblin_worker(new_id);
+        entity_type var_ent = gg;
+        auto rnd_tile = level.get_random_empty_tile();
+        level.spawn_on_level(var_ent, rnd_tile);
+        level.residents.emplace_back(gg);
+    }
+    for (int i = 10; i < 12; ++i) {
+        lwlog_info("placing potion");
+        auto new_id = level.residents.size();
+        auto gg = new potion(new_id);
         entity_type var_ent = gg;
         auto rnd_tile = level.get_random_empty_tile();
         level.spawn_on_level(var_ent, rnd_tile);

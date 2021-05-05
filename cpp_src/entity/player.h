@@ -28,6 +28,7 @@ namespace roguelike {
         decision_making_component dm_cpt;
         repr_component repr_cpt;
         name_component nm_cpt;
+        simple_inventory_component s_inv_cpt;
     };
 
     template <>
