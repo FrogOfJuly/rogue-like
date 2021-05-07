@@ -54,7 +54,7 @@ def color(level):
         return 207 - level
 
 
-def render(stdscr, game_state: dict):
+def render(stdscr, game_state: dict, with_help = False):
     stdscr.clear()
     stdscr.refresh()
     global log
@@ -109,6 +109,15 @@ def render(stdscr, game_state: dict):
     if len(log) < printed_log_len:
         for i in range(printed_log_len - len(log)):
             stdscr.addstr(8+len(log)+i, (W)*3+1, '>')
+
+    if not with_help:
+        stdscr.addstr(H+2, 0, f'Press H for help.')
+    else:
+        stdscr.addstr(H+2, 0, f'WASD for movement.')
+        stdscr.addstr(H+3, 0, f'E for potion.')
+        stdscr.addstr(H+4, 0, f'F to skip turn.')
+        stdscr.addstr(H+5, 0, f'F to pause game (temporarily disconnect).')
+        stdscr.addstr(H+6, 0, f'X to exit game.')
     stdscr.refresh()
 
 
@@ -143,7 +152,6 @@ def main(stdscr):
                     valid = True
                     key = stdscr.getch()
                     if key is not None:
-                        stdscr.refresh()
                         if key == ord('w'):
                             action = cmd.UP
                         elif key == ord('s'):
@@ -161,6 +169,9 @@ def main(stdscr):
                             disconnect("Exited game.")
                         elif key == ord('f'):
                             pass
+                        elif key == ord('h'):
+                            render(stdscr, gameEvent[1], True)
+                            valid = False
                         else:
                             valid = False
                 ge = ['action', player_id, action]
