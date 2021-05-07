@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import socket
 import asyncore
 import random
@@ -10,14 +12,14 @@ from roguelike import cmd
 
 BUFFERSIZE = 8192
 
+num_players = 1
 outgoing = []
 
 
 class Backend:
     def __init__(self, difficulty: str="normal"):
         self.state = rl.GameState()
-        self.state.initialize(1)
-        self.actions = []
+        self.state.initialize(num_players)
 
     def turn(self):
         pass
@@ -44,6 +46,12 @@ class Backend:
         self.state.decide_next_move()
         self.state.redraw_nonplayers()
         return data, player_id
+
+    def handle_disconnection(self, player_id):
+        # self.state.set_player_inactive(player_id)
+        # if (len(outgoing) == 0):
+        pass
+
 
 
 backend = Backend()
@@ -102,20 +110,41 @@ class MainServer(asyncore.dispatcher):
     def handle_accept(self):
         conn, addr = self.accept()
         print('Connection address:' + addr[0] + " " + str(addr[1]))
+        if (len(outgoing) >= num_players):
+            conn.send(pickle.dumps(['reject', "Too many players"]))
         player_id = random.randint(1000, 1000000)
         outgoing.append(RemoteDrawClient(conn, addr, player_id))
         conn.send(pickle.dumps(['id', player_id]))
-        SecondaryServer(conn)
-        conn.send(pickle.dumps(['move', backend.get_state()]))
+        SecondaryServer(conn, player_id)
+        if(len(outgoing) == num_players):
+            conn.send(pickle.dumps(['move', backend.get_state()]))
 
 
 class SecondaryServer(asyncore.dispatcher_with_send):
+    def __init__(self, conn, id):
+        super().__init__(conn)
+        self.id = id
+
     def handle_read(self):
         recievedData = self.recv(BUFFERSIZE)
         if recievedData:
+            if pickle.loads(recievedData)[0] == 'exit':
+                print(f'Player {self.id} has closed the game.')
+                self.close()
+                exit()
             updateWorld(recievedData)
         else:
-            self.close()
+            self.handle_close()
+
+    def handle_close(self):
+        self.close()
+        for i in range(len(outgoing)):
+            if outgoing[i].player_id == self.id:
+                print(f'Player {self.id} has disconnected.')
+                outgoing.pop(i)
+                backend.handle_disconnection(self.id)
+                return None
+        # raise Exception("Unregistered Player")
 
 
 MainServer(4321)

@@ -1,5 +1,9 @@
+#!/usr/bin/env python3
+
 import math
 import pickle
+from time import sleep
+
 import select
 import socket
 import sys
@@ -120,9 +124,12 @@ def main(stdscr):
         ins, outs, ex = select.select([s], [], [], 0)
         for inm in ins:
             gameEvent = pickle.loads(inm.recv(BUFFERSIZE))
+            if gameEvent[0] == 'reject':
+                disconnect(gameEvent[1])
             if gameEvent[0] == 'id':
                 player_id = gameEvent[1]
                 init_log()
+                stdscr.addstr(0, 0, f"You're player {player_id}, awaiting game start")
             else:
                 dump_log(gameEvent[1])
                 render(stdscr, gameEvent[1])
@@ -146,7 +153,10 @@ def main(stdscr):
                             action = cmd.RIGHT
                         elif key == ord('e'):
                             action = cmd.ENTER
+                        elif key == ord('p'):
+                            disconnect(f"Paused game. Return with id {player_id}")
                         elif key == ord('x'):
+                            s.send(pickle.dumps(['exit']))
                             disconnect("Exited game.")
                         else:
                             valid = False
