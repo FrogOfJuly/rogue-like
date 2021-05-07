@@ -9,11 +9,6 @@ from roguelike import cmd
 from enum import Enum
 import os
 
-
-def cls():
-    os.system('cls' if os.name == 'nt' else 'clear')
-
-
 BUFFERSIZE = 8192
 
 serverAddr = '127.0.0.1'
