@@ -4,6 +4,7 @@ import select
 import socket
 import sys
 import json  # for logging only
+import curses
 from roguelike import cmd
 from enum import Enum
 import os
@@ -43,8 +44,22 @@ def dump_log(game_state: dict):
         json.dump(data, file)
 
 
-def render(game_state: dict):
-    cls()
+def disconnect(string):
+    s.close()
+    curses.endwin()
+    print(string)
+    exit()
+
+def color(level):
+    if level > 10:
+        return 197
+    else:
+        return 207 - level
+
+
+def render(stdscr, game_state: dict):
+    stdscr.clear()
+    stdscr.refresh()
     global log
     # print(game_state)
     if game_state == {'start'}:
@@ -60,65 +75,88 @@ def render(game_state: dict):
             newlog = player["lg_cpt"]["log"].split("\n")
             log += list(filter(lambda x: x != '', newlog))
             break
-    print(f"# Room: {1}/10")  # TODO
-    print(f"# Score: {123:5}")  # TODO
+    stdscr.addstr(0, 0, f"# Room: {1}/10")  # TODO
+    stdscr.addstr(1, 0, f"# Score: {123:5}")  # TODO
     for i in range(H):
         for j in range(W):
             tile = game_state[i * W + j]['tile']
+            to_print = None
+            lvl = None
             if tile is None:
-                print("   ", end='')
+                to_print = "   "
             elif 'player' in tile:
-                print(f" {tile['player']['repr_cpt']['repr']} ", end='')
+                to_print = f" {tile['player']['repr_cpt']['repr']} "
+                lvl = tile['player']['lvl']
             elif 'entity' in tile:
                 repr = tile['entity']['repr_cpt']['repr']
                 if repr == '█':
-                    print('███', end='')
+                    to_print = '███'
                 else:
-                    print(f' {repr} ', end='')
-        print()
+                    to_print = f' {repr} '
+                    if 'h_cpt' in tile['entity']:
+                        lvl = tile['entity']['h_cpt']['health']
+            if (lvl):
+                stdscr.addstr(i+2, j*3, to_print, curses.color_pair(color(lvl)))
+            else:
+                stdscr.addstr(i+2, j*3, to_print)
     if not player:
-        print("You died!")
-        return
-    print(f'Level: {player["lvl"]:3}, Health: {player["h_cpt"]["health"]:3}, Damage: {player["a_cpt"]["damage"]}')
-    print(f'log:')
+        stdscr.addstr(H+3, 0, "You died!")
+        disconnect("You died!")
+    stdscr.addstr(H+3, 0, f'Level: {player["lvl"]:3}, '
+                          f'Health: {player["h_cpt"]["health"]:3}, '
+                          f'Damage: {player["a_cpt"]["damage"]}')
+    stdscr.addstr(H+4, 0, f'log:')
 
-    for entry in log[-printed_log_len:]:
-        print(f'> {entry}')
+    for i, entry in enumerate(log[-printed_log_len:]):
+        stdscr.addstr(H+5+i, 0, f'> {entry}')
     if len(log) < printed_log_len:
         for i in range(printed_log_len - len(log)):
-            print('>')
+            stdscr.addstr(H+5+len(log)+i, 0, '>')
+    stdscr.refresh()
 
 
-while True:
-    ins, outs, ex = select.select([s], [], [], 0)
-    for inm in ins:
-        gameEvent = pickle.loads(inm.recv(BUFFERSIZE))
-        if gameEvent[0] == 'id':
-            player_id = gameEvent[1]
-            init_log()
-            print(player_id)
-        else:
-            dump_log(gameEvent[1])
-            render(gameEvent[1])
+def main(stdscr):
+    stdscr.clear()
+    curses.start_color()
+    curses.use_default_colors()
+    for i in range(0, curses.COLORS):
+        curses.init_pair(i + 1, i, -1)
+    while True:
+        ins, outs, ex = select.select([s], [], [], 0)
+        for inm in ins:
+            gameEvent = pickle.loads(inm.recv(BUFFERSIZE))
+            if gameEvent[0] == 'id':
+                player_id = gameEvent[1]
+                init_log()
+            else:
+                dump_log(gameEvent[1])
+                render(stdscr, gameEvent[1])
 
-        if gameEvent[0] == 'state':
-            pass
-        if gameEvent[0] == 'move':
-            action = cmd.PASS
-            key = input("Next action: ")
-            if key is not None:
-                if key == 'w':
-                    action = cmd.UP
-                elif key == 's':
-                    action = cmd.DOWN
-                elif key == 'a':
-                    action = cmd.LEFT
-                elif key == 'd':
-                    action = cmd.RIGHT
-                elif key == 'q':
-                    action = cmd.ENTER
-                elif key == 'x':
-                    s.close()
-                    exit()
-            ge = ['action', player_id, action]
-            s.send(pickle.dumps(ge))
+            if gameEvent[0] == 'state':
+                pass
+            if gameEvent[0] == 'move':
+                action = cmd.PASS
+                valid = False
+                while not valid:
+                    valid = True
+                    key = stdscr.getch()
+                    if key is not None:
+                        if key == ord('w'):
+                            action = cmd.UP
+                        elif key == ord('s'):
+                            action = cmd.DOWN
+                        elif key == ord('a'):
+                            action = cmd.LEFT
+                        elif key == ord('d'):
+                            action = cmd.RIGHT
+                        elif key == ord('e'):
+                            action = cmd.ENTER
+                        elif key == ord('x'):
+                            disconnect("Exited game.")
+                        else:
+                            valid = False
+                ge = ['action', player_id, action]
+                s.send(pickle.dumps(ge))
+
+
+curses.wrapper(main)
