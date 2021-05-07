@@ -1,10 +1,13 @@
 //
 // Created by Kirill Golubev on 17.04.2021.
 //
+#pragma once
 
 #include <iostream>
 #include <sstream>
 #include <variant>
+#include <memory>
+#include <cassert>
 
 #define LOG_LEVEL -1
 
