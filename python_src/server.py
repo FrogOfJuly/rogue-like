@@ -7,15 +7,6 @@ import roguelike as rl
 from enum import Enum
 from roguelike import cmd
 
-class Action(Enum):
-    UP = 1
-    DOWN = 2
-    LEFT = 3
-    RIGHT = 4
-    ESC = 5
-    PASS = 6
-    ENTER = 7
-
 
 BUFFERSIZE = 8192
 
