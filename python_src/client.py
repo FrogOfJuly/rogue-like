@@ -141,6 +141,7 @@ def main(stdscr):
                     valid = True
                     key = stdscr.getch()
                     if key is not None:
+                        stdscr.refresh()
                         if key == ord('w'):
                             action = cmd.UP
                         elif key == ord('s'):
@@ -156,7 +157,7 @@ def main(stdscr):
                         elif key == ord('x'):
                             s.send(pickle.dumps(['exit']))
                             disconnect("Exited game.")
-                        elif key == curses.KEY_ENTER:
+                        elif key == ord('f'):
                             pass
                         else:
                             valid = False
