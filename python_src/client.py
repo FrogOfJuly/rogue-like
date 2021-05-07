@@ -99,16 +99,16 @@ def render(stdscr, game_state: dict):
     if not player:
         s.send(pickle.dumps(['exit']))
         disconnect("You died!")
-    stdscr.addstr(2, (W+1)*3, f'Level: {player["lvl"]:3}, '
-                          f'Health: {player["h_cpt"]["health"]:3}, '
-                          f'Damage: {player["a_cpt"]["damage"]}')
-    stdscr.addstr(10, (W+1)*3, f'log:')
+    stdscr.addstr(2, (W)*3+1, f'Level: {player["lvl"]:3}')
+    stdscr.addstr(3, (W)*3+1, f'Health: {player["h_cpt"]["health"]:3}')
+    stdscr.addstr(4, (W)*3+1, f'Damage: {player["a_cpt"]["damage"]}')
+    stdscr.addstr(9, (W)*3+1, f'log:')
 
     for i, entry in enumerate(log[-printed_log_len:]):
-        stdscr.addstr(11+i, (W+1)*3, f'> {entry}')
+        stdscr.addstr(10+i, (W)*3+1, f'> {entry}')
     if len(log) < printed_log_len:
         for i in range(printed_log_len - len(log)):
-            stdscr.addstr(11+len(log)+i, (W+1)*3, '>')
+            stdscr.addstr(10+len(log)+i, (W)*3+1, '>')
     stdscr.refresh()
 
 
