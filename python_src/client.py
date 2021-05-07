@@ -116,7 +116,7 @@ def render(stdscr, game_state: dict, with_help = False):
         stdscr.addstr(H+2, 0, f'WASD for movement.')
         stdscr.addstr(H+3, 0, f'E for potion.')
         stdscr.addstr(H+4, 0, f'F to skip turn.')
-        stdscr.addstr(H+5, 0, f'F to pause game (temporarily disconnect).')
+        stdscr.addstr(H+5, 0, f'P to pause game (temporarily disconnect).')
         stdscr.addstr(H+6, 0, f'X to exit game.')
     stdscr.refresh()
 
