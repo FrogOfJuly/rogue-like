@@ -10,7 +10,8 @@
 namespace roguelike {
     struct goblin : entity {
         goblin(int id) : entity(id) {
-            h_cpt = {2, 2};
+            h_cpt.max_health = 2;
+            h_cpt.health = h_cpt.max_health;
             a_cpt.damage = 4;
             m_cpt.y = -1;
             m_cpt.x = -1;

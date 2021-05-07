@@ -9,6 +9,7 @@
 #define ROGUE_LIKE_ENTITY_HPP
 namespace roguelike {
     struct entity {
+        entity() = delete;
         explicit entity(int id) : id{id} {}
 
         entity_id id{-1};
