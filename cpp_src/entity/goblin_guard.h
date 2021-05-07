@@ -12,7 +12,7 @@
 namespace roguelike {
     struct goblin_guard : public goblin {
         goblin_guard(int id) : goblin(id) {
-            h_cpt.health = 12;
+            h_cpt = {12, 12};
             a_cpt.damage = 1;
             dm_cpt.idle_strategy = std::make_unique<passive_strategy>();
             nm_cpt.name = "goblin_guard" + std::to_string(id);

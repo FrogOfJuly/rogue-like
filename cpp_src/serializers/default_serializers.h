@@ -14,7 +14,7 @@ namespace roguelike {
     //    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(component);
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(move_component, x, y, residency);
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(atk_component, damage);
-    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(health_component, health);
+    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(health_component, health, max_health);
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(repr_component, repr);
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(decision_making_component, decision, eye_sight);
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(name_component, name);

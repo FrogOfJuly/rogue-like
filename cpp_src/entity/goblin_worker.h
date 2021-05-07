@@ -3,8 +3,8 @@
 //
 
 #include "../strategies/agressive_strategy/agressive_strategy.h"
-#include "../strategies/passive_strategy/passive_strategy.h"
 #include "../strategies/fearfull_strategy/fearfull_strategy.h"
+#include "../strategies/passive_strategy/passive_strategy.h"
 #include "entity.hpp"
 #include "goblin.h"
 
@@ -13,7 +13,7 @@
 namespace roguelike {
     struct goblin_worker : public goblin {
         goblin_worker(int id) : goblin(id) {
-            h_cpt.health = 2;
+            h_cpt = {2, 2};
             a_cpt.damage = 1;
             dm_cpt.active_strategy = std::make_unique<fearfull_strategy>();
             dm_cpt.idle_strategy = std::make_unique<passive_strategy>();
@@ -21,7 +21,7 @@ namespace roguelike {
         }
     };
 
-    template<>
+    template <>
     inline std::string repr_component::compute_representation<goblin_worker>(const goblin_worker *g) {
         switch (g->dm_cpt.decision) {
             case LEFT:
@@ -37,7 +37,7 @@ namespace roguelike {
         }
     }
 
-    template<typename entityType>
+    template <typename entityType>
     struct interacter<goblin_worker, entityType> {
         static inline void interact(goblin_worker &inted, entityType &inting) {
             if constexpr (has_member_logging_component<entityType>::value) {
@@ -58,7 +58,7 @@ namespace roguelike {
         }
     };
 
-    template<>
+    template <>
     struct interacter<goblin_worker, goblin_worker> {
         static inline void interact(goblin_worker &inted, goblin_worker &inting) {}
     };

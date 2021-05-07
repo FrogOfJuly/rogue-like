@@ -36,6 +36,7 @@ namespace roguelike {
     //--------------end of atk_component-----------------------------------------
 
     struct health_component : public component {
+        int max_health = -1;
         int health = -1;
 
         template <typename T>
@@ -114,7 +115,7 @@ namespace roguelike {
     struct one_time_effect_component : public component {
         std::string msg_on_effect = "?";
         template <typename U, typename T>
-        static inline bool apply_effect(U* src, T *tgt) {
+        static inline bool apply_effect(U *src, T *tgt) {
             return false;
         }
     };
