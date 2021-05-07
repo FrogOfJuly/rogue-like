@@ -72,8 +72,6 @@ def render(stdscr, game_state: dict):
             newlog = player["lg_cpt"]["log"].split("\n")
             log += list(filter(lambda x: x != '', newlog))
             break
-    stdscr.addstr(0, 0, f"# Room: {1}/10")  # TODO
-    stdscr.addstr(1, 0, f"# Score: {123:5}")  # TODO
     for i in range(H):
         for j in range(W):
             tile = game_state[i * W + j]['tile']
@@ -93,22 +91,24 @@ def render(stdscr, game_state: dict):
                     if 'h_cpt' in tile['entity']:
                         lvl = tile['entity']['h_cpt']['health']
             if (lvl):
-                stdscr.addstr(i+2, j*3, to_print, curses.color_pair(color(lvl)))
+                stdscr.addstr(i, j*3, to_print, curses.color_pair(color(lvl)))
             else:
-                stdscr.addstr(i+2, j*3, to_print)
+                stdscr.addstr(i, j*3, to_print)
     if not player:
         s.send(pickle.dumps(['exit']))
         disconnect("You died!")
-    stdscr.addstr(2, (W)*3+1, f'Level: {player["lvl"]:3}')
-    stdscr.addstr(3, (W)*3+1, f'Health: {player["h_cpt"]["health"]:3}')
-    stdscr.addstr(4, (W)*3+1, f'Damage: {player["a_cpt"]["damage"]}')
-    stdscr.addstr(9, (W)*3+1, f'log:')
+    stdscr.addstr(0, (W)*3+1, f"{'Room:':9} {1}/10")  # TODO
+    stdscr.addstr(1, (W)*3+1, f"{'Score:':9} {123}")  # TODO
+    stdscr.addstr(3, (W)*3+1, f"{'Level:':9} {player['lvl']}")
+    stdscr.addstr(4, (W)*3+1, f"{'Health:':9} {player['h_cpt']['health']}")
+    stdscr.addstr(5, (W)*3+1, f"{'Damage:':9} {player['a_cpt']['damage']}")
+    stdscr.addstr(7, (W)*3+1, f'log:')
 
     for i, entry in enumerate(log[-printed_log_len:]):
-        stdscr.addstr(10+i, (W)*3+1, f'> {entry}')
+        stdscr.addstr(8+i, (W)*3+1, f'> {entry}')
     if len(log) < printed_log_len:
         for i in range(printed_log_len - len(log)):
-            stdscr.addstr(10+len(log)+i, (W)*3+1, '>')
+            stdscr.addstr(8+len(log)+i, (W)*3+1, '>')
     stdscr.refresh()
 
 
@@ -156,6 +156,8 @@ def main(stdscr):
                         elif key == ord('x'):
                             s.send(pickle.dumps(['exit']))
                             disconnect("Exited game.")
+                        elif key == curses.KEY_ENTER:
+                            pass
                         else:
                             valid = False
                 ge = ['action', player_id, action]
