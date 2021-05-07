@@ -113,6 +113,7 @@ def render(stdscr, game_state: dict):
 
 
 def main(stdscr):
+    global player_id
     stdscr.clear()
     curses.start_color()
     curses.use_default_colors()
@@ -128,6 +129,7 @@ def main(stdscr):
                 player_id = gameEvent[1]
                 init_log()
                 stdscr.addstr(0, 0, f"You're player {player_id}, awaiting game start")
+                stdscr.refresh()
             else:
                 dump_log(gameEvent[1])
                 render(stdscr, gameEvent[1])
