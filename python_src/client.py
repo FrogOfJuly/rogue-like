@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 import math
 import pickle
 from time import sleep
@@ -99,18 +97,18 @@ def render(stdscr, game_state: dict):
             else:
                 stdscr.addstr(i+2, j*3, to_print)
     if not player:
-        stdscr.addstr(H+3, 0, "You died!")
+        s.send(pickle.dumps(['exit']))
         disconnect("You died!")
-    stdscr.addstr(H+3, 0, f'Level: {player["lvl"]:3}, '
+    stdscr.addstr(2, (W+1)*3, f'Level: {player["lvl"]:3}, '
                           f'Health: {player["h_cpt"]["health"]:3}, '
                           f'Damage: {player["a_cpt"]["damage"]}')
-    stdscr.addstr(H+4, 0, f'log:')
+    stdscr.addstr(10, (W+1)*3, f'log:')
 
     for i, entry in enumerate(log[-printed_log_len:]):
-        stdscr.addstr(H+5+i, 0, f'> {entry}')
+        stdscr.addstr(11+i, (W+1)*3, f'> {entry}')
     if len(log) < printed_log_len:
         for i in range(printed_log_len - len(log)):
-            stdscr.addstr(H+5+len(log)+i, 0, '>')
+            stdscr.addstr(11+len(log)+i, (W+1)*3, '>')
     stdscr.refresh()
 
 
