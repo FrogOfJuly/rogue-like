@@ -50,6 +50,14 @@ void roguelike::gamestate::clean_decisions() {
     }
 }
 void roguelike::gamestate::clean_dead() {}
+void roguelike::gamestate::clean_logs() {
+    for (int i = 0; i < player_num; ++i) {
+        players[i].lg_cpt.log.str("");
+        players[i].lg_cpt.log.clear();
+    }
+    level.common_log.str("");
+    level.common_log.clear();
+}
 void roguelike::gamestate::resolve_all_interactions() {
     lwlog_info("resolving interactions");
     inter_system.resolve_all_interactions();
@@ -188,14 +196,6 @@ void roguelike::gamestate::initialize(int player_number) {
         level.residents.emplace_back(gg);
     }
     lwlog_info("spawned everybody");
-}
-void roguelike::gamestate::clean_logs() {
-    for (int i = 0; i < player_num; ++i) {
-        players[i].lg_cpt.log.str("");
-        players[i].lg_cpt.log.clear();
-    }
-    level.common_log.str("");
-    level.common_log.clear();
 }
 void roguelike::gamestate::end_turn() {
     lwlog_info("ending turn");
