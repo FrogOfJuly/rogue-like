@@ -18,7 +18,7 @@ namespace roguelike {
             a_cpt.damage = 1;
             dm_cpt.active_strategy = std::make_unique<fearfull_strategy>();
             dm_cpt.idle_strategy = std::make_unique<passive_strategy>();
-            nm_cpt.name = "goblin_worker" + std::to_string(id);
+            nm_cpt.name = "goblin_worker";
         }
     };
 

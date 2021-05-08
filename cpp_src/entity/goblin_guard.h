@@ -16,7 +16,7 @@ namespace roguelike {
             h_cpt.health = h_cpt.max_health;
             a_cpt.damage = 1;
             dm_cpt.idle_strategy = std::make_unique<passive_strategy>();
-            nm_cpt.name = "goblin_guard" + std::to_string(id);
+            nm_cpt.name = "goblin_guard";
         }
     };
 

@@ -18,7 +18,7 @@ namespace roguelike {
             dm_cpt.eye_sight = 5;
             dm_cpt.active_strategy = std::make_unique<agressive_strategy>();
             dm_cpt.idle_strategy = std::make_unique<random_strategy>();
-            nm_cpt.name = "goblin" + std::to_string(id);
+            nm_cpt.name = "goblin";
         }
 
         decision_making_component dm_cpt;
