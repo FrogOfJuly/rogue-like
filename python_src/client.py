@@ -43,9 +43,13 @@ def dump_log(game_state: dict):
 
 def disconnect(string):
     s.close()
+    curses.nocbreak()
+    curses.echo()
     curses.endwin()
     print(string)
+    print()
     exit()
+
 
 def color(level):
     if level > 10:
