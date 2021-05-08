@@ -78,22 +78,24 @@ bool roguelike::move_system::more_general_move(entity_type &var_ent) {
             constexpr bool has_inventory = has_member_simple_inventory_component<entT>::value;
 
             if constexpr (able_to_dm and has_inventory) {
-                std::cout << "Somebody has dm and inventory" << std::endl;
-                if (ent_ptr->dm_cpt.decision == cmd::ENTER and ent_ptr->s_inv_cpt.spot.has_value()) {
-                    std::cout << "received enter command with nonempty spot" << std::endl;
-                    auto var_spot_cnt = ent_ptr->s_inv_cpt.spot.value();
+                auto active_slot = simple_inventory_component::inventory_spot::active;
+                lwlog_info("Somebody has dm and inventory");
+                bool has_active_slot = ent_ptr->s_inv_cpt.spots.count(active_slot) != 0;
+                if (ent_ptr->dm_cpt.decision == cmd::ENTER and has_active_slot) {
+                    lwlog_info("received enter command with nonempty spot");
+                    auto var_spot_cnt = ent_ptr->s_inv_cpt.spots.at(active_slot);
                     bool used = std::visit(
                         [ent_ptr](auto *spot_cnt_ptr) {
                             using cntT = std::remove_pointer_t<decltype(spot_cnt_ptr)>;
                             if constexpr (has_member_one_time_effect_component<cntT>::value) {
-                                std::cout << "applying effect" << std::endl;
+                                lwlog_info("applying effect");
                                 return spot_cnt_ptr->ot_eff_cpt.apply_effect(spot_cnt_ptr, ent_ptr);
                             }
                             return false;
                         },
                         var_spot_cnt);
                     if (used) {
-                        ent_ptr->s_inv_cpt.spot.reset();
+                        ent_ptr->s_inv_cpt.spots.erase(active_slot);
                     }
                     return moved;
                 }

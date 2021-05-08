@@ -19,6 +19,9 @@ set(LIB_SOURCES
         cpp_src/level/room_view.cpp
         cpp_src/level/room_view.h
 
+        cpp_src/entity/components.cpp
+        cpp_src/entity/components.h
+
         cpp_src/entity/entity.hpp
         cpp_src/entity/player.h
         cpp_src/entity/goblin.h

@@ -33,13 +33,31 @@ namespace roguelike {
     template <typename entityType>
     struct interacter<potion, entityType> {
         static inline void interact(potion &inted, entityType &inting) {
+            constexpr bool has_log = has_member_logging_component<entityType>::value;
             if constexpr (has_member_simple_inventory_component<entityType>::value) {
-                if (not inting.s_inv_cpt.spot.has_value()) {
-                    inted.pk_cpt.picked = true;
-                    inting.s_inv_cpt.spot = &inted;
+                lwlog_info("somebody with inventory interacted with potion");
+                inted.pk_cpt.picked = false;
+                if (inting.s_inv_cpt.spot.has_value()) {
+                    lwlog_info("something is in temporal spot");
+                    if constexpr (has_log) {
+                        inting.lg_cpt.log << "can't pick item" << std::endl;
+                    }
+
+                    return;
                 }
+                inting.s_inv_cpt.spot = &inted;
+                inting.s_inv_cpt.manage();
+                if (inting.s_inv_cpt.spot.has_value()) {
+                    lwlog_info("managing left item on temporary spot");
+                    if constexpr (has_log) {
+                        inting.lg_cpt.log << "you can't pick this item" << std::endl;
+                    }
+                    inting.s_inv_cpt.spot.reset();
+                    return;
+                }
+                inted.pk_cpt.picked = true;
             }
-            if constexpr (has_member_logging_component<entityType>::value) {
+            if constexpr (has_log) {
                 std::string lg_entry = inted.pk_cpt.picked ? "you picked potion" : "you interacted with potion";
                 inting.lg_cpt.log << lg_entry << std::endl;
             }

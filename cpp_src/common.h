@@ -3,11 +3,12 @@
 //
 #pragma once
 
+#include <cassert>
 #include <iostream>
+#include <memory>
+#include <optional>
 #include <sstream>
 #include <variant>
-#include <memory>
-#include <cassert>
 
 #define LOG_LEVEL 7
 

@@ -43,7 +43,7 @@ namespace roguelike {
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(entity, id, level);
     // no level_component bc it need player object to for serialisation,
     // thus it is done in entity_type serialization -----v
-    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(player, id, h_cpt, m_cpt, a_cpt, dm_cpt, lg_cpt);
+    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(player, id, h_cpt, m_cpt, a_cpt, dm_cpt, lg_cpt, s_inv_cpt);
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(potion, id, nm_cpt);
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(goblin, id, dm_cpt, h_cpt, a_cpt, m_cpt, nm_cpt);
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(goblin_guard, id, dm_cpt, h_cpt, a_cpt, m_cpt, nm_cpt);

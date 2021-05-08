@@ -4,6 +4,7 @@
 
 #include "non_default_serialize.h"
 
+#include "../../deps/magic_enum/include/magic_enum.hpp"
 #include "../game_state/gamestate.h"
 #include "../utility/entity_info.h"
 #include "serialize_info.h"
@@ -47,11 +48,30 @@ void roguelike::from_json(const nlohmann::json &j, roguelike::entity_type &p) {
 void roguelike::to_json(nlohmann::json &j, const logging_component &p) { j["log"] = p.log.str(); }
 void roguelike::from_json(const nlohmann::json &j, logging_component &p) { p.log << j["log"]; }
 void roguelike::to_json(nlohmann::json &j, const roguelike::simple_inventory_component &p) {
-    if (not p.spot.has_value()) {
-        j["spot"] = "none";
-        return;
+    static constexpr auto item_spots = magic_enum::enum_entries<simple_inventory_component::inventory_spot>();
+    j = nlohmann::json::array();
+    for (auto it : item_spots) {
+        auto res = nlohmann::json();
+        auto value = it.first;
+        std::string name{it.second};
+        if (p.spots.count(value) == 0) {
+            res[name] = "none";
+            j.push_back(res);
+            continue;
+        }
+        std::string spot_name = std::visit(
+            [](auto *ent_ptr) {
+                using entT = std::remove_pointer_t<decltype(ent_ptr)>;
+                if constexpr (has_member_name_component<entT>::value) {
+                    return ent_ptr->nm_cpt.name;
+                } else {
+                    return std::string("unknown item");
+                }
+            },
+            p.spots.at(value));
+        res[name] = spot_name;
+        j.push_back(res);
     }
-    to_json(j["spot"], p.spot.value());
 }
 void roguelike::from_json(const nlohmann::json &j, roguelike::simple_inventory_component &p) {
     throw std::runtime_error("One cant not construct simple inventory component from it's json serialization");

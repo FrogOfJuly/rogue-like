@@ -2,6 +2,7 @@
 // Created by Kirill Golubev on 23.04.2021.
 //
 #include <optional>
+#include <unordered_map>
 
 #include "../common.h"
 #include "../strategies/abstract_strategy.h"
@@ -80,22 +81,7 @@ namespace roguelike {
         std::unique_ptr<strategy> active_strategy;
         std::optional<general_id> charges_into;
 
-        [[nodiscard]] std::pair<int, int> get_velocity() const {
-            switch (decision) {
-                case UP:
-                    return std::make_pair(0, -1);
-                case DOWN:
-                    return std::make_pair(0, 1);
-                case LEFT:
-                    return std::make_pair(-1, 0);
-                case RIGHT:
-                    return std::make_pair(1, 0);
-                case ENTER:
-                case ESC:
-                case PASS:
-                    return std::make_pair(0, 0);
-            }
-        }
+        [[nodiscard]] std::pair<int, int> get_velocity() const;
     };
 
     //--------------end of decision_making_component-----------------------------
@@ -107,18 +93,23 @@ namespace roguelike {
     //--------------end of logging_component-------------------------------------
 
     struct name_component : public component {
-        std::string name = "";
+        std::string name;
     };
 
     //--------------end of name_component----------------------------------------
 
     struct simple_inventory_component : public component {
+        enum inventory_spot { active = 0, defence, offence, armor };
         std::optional<entity_type> spot;
+        std::unordered_map<inventory_spot, entity_type> spots;
+        void manage();
     };
 
     //--------------end of simple inventory component----------------------------
     struct pickable_component : public component {
+        using spot_type = simple_inventory_component::inventory_spot;
         bool picked = false;
+        spot_type desired_spot = spot_type::active;
     };
 
     //--------------end of pickable component------------------------------------
