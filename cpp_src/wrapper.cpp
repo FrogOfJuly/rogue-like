@@ -27,7 +27,7 @@ PYBIND11_MODULE(roguelike, m) {
         .def("get_serialization", &roguelike::gamestate::get_serialization)
         .def("receive_player_command", &roguelike::gamestate::receive_player_command)
         .def("clean_logs", &roguelike::gamestate::clean_logs)
-        .def("clean_decisions", &roguelike::gamestate::clean_decision)
+        .def("clean_decisions", &roguelike::gamestate::clean_decisions)
         .def("end_turn", &roguelike::gamestate::end_turn)
         .def("decide_next_move", &roguelike::gamestate::decide_next_move);
 
