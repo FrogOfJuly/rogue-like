@@ -215,4 +215,7 @@ def main(stdscr):
                 s.send(pickle.dumps(ge))
 
 
-curses.wrapper(main)
+stdscr = curses.initscr()
+curses.noecho()
+curses.cbreak()
+main(stdscr)
