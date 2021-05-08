@@ -7,11 +7,14 @@
 #define ROGUE_LIKE_ITEMS_H
 namespace roguelike {
     struct potion {
-        potion(int id) : id{id} {}
+        potion(int id) : id{id} {
+            np_cpt.name = "health potion";
+        }
         entity_id id;
         repr_component repr_cpt;
         pickable_component pk_cpt;
         one_time_effect_component ot_eff_cpt;
+        name_component nm_cpt;
     };
 
     template <>

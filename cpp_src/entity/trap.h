@@ -11,7 +11,7 @@ namespace roguelike {
     struct trap {
         trap(int id) : id{id} {
             a_cpt.damage = 5;
-            nm_cpt.name = "trap" + std::to_string(id);
+            nm_cpt.name = "trap";
             h_cpt.health = 1;
         }
         entity_id id;
