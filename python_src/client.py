@@ -104,7 +104,7 @@ def render(stdscr, game_state: dict, flags: dict):
             elif 'player' in tile:
                 to_print = f" {tile['player']['repr_cpt']['repr']} "
                 legend['player'] = tile['player']['repr_cpt']['repr']
-                lvl = tile['player']['lvl']
+                lvl = tile['player']['lvl_cpt']['level']
             elif 'entity' in tile:
                 repr = tile['entity']['repr_cpt']['repr']
                 if repr == '█':
@@ -124,7 +124,8 @@ def render(stdscr, game_state: dict, flags: dict):
                 stdscr.addstr(i, j*3, to_print)
     stdscr.addstr(0, (W)*3+1, f"{'Room:':9} {1}/10")  # TODO
     stdscr.addstr(1, (W)*3+1, f"{'Score:':9} {123}")  # TODO
-    stdscr.addstr(3, (W)*3+1, f"{'Level:':9} {player['lvl']}")
+    stdscr.addstr(3, (W)*3+1, f"{'Level:':9} {player['lvl_cpt']['level']}")
+    stdscr.addstr(3, (W)*3+1, f"{'Exp:':9} {player['lvl_cpt']['experience']}/{player['lvl_cpt']['exp_until_next_level']}")
     stdscr.addstr(4, (W)*3+1, f"{'Health:':9} {player['h_cpt']['health']}")
     stdscr.addstr(5, (W)*3+1, f"{'Damage:':9} {player['a_cpt']['damage']}")
     stdscr.addstr(7, (W)*3+1, f'log:')
