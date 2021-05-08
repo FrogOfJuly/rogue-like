@@ -118,6 +118,8 @@ def render(stdscr, game_state: dict, flags: dict):
                     to_print = f' {repr} '
                     if 'h_cpt' in tile['entity'] and tile['entity']['h_cpt']['max_health'] > 0:
                         lvl = int(tile['entity']['h_cpt']['health'] * 10 / tile['entity']['h_cpt']['max_health'])
+                    elif 'lvl_cpt' in tile['entity']:
+                        lvl = tile['entity']['lvl_cpt']['level']
             if (lvl):
                 stdscr.addstr(i, j*3, to_print, curses.color_pair(color(lvl)))
             else:
@@ -215,4 +217,7 @@ def main(stdscr):
                 s.send(pickle.dumps(ge))
 
 
-curses.wrapper(main)
+stdscr = curses.initscr()
+curses.noecho()
+curses.cbreak()
+main(stdscr)
