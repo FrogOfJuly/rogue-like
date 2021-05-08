@@ -65,9 +65,12 @@ void roguelike::gamestate::resolve_all_interactions() {
 void roguelike::gamestate::move_nonplayers() {
     lwlog_info("moving nonplayers");
     for (auto &var_ent : level.residents) {
-        bool is_dead = std::visit([this](auto *ent_ptr) {
-            lwlog_info("-checking if entity %d is dead", ent_ptr->id.value);
-            return level.dead.count(ent_ptr->id.value) != 0; }, var_ent);
+        bool is_dead = std::visit(
+            [this](auto *ent_ptr) {
+                lwlog_info("-checking if entity %d is dead", ent_ptr->id.value);
+                return level.dead.count(ent_ptr->id.value) != 0;
+            },
+            var_ent);
         if (is_dead) {
             lwlog_info("-it is dead. Skipping");
             continue;
@@ -112,11 +115,12 @@ void roguelike::gamestate::initialize(int player_number) {
     lwlog_info("Initializning gamestate object");
     lwlog_info("allocating  player objects");
     lvl_num = 0;
-    level.generate_level(lvl_num);
+    level.generate_terrain(lvl_num);
+    lwlog_info("generated level");
+    // Player do not have default constructor and
+    // I can't declare vector of players in header bc it requires complete type
     player_num = player_number;
     players = (player *)new char[sizeof(player) * player_num];
-    // They do not have default constructor and
-    // I can't declare vector of them in header bc it requires complete type
     for (int i = 0; i < player_num; ++i) {
         lwlog_info("placing player");
         new (&players[i]) player(i);
@@ -125,53 +129,8 @@ void roguelike::gamestate::initialize(int player_number) {
         auto rnd_tile = level.get_random_empty_tile();
         level.spawn_on_level(var_ent, rnd_tile);
     }
-    for (int i = 0; i < 3; ++i) {
-        lwlog_info("placing goblin");
-        auto new_id = level.residents.size();
-        auto g = new goblin(new_id);
-        g->dm_cpt.decision = DOWN;
-        entity_type var_ent = g;
-        auto rnd_tile = level.get_random_empty_tile();
-        level.spawn_on_level(var_ent, rnd_tile);
-        level.residents.emplace_back(g);
-    }
-    for (int i = 3; i < 5; ++i) {
-        lwlog_info("placing goblin guard");
-        auto new_id = level.residents.size();
-        auto gg = new goblin_guard(new_id);
-        entity_type var_ent = gg;
-        auto rnd_tile = level.get_random_empty_tile();
-        level.spawn_on_level(var_ent, rnd_tile);
-        level.residents.emplace_back(gg);
-    }
-    for (int i = 5; i < 7; ++i) {
-        lwlog_info("placing trap");
-        auto new_id = level.residents.size();
-        auto gg = new trap(new_id);
-        entity_type var_ent = gg;
-        auto rnd_tile = level.get_random_empty_tile();
-        level.spawn_on_level(var_ent, rnd_tile);
-        level.residents.emplace_back(gg);
-    }
-    for (int i = 7; i < 10; ++i) {
-        lwlog_info("placing goblin worker");
-        auto new_id = level.residents.size();
-        auto gg = new goblin_worker(new_id);
-        entity_type var_ent = gg;
-        auto rnd_tile = level.get_random_empty_tile();
-        level.spawn_on_level(var_ent, rnd_tile);
-        level.residents.emplace_back(gg);
-    }
-    for (int i = 10; i < 12; ++i) {
-        lwlog_info("placing potion");
-        auto new_id = level.residents.size();
-        auto gg = new potion(new_id);
-        entity_type var_ent = gg;
-        auto rnd_tile = level.get_random_empty_tile();
-        level.spawn_on_level(var_ent, rnd_tile);
-        level.residents.emplace_back(gg);
-    }
-    lwlog_info("spawned everybody");
+    lwlog_info("spawned players");
+    level.generate_enemies(lvl_num);
 }
 void roguelike::gamestate::end_turn() {
     lwlog_info("ending turn");

@@ -9,6 +9,7 @@ namespace roguelike {
     struct potion {
         potion(int id) : id{id} {
             nm_cpt.name = "health potion";
+            ot_eff_cpt.msg_on_effect = "you have drank a potion of health";
         }
         entity_id id;
         repr_component repr_cpt;
@@ -19,8 +20,8 @@ namespace roguelike {
 
     template <>
     inline bool one_time_effect_component::apply_effect(potion *src, player *tgt) {
+        tgt->lg_cpt.log << msg_on_effect << std::endl;
         tgt->h_cpt.health += 5;
-        tgt->lg_cpt.log << "you have drank potion of health" << std::endl;
         return true;
     }
 

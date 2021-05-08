@@ -65,7 +65,7 @@ void roguelike::room::spawn_on_level(entity_type& var_ent, roguelike::tile_idx t
         },
         var_ent);
 }
-void roguelike::room::generate_level(int lvl_num) {
+void roguelike::room::generate_terrain(int lvl_num) {
     using chunkType = std::array<int, 25>;
     const static int chunk_size = 5;
 
@@ -307,3 +307,52 @@ bool roguelike::room::do_tiles_have_loc(std::pair<int, int> p0, std::pair<int, i
     return has_line_of_sight;
 }
 roguelike::entity_type roguelike::room::get_resident(roguelike::entity_id id) const { return residents.at(id.value); }
+
+void roguelike::room::generate_enemies(int lvl_num) {
+    for (int i = 0; i < 3; ++i) {
+        lwlog_info("placing goblin");
+        auto new_id = residents.size();
+        auto g = new goblin(new_id);
+        g->dm_cpt.decision = DOWN;
+        entity_type var_ent = g;
+        auto rnd_tile = get_random_empty_tile();
+        spawn_on_level(var_ent, rnd_tile);
+        residents.emplace_back(g);
+    }
+    for (int i = 3; i < 5; ++i) {
+        lwlog_info("placing goblin guard");
+        auto new_id = residents.size();
+        auto gg = new goblin_guard(new_id);
+        entity_type var_ent = gg;
+        auto rnd_tile = get_random_empty_tile();
+        spawn_on_level(var_ent, rnd_tile);
+        residents.emplace_back(gg);
+    }
+    for (int i = 5; i < 7; ++i) {
+        lwlog_info("placing trap");
+        auto new_id = residents.size();
+        auto gg = new trap(new_id);
+        entity_type var_ent = gg;
+        auto rnd_tile = get_random_empty_tile();
+        spawn_on_level(var_ent, rnd_tile);
+        residents.emplace_back(gg);
+    }
+    for (int i = 7; i < 10; ++i) {
+        lwlog_info("placing goblin worker");
+        auto new_id = residents.size();
+        auto gg = new goblin_worker(new_id);
+        entity_type var_ent = gg;
+        auto rnd_tile = get_random_empty_tile();
+        spawn_on_level(var_ent, rnd_tile);
+        residents.emplace_back(gg);
+    }
+    for (int i = 10; i < 12; ++i) {
+        lwlog_info("placing potion");
+        auto new_id = residents.size();
+        auto gg = new potion(new_id);
+        entity_type var_ent = gg;
+        auto rnd_tile = get_random_empty_tile();
+        spawn_on_level(var_ent, rnd_tile);
+        residents.emplace_back(gg);
+    }
+}

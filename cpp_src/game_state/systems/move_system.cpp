@@ -87,7 +87,7 @@ bool roguelike::move_system::more_general_move(entity_type &var_ent) {
                             using cntT = std::remove_pointer_t<decltype(spot_cnt_ptr)>;
                             if constexpr (has_member_one_time_effect_component<cntT>::value) {
                                 std::cout << "applying effect" << std::endl;
-                                return one_time_effect_component::apply_effect(spot_cnt_ptr, ent_ptr);
+                                return spot_cnt_ptr->ot_eff_cpt.apply_effect(spot_cnt_ptr, ent_ptr);
                             }
                             return false;
                         },

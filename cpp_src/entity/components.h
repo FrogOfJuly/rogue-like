@@ -116,19 +116,22 @@ namespace roguelike {
         std::optional<entity_type> spot;
     };
 
-    //--------------end of simple inventory component----------------------------------------
-
+    //--------------end of simple inventory component----------------------------
     struct pickable_component : public component {
         bool picked = false;
     };
 
+    //--------------end of pickable component------------------------------------
+
     struct one_time_effect_component : public component {
         std::string msg_on_effect = "?";
         template <typename U, typename T>
-        static inline bool apply_effect(U *src, T *tgt) {
+        inline bool apply_effect(U *src, T *tgt) {
             return false;
         }
     };
+
+    //--------------end of one time effect component-----------------------------
 
 }  // namespace roguelike
 

@@ -55,7 +55,9 @@ namespace roguelike {
 
         void spawn_on_level(entity_type &ent, tile_idx tidx = -1);
 
-        void generate_level(int lvl_num);
+        void generate_terrain(int lvl_num);
+
+        void generate_enemies(int lvl_num);
 
         [[nodiscard]] room_view get_area_around_tile(tile_idx idx, int radius) const;
 
