@@ -38,11 +38,11 @@ class Backend:
         self.state.move_nonplayers()
         self.state.resolve_all_interactions()
         self.state.redraw_players()
-
-        data = json.loads(self.state.get_serialization())
-        self.state.end_turn()
+        self.state.clean_decisions()
         self.state.decide_next_move()
         self.state.redraw_nonplayers()
+        data = json.loads(self.state.get_serialization())
+        self.state.clean_logs()
         return data, player_id
 
     def handle_disconnection(self, player_id):
