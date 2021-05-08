@@ -41,8 +41,7 @@ void roguelike::agressive_strategy::form_decision(roguelike::decision_making_com
         }
         dm_cpt.charges_into = charges_into;
         // no pathfinding yet
-        assert(c.x != 0);
-        assert(c.y != 0);
+        assert(c.x != 0 and c.y != 0);
         if (abs(c.x) > abs(c.y)) {
             if (c.x < 0) {
                 dm_cpt.decision = cmd::LEFT;
