@@ -9,7 +9,6 @@
 #include "../level/room.h"
 #include "../serializers/serialize_info.h"
 #include "systems/decision_making_system.h"
-#include "systems/drawing_system.h"
 #include "systems/interaction_system.h"
 #include "systems/move_system.h"
 
@@ -31,7 +30,6 @@ namespace roguelike {
 
         move_system mv_system;
         interaction_system inter_system;
-        /*drawing_system draw_system; -- all methods are static, so no need to create object*/
         decision_making_system dm_system;
 
         player* get_player(player_id id) const;
@@ -46,8 +44,6 @@ namespace roguelike {
         void move_players();
         void move_nonplayers();
         void decide_next_move();
-        void redraw_nonplayers();
-        void redraw_players();
         void resolve_all_interactions();
         void clean_dead();
         void clean_decisions();

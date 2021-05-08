@@ -23,8 +23,6 @@ class Backend:
         pass
 
     def get_state(self):
-        self.state.redraw_players()
-        self.state.redraw_nonplayers()
         return json.loads(self.state.get_serialization())
 
     def player_action(self, player_id: int, action: cmd):
@@ -37,10 +35,10 @@ class Backend:
         self.state.resolve_all_interactions()
         self.state.move_nonplayers()
         self.state.resolve_all_interactions()
-        self.state.redraw_players()
+
         self.state.clean_decisions()
         self.state.decide_next_move()
-        self.state.redraw_nonplayers()
+
         data = json.loads(self.state.get_serialization())
         self.state.clean_logs()
         return data, player_id

@@ -28,11 +28,9 @@ set(LIB_SOURCES
         cpp_src/entity/trap.h
 
         cpp_src/game_state/systems/base_system.h
-        cpp_src/game_state/systems/drawing_system.h
         cpp_src/game_state/systems/interaction_system.h
         cpp_src/game_state/systems/move_system.cpp
         cpp_src/game_state/systems/move_system.h
-        cpp_src/game_state/systems/drawing_system.cpp
         cpp_src/game_state/systems/interaction_system.cpp
         cpp_src/game_state/systems/decision_making_system.h
         cpp_src/game_state/systems/decision_making_system.cpp

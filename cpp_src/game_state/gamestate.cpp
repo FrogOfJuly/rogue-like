@@ -62,30 +62,6 @@ void roguelike::gamestate::resolve_all_interactions() {
     lwlog_info("resolving interactions");
     inter_system.resolve_all_interactions();
 }
-void roguelike::gamestate::redraw_players() {
-    lwlog_info("drawing players");
-    for (int i = 0; i < player_num; ++i) {
-        auto &plr = players[i];
-        entity_type var_ent(&plr);
-        drawing_system::general_draw(var_ent);
-    }
-}
-void roguelike::gamestate::redraw_nonplayers() {
-    lwlog_info("drawing non players");
-    for (auto &var_ent : level.residents) {
-        bool is_dead = std::visit([this](auto *ent_ptr) {
-            lwlog_info("-checking if entity %d is dead", ent_ptr->id.value);
-            return level.dead.count(ent_ptr->id.value) != 0;
-        }, var_ent);
-        if (is_dead) {
-            lwlog_info("-it is dead. Skipping");
-            continue;
-        }
-        lwlog_info("-it is not dead. Drawing");
-        drawing_system::general_draw(var_ent);
-        lwlog_info("Drawing ended");
-    }
-}
 void roguelike::gamestate::move_nonplayers() {
     lwlog_info("moving nonplayers");
     for (auto &var_ent : level.residents) {

@@ -20,8 +20,6 @@ PYBIND11_MODULE(roguelike, m) {
         .def("resolve_all_interactions", &roguelike::gamestate::resolve_all_interactions)
         .def("move_players", &roguelike::gamestate::move_players)
         .def("move_nonplayers", &roguelike::gamestate::move_nonplayers)
-        .def("redraw_nonplayers", &roguelike::gamestate::redraw_nonplayers)
-        .def("redraw_players", &roguelike::gamestate::redraw_players)
         .def("clean_dead", &roguelike::gamestate::clean_dead)
         .def("clean_decisions", &roguelike::gamestate::clean_decisions)
         .def("get_serialization", &roguelike::gamestate::get_serialization)
