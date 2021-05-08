@@ -13,7 +13,8 @@
 namespace roguelike {
     struct goblin_worker : public goblin {
         goblin_worker(int id) : goblin(id) {
-            h_cpt = {2, 2};
+            h_cpt.max_health = 2;
+            h_cpt.health = h_cpt.max_health;
             a_cpt.damage = 1;
             dm_cpt.active_strategy = std::make_unique<fearfull_strategy>();
             dm_cpt.idle_strategy = std::make_unique<passive_strategy>();
