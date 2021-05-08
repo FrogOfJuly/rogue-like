@@ -8,8 +8,6 @@ import sys
 import json  # for logging only
 import curses
 from roguelike import cmd
-from enum import Enum
-import os
 
 BUFFERSIZE = 8192
 
@@ -74,7 +72,7 @@ def color(level):
         return 197
 
 
-def render(stdscr, game_state: dict, with_help = False):
+def render(stdscr, game_state: dict, flags: dict):
     stdscr.clear()
     stdscr.refresh()
     global log
@@ -84,6 +82,7 @@ def render(stdscr, game_state: dict, with_help = False):
     game_state = game_state['level']
     H = int(math.sqrt(len(game_state)))
     W = H
+    legend = {}
     player = None
     for tile_ in game_state:
         tile = tile_["tile"]
@@ -92,6 +91,9 @@ def render(stdscr, game_state: dict, with_help = False):
             newlog = player["lg_cpt"]["log"].split("\n")
             log += list(filter(lambda x: x != '', newlog))
             break
+    if not player:
+        s.send(pickle.dumps(['exit']))
+        disconnect("You died!")
     for i in range(H):
         for j in range(W):
             tile = game_state[i * W + j]['tile']
@@ -101,12 +103,18 @@ def render(stdscr, game_state: dict, with_help = False):
                 to_print = "   "
             elif 'player' in tile:
                 to_print = f" {tile['player']['repr_cpt']['repr']} "
+                legend['player'] = tile['player']['repr_cpt']['repr']
                 lvl = tile['player']['lvl']
             elif 'entity' in tile:
                 repr = tile['entity']['repr_cpt']['repr']
                 if repr == '█':
                     to_print = '███'
                 else:
+                    if 'nm_cpt' in tile['entity']:
+                        if tile['entity']['nm_cpt']['name'] not in legend:
+                            legend[tile['entity']['nm_cpt']['name']] = [tile['entity']['repr_cpt']['repr']]
+                        elif tile['entity']['repr_cpt']['repr'] not in legend[tile['entity']['nm_cpt']['name']]:
+                            legend[tile['entity']['nm_cpt']['name']].append(tile['entity']['repr_cpt']['repr'])
                     to_print = f' {repr} '
                     if 'h_cpt' in tile['entity'] and tile['entity']['h_cpt']['max_health'] > 0:
                         lvl = int(tile['entity']['h_cpt']['health'] * 10 / tile['entity']['h_cpt']['max_health'])
@@ -114,9 +122,6 @@ def render(stdscr, game_state: dict, with_help = False):
                 stdscr.addstr(i, j*3, to_print, curses.color_pair(color(lvl)))
             else:
                 stdscr.addstr(i, j*3, to_print)
-    if not player:
-        s.send(pickle.dumps(['exit']))
-        disconnect("You died!")
     stdscr.addstr(0, (W)*3+1, f"{'Room:':9} {1}/10")  # TODO
     stdscr.addstr(1, (W)*3+1, f"{'Score:':9} {123}")  # TODO
     stdscr.addstr(3, (W)*3+1, f"{'Level:':9} {player['lvl']}")
@@ -130,12 +135,20 @@ def render(stdscr, game_state: dict, with_help = False):
         for i in range(printed_log_len - len(log)):
             stdscr.addstr(8+len(log)+i, (W)*3+1, '>')
 
-    if not with_help:
+    if len(flags) == 0:
         stdscr.addstr(H+2, 0, f'Press H for help.')
+    elif 'legend' in flags:
+        for i, key in enumerate(sorted(legend.keys())):
+            if " " in legend[key]:
+                legend[key].remove(" ")
+            if not legend[key]:
+                continue
+            stdscr.addstr(H+2+i, 0, f'{f"{key}:":20} {", ".join(legend[key])}')
     else:
         stdscr.addstr(H+2, 0, f'WASD for movement.')
         stdscr.addstr(H+3, 0, f'E for potion.')
         stdscr.addstr(H+4, 0, f'F to skip turn.')
+        stdscr.addstr(H+4, 0, f'L for the legend.')
         stdscr.addstr(H+5, 0, f'P to pause game (temporarily disconnect).')
         stdscr.addstr(H+6, 0, f'X to exit game.')
     stdscr.refresh()
@@ -161,7 +174,7 @@ def main(stdscr):
                 stdscr.refresh()
             else:
                 dump_log(gameEvent[1])
-                render(stdscr, gameEvent[1])
+                render(stdscr, gameEvent[1], {})
 
             if gameEvent[0] == 'state':
                 pass
@@ -190,7 +203,10 @@ def main(stdscr):
                         elif key == ord('f'):
                             pass
                         elif key == ord('h'):
-                            render(stdscr, gameEvent[1], True)
+                            render(stdscr, gameEvent[1], {"help": True})
+                            valid = False
+                        elif key == ord('l'):
+                            render(stdscr, gameEvent[1], {"legend": True})
                             valid = False
                         else:
                             valid = False
