@@ -18,7 +18,7 @@ RUN cd roguelike && mkdir deps && cd deps &&               \
     git clone https://github.com/Neargye/magic_enum.git && \
     git clone https://github.com/Akagi201/lwlog.git &&     \
     git clone https://github.com/nlohmann/json.git &&      \
-    git checkout devel
+    git checkout soft_deadline_2
 RUN pip3 install ./roguelike
 CMD cd roguelike/python_src &&   \
     echo "nohup python3 server.py &\n" | bash  && \
