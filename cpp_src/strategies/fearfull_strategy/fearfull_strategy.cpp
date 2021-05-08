@@ -30,8 +30,7 @@ void roguelike::fearfull_strategy::form_decision(roguelike::decision_making_comp
         }
         dm_cpt.charges_into = view->oracle->get_tile(c.x + view->point_of_view.x, c.y + view->point_of_view.y).resident;
         // no pathfinding yet
-        assert(c.x != 0);
-        assert(c.y != 0);
+        assert(c.x != 0 and c.y != 0) ;
         if (abs(c.x) > abs(c.y)) {
             if (c.x < 0) {
                 dm_cpt.decision = cmd::RIGHT;
