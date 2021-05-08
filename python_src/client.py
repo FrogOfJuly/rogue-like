@@ -52,10 +52,26 @@ def disconnect(string):
 
 
 def color(level):
-    if level > 10:
+    if level >= 9:
+        return 83
+    elif level == 8:
+        return 77
+    elif level == 7:
+        return 35
+    elif level == 6:
+        return 29
+    elif level == 5:
+        return 12
+    elif level == 4:
+        return 203
+    elif level == 3:
+        return 173
+    elif level == 2:
+        return 161
+    elif level == 1:
+        return 10
+    elif level <= 0:
         return 197
-    else:
-        return 207 - level
 
 
 def render(stdscr, game_state: dict, with_help = False):
@@ -92,8 +108,8 @@ def render(stdscr, game_state: dict, with_help = False):
                     to_print = '███'
                 else:
                     to_print = f' {repr} '
-                    if 'h_cpt' in tile['entity']:
-                        lvl = tile['entity']['h_cpt']['health']
+                    if 'h_cpt' in tile['entity'] and tile['entity']['h_cpt']['max_health'] > 0:
+                        lvl = int(tile['entity']['h_cpt']['health'] * 10 / tile['entity']['h_cpt']['max_health'])
             if (lvl):
                 stdscr.addstr(i, j*3, to_print, curses.color_pair(color(lvl)))
             else:
