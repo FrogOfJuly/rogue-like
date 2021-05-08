@@ -21,6 +21,9 @@ void roguelike::agressive_strategy::form_decision(roguelike::decision_making_com
         if (not std::holds_alternative<player*>(c.observed_entity.value())) {
             continue;
         }
+        lwlog_info("observed player on relative coords: (%d, %d)", c.x, c.y);
+        lwlog_info(
+            "absolute coords: (%d, %d)", c.x + view->point_of_view.x, c.y + view->point_of_view.y);
 
         bool has_line_of_sight = view->oracle->do_tiles_have_loc(
             {view->point_of_view.x, view->point_of_view.y}, {c.x + view->point_of_view.x, c.y + view->point_of_view.y});
@@ -41,7 +44,7 @@ void roguelike::agressive_strategy::form_decision(roguelike::decision_making_com
         }
         dm_cpt.charges_into = charges_into;
         // no pathfinding yet
-        assert(c.x != 0 and c.y != 0);
+        assert(c.x != 0 or c.y != 0);
         if (abs(c.x) > abs(c.y)) {
             if (c.x < 0) {
                 dm_cpt.decision = cmd::LEFT;

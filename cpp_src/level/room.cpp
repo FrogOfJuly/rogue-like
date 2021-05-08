@@ -198,10 +198,12 @@ roguelike::room_view roguelike::room::get_area_around_tile(roguelike::tile_idx i
     auto p = pairFromIdx(idx);
     std::vector<room_view::cell> view;
     room_view::cell point_of_view{p.first, p.second, room_view::observation()};
-
-    for (int i = 1; i < radius + 1; ++i) {
+    for (int i = 0; i < radius + 1; ++i) {
         auto idxes = utils::get_circle(i, p.first, p.second);
         for (const auto& idx_pair : idxes) {
+            if (idx_pair.first == p.first and idx_pair.second == p.second) {
+                continue;
+            }
             auto maybe_tl = get_tile_if_exists(idx_pair.first, idx_pair.second);
             if (not maybe_tl.has_value()) {
                 continue;
