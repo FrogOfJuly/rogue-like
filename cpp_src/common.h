@@ -9,7 +9,7 @@
 #include <memory>
 #include <cassert>
 
-#define LOG_LEVEL 7
+#define LOG_LEVEL -1
 
 #include "../deps/lwlog/lwlog.h"
 

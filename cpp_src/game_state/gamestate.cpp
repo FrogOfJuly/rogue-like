@@ -33,7 +33,6 @@ std::string roguelike::gamestate::get_serialization() const {
 }
 
 void roguelike::gamestate::clean_decisions() {
-    lwlog_info("cleaning decisions");
     for (int i = 0; i < player_num; ++i) {
         auto &plr = players[i];
         plr.dm_cpt.decision = PASS;
@@ -50,12 +49,8 @@ void roguelike::gamestate::clean_decisions() {
     }
 }
 void roguelike::gamestate::clean_dead() {}
-void roguelike::gamestate::resolve_all_interactions() {
-    lwlog_info("resolving interactions");
-    inter_system.resolve_all_interactions();
-}
+void roguelike::gamestate::resolve_all_interactions() { inter_system.resolve_all_interactions(); }
 void roguelike::gamestate::redraw_players() {
-    lwlog_info("drawing players");
     for (int i = 0; i < player_num; ++i) {
         auto &plr = players[i];
         entity_type var_ent(&plr);
@@ -63,45 +58,35 @@ void roguelike::gamestate::redraw_players() {
     }
 }
 void roguelike::gamestate::redraw_nonplayers() {
-    lwlog_info("drawing non players");
     for (auto &var_ent : level.residents) {
-        bool is_dead = std::visit([this](auto *ent_ptr) {
-            lwlog_info("-checking if entity %d is dead", ent_ptr->id.value);
-            return level.dead.count(ent_ptr->id.value) != 0;
-        }, var_ent);
+        bool is_dead = std::visit([this](auto *ent_ptr) { return level.dead.count(ent_ptr->id.value) != 0; }, var_ent);
         if (is_dead) {
-            lwlog_info("-it is dead. Skipping");
             continue;
         }
-        lwlog_info("-it is not dead. Drawing");
         drawing_system::general_draw(var_ent);
-        lwlog_info("Drawing ended");
     }
 }
 void roguelike::gamestate::move_nonplayers() {
-    lwlog_info("moving nonplayers");
     for (auto &var_ent : level.residents) {
-        bool is_dead = std::visit([this](auto *ent_ptr) {
-            lwlog_info("-checking if entity %d is dead", ent_ptr->id.value);
-            return level.dead.count(ent_ptr->id.value) != 0; }, var_ent);
+        bool is_dead = std::visit([this](auto *ent_ptr) { return level.dead.count(ent_ptr->id.value) != 0; }, var_ent);
         if (is_dead) {
-            lwlog_info("-it is dead. Skipping");
             continue;
         }
-        lwlog_info("-it is not dead. Making move");
+        lwlog_info("moving nonplayer");
         mv_system.more_general_move(var_ent);
     }
 }
 void roguelike::gamestate::move_players() {
     for (int i = 0; i < player_num; ++i) {
         auto &plr = players[i];
-        lwlog_info("moving player %d with decision %d", plr.id.value, players->dm_cpt.decision);
+        lwlog_info("moving player %d", plr.id);
+        std::cout << "moving player with decision: " << players->dm_cpt.decision << std::endl;
         entity_type var_ent = &plr;
         mv_system.more_general_move(var_ent);
     }
 }
 int roguelike::gamestate::receive_player_command(int player_id, roguelike::cmd command) {
-    lwlog_info("getting command %d for player %d", command, player_id);
+    lwlog_info("getting player command");
     if (player_id >= player_num) {
         throw std::runtime_error("No such player id: " + std::to_string(player_id));
     }
@@ -121,7 +106,6 @@ int roguelike::gamestate::receive_player_command(int player_id, roguelike::cmd c
     for (int i = 0; i < player_num; ++i) {
         command_to_receive.push(i);  // enqueue all players for commands
     }
-    lwlog_info("all players got their commands");
     return -1;
 }
 void roguelike::gamestate::initialize(int player_number) {
@@ -187,7 +171,6 @@ void roguelike::gamestate::initialize(int player_number) {
         level.spawn_on_level(var_ent, rnd_tile);
         level.residents.emplace_back(gg);
     }
-    lwlog_info("spawned everybody");
 }
 void roguelike::gamestate::clean_logs() {
     for (int i = 0; i < player_num; ++i) {
@@ -198,28 +181,18 @@ void roguelike::gamestate::clean_logs() {
     level.common_log.clear();
 }
 void roguelike::gamestate::end_turn() {
-    lwlog_info("ending turn");
     clean_decisions();
     clean_logs();
 }
 void roguelike::gamestate::decide_next_move() {
-    lwlog_info("deviding next move");
     for (auto &var_ent : level.residents) {
-        bool is_dead = std::visit(
-            [this](auto *ent_ptr) {
-                lwlog_info("-checking if entity %d is dead", ent_ptr->id.value);
-                return level.dead.count(ent_ptr->id.value) != 0;
-            },
-            var_ent);
+        bool is_dead = std::visit([this](auto *ent_ptr) { return level.dead.count(ent_ptr->id.value) != 0; }, var_ent);
         if (is_dead) {
-            lwlog_info("-it is dead. Skipping");
             continue;
         }
-        lwlog_info("-it is not dead. Making decision");
         dm_system.make_decision(var_ent);
     }
     for (int i = 0; i < player_num; ++i) {
-        lwlog_info("-recording common log for player %d", i);
         players[i].lg_cpt.log << level.common_log.str();
     }
 }
@@ -232,33 +205,23 @@ roguelike::gamestate::~gamestate() {
 }
 roguelike::player *roguelike::gamestate::get_player(roguelike::player_id id) { return &players[id.value]; }
 roguelike::entity_type roguelike::gamestate::get_entity(roguelike::general_id id) {
-    lwlog_info("getting entity");
     return std::visit(
         overloaded{
             [this](player_id id) {
-                lwlog_info("-player with id %d", id.value);
                 entity_type plr = get_player(id);
                 return plr;
             },
-            [this](entity_id id) {
-                lwlog_info("-residnet with id %d", id.value);
-                return level.get_resident(id);
-            }},
+            [this](entity_id id) { return level.get_resident(id); }},
         id);
 }
 void roguelike::gamestate::report_murder(roguelike::general_id mdred_id, roguelike::general_id mdrer_id) {
-    lwlog_info("reporting murder");
     std::visit(
         overloaded{
             [this](player_id id) {
-                lwlog_info("player %d got murdered", id.value);
                 dead_players.insert(id.value);
                 get_player(id)->lg_cpt.log << "you are dead!\n";
             },
-            [this](entity_id id) {
-                lwlog_info("entity %d got murdered", id.value);
-                level.dead.insert(id.value);
-            }},
+            [this](entity_id id) { level.dead.insert(id.value); }},
         mdred_id);
 
     entity_type mdred_ent = get_entity(mdred_id);

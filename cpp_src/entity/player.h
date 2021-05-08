@@ -11,8 +11,7 @@ namespace roguelike {
     struct player {
         player(int pl_id) {
             id = player_id{pl_id};
-            h_cpt.max_health = 50;
-            h_cpt.health = h_cpt.max_health;
+            h_cpt = {50, 50};
             a_cpt.damage = 2;
             m_cpt.x = -1;
             m_cpt.y = -1;
