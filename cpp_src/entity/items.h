@@ -8,7 +8,7 @@
 namespace roguelike {
     struct potion {
         potion(int id) : id{id} {
-            np_cpt.name = "health potion";
+            nm_cpt.name = "health potion";
         }
         entity_id id;
         repr_component repr_cpt;
