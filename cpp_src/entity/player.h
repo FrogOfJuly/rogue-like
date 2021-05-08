@@ -18,11 +18,10 @@ namespace roguelike {
             m_cpt.y = -1;
             dm_cpt.decision = PASS;
             nm_cpt.name = "player" + std::to_string(pl_id);
-            level_component lvl_cpt;
+
         }
 
         player_id id = player_id{-1};
-        int lvl = 0;
         logging_component lg_cpt;
         health_component h_cpt;
         move_component m_cpt;
@@ -31,6 +30,7 @@ namespace roguelike {
         repr_component repr_cpt;
         name_component nm_cpt;
         simple_inventory_component s_inv_cpt;
+        level_component lvl_cpt;
     };
 
     template <>

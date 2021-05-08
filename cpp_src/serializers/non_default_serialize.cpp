@@ -70,30 +70,6 @@ void roguelike::to_json(nlohmann::json &j, const gamestate &p) {
         entity_type resident = p.get_entity(id);
         auto resident_json = nlohmann::json();
         to_json(resident_json, resident);
-        /*std::visit(
-        overloaded{
-            [&p](player_id id) {
-                auto j_local = nlohmann::json();
-                nlohmann::to_json(j_local["player"], p.players[id.value]);
-                std::string str_repr = j_local["player"]["repr_cpt"]["repr"];
-                return j_local;
-            },
-            [&p](entity_id id) {
-                auto j_local = nlohmann::json();
-                const auto &var_ent = p.level.residents[id.value];
-                nlohmann::to_json(j_local["entity"], var_ent);
-                bool has_repr = std::visit(
-                    [](auto *ent) {
-                        return has_member_repr_component<std::remove_pointer_t<decltype(ent)>>::value;
-                    },
-                    var_ent);
-                if (not has_repr) {
-                    j_local["entity"]["repr_cpt"]["repr"] = "?";
-                    return j_local;
-                }
-                return j_local;
-            }},
-        tle.resident.value());*/
         cur_tile_json["tile"] = resident_json;
         room_json.push_back(cur_tile_json);
     }
