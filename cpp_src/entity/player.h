@@ -18,6 +18,7 @@ namespace roguelike {
             m_cpt.y = -1;
             dm_cpt.decision = PASS;
             nm_cpt.name = "player" + std::to_string(pl_id);
+            level_component lvl_cpt;
         }
 
         player_id id = player_id{-1};

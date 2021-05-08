@@ -24,6 +24,18 @@ namespace roguelike {
 
     //--------------end of move_component----------------------------------------
 
+    struct level_component : public component {
+        int exp = 0;
+        template <typename entType>
+        inline std::pair<int, int> get_level(entType *ent) {
+            int cur_level = exp / 10;
+            int next_level = (cur_level + 1) * 10;
+            return std::make_pair(cur_level, next_level);
+        }
+    };
+
+    //--------------end of move_component----------------------------------------
+
     struct atk_component : public component {
         int damage = -1;
 
@@ -53,8 +65,6 @@ namespace roguelike {
     //--------------end of health_component--------------------------------------
 
     struct repr_component : public component {
-        std::string repr = "?";
-
         template <typename T>
         static inline std::string compute_representation(const T *) {
             return "?";

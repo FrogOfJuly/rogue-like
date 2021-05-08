@@ -39,7 +39,7 @@ namespace roguelike {
 
         [[nodiscard]] tile_idx get_random_empty_tile() const;
 
-        [[nodiscard]] entity_type get_resident(entity_id id);
+        [[nodiscard]] entity_type get_resident(entity_id id) const;
 
         void remove_resident(tile_idx idx);
 

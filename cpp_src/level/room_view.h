@@ -22,7 +22,7 @@ namespace roguelike {
         struct cell {
             int x = -1;
             int y = -1;
-            std::optional<entity_type> observed_entity;
+            observation observed_entity;
         };
 
         static cell make_cell(const observation& obs, int x, int y);

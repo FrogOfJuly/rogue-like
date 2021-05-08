@@ -34,8 +34,8 @@ namespace roguelike {
         /*drawing_system draw_system; -- all methods are static, so no need to create object*/
         decision_making_system dm_system;
 
-        player* get_player(player_id id);
-        entity_type get_entity(general_id id);
+        player* get_player(player_id id) const;
+        entity_type get_entity(general_id id) const;
 
         void report_murder(general_id mdred_id, general_id mdrer_id);
 

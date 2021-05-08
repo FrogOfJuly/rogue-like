@@ -230,9 +230,9 @@ roguelike::gamestate::~gamestate() {
     }
     delete[](char *) players;
 }
-roguelike::player *roguelike::gamestate::get_player(roguelike::player_id id) { return &players[id.value]; }
-roguelike::entity_type roguelike::gamestate::get_entity(roguelike::general_id id) {
-    lwlog_info("getting entity");
+
+roguelike::player *roguelike::gamestate::get_player(roguelike::player_id id) const { return &players[id.value]; }
+roguelike::entity_type roguelike::gamestate::get_entity(roguelike::general_id id) const {
     return std::visit(
         overloaded{
             [this](player_id id) {

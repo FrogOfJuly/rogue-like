@@ -8,7 +8,7 @@
 #include "../../utility/entity_info.h"
 
 void roguelike::drawing_system::general_draw(entity_type &var_ent) {
-    std::visit(
+    /*std::visit(
         [](auto *ent) {
             lwlog_info("asserting entity pointer");
             assert(ent);
@@ -19,5 +19,6 @@ void roguelike::drawing_system::general_draw(entity_type &var_ent) {
                 return;
             }
         },
-        var_ent);
+        var_ent);*/
+    return;
 }
