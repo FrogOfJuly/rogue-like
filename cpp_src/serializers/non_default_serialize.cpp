@@ -23,11 +23,11 @@ void roguelike::to_json(nlohmann::json &j, const roguelike::entity_type &p) {
             to_json(j_local, *ent_ptr);
             j_local["repr_cpt"]["repr"] = repr_component::compute_representation(ent_ptr);
             j_local["repr_cpt"]["repr"] = repr_component::compute_representation(ent_ptr);
-            if constexpr (has_member_level_component<entT>::value) {
-                auto lvl_p = ent_ptr->lvl_cpt.get_level(ent_ptr);
-                j_local["lvl_cpt"]["level"] = lvl_p.first;
-                j_local["lvl_cpt"]["exp_until_next_level"] = lvl_p.second;
-                j_local["lvl_cpt"]["experience"] = ent_ptr->lvl_cpt.exp;
+            if constexpr (has_member_expirience_components<entT>::value) {
+                auto exp_p = ent_ptr->exp_cpt.get_level(ent_ptr);
+                j_local["exp_cpt"]["level"] = exp_p.first;
+                j_local["exp_cpt"]["exp_until_next_level"] = exp_p.second;
+                j_local["exp_cpt"]["experience"] = ent_ptr->exp_cpt.exp;
             }
             if constexpr (std::is_same_v<entT, player>) {
                 auto ret_j = nlohmann::json();

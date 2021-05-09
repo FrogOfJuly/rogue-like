@@ -18,7 +18,6 @@ namespace roguelike {
             m_cpt.y = -1;
             dm_cpt.decision = PASS;
             nm_cpt.name = "player" + std::to_string(pl_id);
-
         }
 
         player_id id = player_id{-1};
@@ -30,7 +29,7 @@ namespace roguelike {
         repr_component repr_cpt;
         name_component nm_cpt;
         simple_inventory_component s_inv_cpt;
-        level_component lvl_cpt;
+        expirience_components exp_cpt;
     };
 
     template <>
@@ -42,9 +41,10 @@ namespace roguelike {
     struct interacter<player, entityType> {
         static inline void interact(player &inted, entityType &inting) {
             if constexpr (has_member_atk_component<entityType>::value) {
-                auto dmg = atk_component::calculate_damage(&inting);
-                health_component::receive_damage(&inted, dmg);
-                inted.lg_cpt.log << "you received " << dmg << " damage\n";
+                int dmg = atk_component::calculate_damage(&inting);
+                int health = inted.h_cpt.health;
+                int rec_dmg = health_component::receive_damage(&inted, dmg);
+                inted.lg_cpt.log << "you received " << rec_dmg << " damage\n";
                 return;
             }
             if constexpr (has_member_name_component<entityType>::value) {

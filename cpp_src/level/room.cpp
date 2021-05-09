@@ -33,7 +33,12 @@ const roguelike::tile& roguelike::room::get_tile(int x, int y) const {
     auto des_tile_idx = x + y * W;
     return tiles[des_tile_idx];
 }
-roguelike::tile_idx roguelike::room::idxFromPair(int x, int y) { return x + y * W; }
+roguelike::tile_idx roguelike::room::idxFromPair(int x, int y) {
+    if (x >= W or y >= W or x < 0 or y < 0){
+        return -1;
+    }
+    return x + y * W;
+}
 std::pair<int, int> roguelike::room::pairFromIdx(roguelike::tile_idx idx) { return std::make_pair(idx % W, idx / W); }
 roguelike::tile_idx roguelike::room::get_empty_tile() const {
     for (int i = 0; i < W * H; ++i) {
@@ -188,11 +193,7 @@ roguelike::tile_idx roguelike::room::get_random_empty_tile() const {
     return -1;
 }
 void roguelike::room::remove_resident(roguelike::tile_idx idx) {
-    auto res_id = tiles[idx].resident;
-    if (not res_id.has_value()) {
-        return;
-    }
-    tiles[idx].resident = std::optional<general_id>();
+    tiles[idx].resident.reset();
 }
 roguelike::room_view roguelike::room::get_area_around_tile(roguelike::tile_idx idx, int radius) const {
     auto p = pairFromIdx(idx);
@@ -350,6 +351,43 @@ void roguelike::room::generate_enemies(int lvl_num) {
         lwlog_info("placing potion");
         auto new_id = residents.size();
         auto gg = new potion(new_id);
+        entity_type var_ent = gg;
+        auto rnd_tile = get_random_empty_tile();
+        spawn_on_level(var_ent, rnd_tile);
+        residents.emplace_back(gg);
+    }
+    for (int i = 12; i < 14; ++i) {
+        lwlog_info("placing sword");
+        auto new_id = residents.size();
+        auto gg = new sword(new_id);
+        entity_type var_ent = gg;
+        auto rnd_tile = get_random_empty_tile();
+        spawn_on_level(var_ent, rnd_tile);
+        residents.emplace_back(gg);
+    }
+    for (int i = 14; i < 16; ++i) {
+        lwlog_info("placing shield");
+        auto new_id = residents.size();
+        auto gg = new shield(new_id);
+        entity_type var_ent = gg;
+        auto rnd_tile = get_random_empty_tile();
+        spawn_on_level(var_ent, rnd_tile);
+        residents.emplace_back(gg);
+    }
+    {
+        lwlog_info("placing armor");
+        auto new_id = residents.size();
+        auto gg = new armor(new_id);
+        entity_type var_ent = gg;
+        auto rnd_tile = get_random_empty_tile();
+        lwlog_info("spawned armor on tile %d", rnd_tile);
+        spawn_on_level(var_ent, rnd_tile);
+        residents.emplace_back(gg);
+    }
+    {
+        lwlog_info("placing shovel");
+        auto new_id = residents.size();
+        auto gg = new shovel(new_id);
         entity_type var_ent = gg;
         auto rnd_tile = get_random_empty_tile();
         spawn_on_level(var_ent, rnd_tile);

@@ -25,7 +25,7 @@ namespace roguelike {
 
     //--------------end of move_component----------------------------------------
 
-    struct level_component : public component {
+    struct expirience_components : public component {
         int exp = 0;
         template <typename entType>
         inline std::pair<int, int> get_level(entType *ent) {
@@ -42,11 +42,42 @@ namespace roguelike {
 
         template <typename T>
         static inline int calculate_damage(const T *ent) {
+            if constexpr (has_member_simple_inventory_component<T>::value) {
+                return ent->a_cpt.damage + ent->s_inv_cpt.get_damage_bonus();
+            }
             return ent->a_cpt.damage;
         }
     };
 
     //--------------end of atk_component-----------------------------------------
+
+    struct dfc_component : public component {
+        int damage_reduction = 0;
+
+        template <typename T>
+        static inline int calculate_damage_reduction(const T *ent) {
+            if constexpr (has_member_simple_inventory_component<T>::value) {
+                return ent->dfc_cpt.damage_reduction + ent->s_inv_cpt.get_defence_bonus();
+            }
+            return ent->dfc_cpt.damage_reduction;
+        }
+    };
+
+    //--------------end of prot_component-----------------------------------------
+
+    struct prot_component : public component {
+        double protection_scale = 1.0;
+
+        template <typename T>
+        static inline double calculate_protection_scale(const T *ent) {
+            if constexpr (has_member_simple_inventory_component<T>::value) {
+                return ent->prt_cpt.protection_scale + ent->s_inv_cpt.get_protection_bonus();
+            }
+            return ent->prt_cpt.protection_scale;
+        }
+    };
+
+    //--------------end of dfc_component-----------------------------------------
 
     struct health_component : public component {
         int max_health = -1;
@@ -58,8 +89,14 @@ namespace roguelike {
         }
 
         template <typename T>
-        static inline void receive_damage(T *ent, int damage) {
+        static inline int receive_damage(T *ent, int damage) {
+            if constexpr (has_member_simple_inventory_component<T>::value) {
+                double prot = ent->s_inv_cpt.get_protection_bonus();
+                int red = ent->s_inv_cpt.get_defence_bonus();
+                damage = std::max(0, (int)((damage - red) * prot));
+            }
             ent->h_cpt.health -= damage;
+            return damage;
         }
     };
 
@@ -103,6 +140,9 @@ namespace roguelike {
         std::optional<entity_type> spot;
         std::unordered_map<inventory_spot, entity_type> spots;
         void manage();
+        [[nodiscard]] int get_damage_bonus() const;
+        [[nodiscard]] int get_defence_bonus() const;
+        [[nodiscard]] double get_protection_bonus() const;
     };
 
     //--------------end of simple inventory component----------------------------
@@ -123,6 +163,10 @@ namespace roguelike {
     };
 
     //--------------end of one time effect component-----------------------------
+
+    struct level_component : public component {
+        int lvl = -1;
+    };
 
 }  // namespace roguelike
 

@@ -19,8 +19,8 @@ namespace roguelike {
     void to_json(nlohmann::json &j, const simple_inventory_component &p);
     void from_json(const nlohmann::json &j, simple_inventory_component &p);
 
-    void to_json(nlohmann::json &j, const level_component &p);
-    void from_json(const nlohmann::json &j, level_component &p);
+    void to_json(nlohmann::json &j, const expirience_components &p);
+    void from_json(const nlohmann::json &j, expirience_components &p);
 }  // namespace roguelike
 #define ROGUE_LIKE_SERIALIZE_H
 

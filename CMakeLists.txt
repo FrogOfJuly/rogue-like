@@ -26,7 +26,7 @@ set(LIB_SOURCES
         cpp_src/entity/player.h
         cpp_src/entity/goblin.h
         cpp_src/entity/goblin_guard.h
-        cpp_src/entity/items.h
+        cpp_src/entity/potion.h
         cpp_src/entity/wall.h
         cpp_src/entity/trap.h
 

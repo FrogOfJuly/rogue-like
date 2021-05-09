@@ -16,7 +16,8 @@ namespace roguelike {
             h_cpt.health = h_cpt.max_health;
             a_cpt.damage = 1;
             dm_cpt.idle_strategy = std::make_unique<passive_strategy>();
-            nm_cpt.name = "goblin_guard";
+            nm_cpt.name = "goblin guard";
+            lvl_cpt.lvl = 5;
         }
     };
 
@@ -39,18 +40,16 @@ namespace roguelike {
     template <typename entityType>
     struct interacter<goblin_guard, entityType> {
         static inline void interact(goblin_guard &inted, entityType &inting) {
+            if constexpr (has_member_atk_component<entityType>::value and not std::is_base_of_v<goblin, entityType>) {
+                auto dmg = atk_component::calculate_damage(&inting);
+                auto rec_dmg = health_component::receive_damage(&inted, dmg);
+                if constexpr (has_member_logging_component<entityType>::value) {
+                    inting.lg_cpt.log << "you damaged goblin guard by " << rec_dmg << "\n";
+                }
+                return;
+            }
             if constexpr (has_member_logging_component<entityType>::value) {
                 inting.lg_cpt.log << "you interacted with goblin guard" << std::to_string(inted.id.value) << "\n";
-            }
-            std::string inting_name = "unknown";
-            if constexpr (has_member_name_component<entityType>::value) {
-                inting_name = inting.nm_cpt.name;
-            }
-            if constexpr (has_member_atk_component<entityType>::value and not std::is_base_of_v<goblin, entityType>) {
-                std::cout << inted.nm_cpt.name << " was damaged by " << inting_name << std::endl;
-                auto dmg = atk_component::calculate_damage(&inting);
-                health_component::receive_damage(&inted, dmg);
-                return;
             }
             return;
         }

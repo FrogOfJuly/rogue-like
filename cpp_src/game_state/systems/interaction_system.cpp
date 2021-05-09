@@ -71,5 +71,26 @@ void roguelike::interaction_system::resolve_all_interactions() {
             auto &inting_ent = interacting_pair.second;
             game_ptr->mv_system.more_general_move(inting_ent);
         }
+
+        bool is_wall = std::holds_alternative<wall *>(interacting_pair.first);
+        bool has_shovel = std::visit(
+            [](auto *ent_ptr) {
+                using entT = std::remove_pointer_t<decltype(ent_ptr)>;
+                if constexpr (has_member_simple_inventory_component<entT>::value) {
+                    bool has_of_item =
+                        ent_ptr->s_inv_cpt.spots.count(simple_inventory_component::inventory_spot::offence) != 0;
+                    if (not has_of_item) {
+                        return false;
+                    }
+                    auto of_item = ent_ptr->s_inv_cpt.spots.at(simple_inventory_component::inventory_spot::offence);
+                    bool is_shovel = std::holds_alternative<shovel *>(of_item);
+                    return is_shovel;
+                }
+                return false;
+            },
+            interacting_pair.second);
+        if (is_wall and has_shovel) {
+            game_ptr->level.remove_resident(des_idx);
+        }
     }
 }
