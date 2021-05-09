@@ -70,6 +70,7 @@ void roguelike::from_json(const nlohmann::json &j, roguelike::simple_inventory_c
 void roguelike::to_json(nlohmann::json &j, const gamestate &p) {
     auto room_json = nlohmann::json();
     for (const auto &tle : p.level.tiles) {
+
         auto cur_tile_json = nlohmann::json();
         if (tle.empty()) {
             cur_tile_json["tile"] = nlohmann::json();

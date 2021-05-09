@@ -14,6 +14,7 @@
 #include "../entity/shield.h"
 #include "../entity/armor.h"
 #include "../entity/shovel.h"
+#include "../entity/chest.h"
 #include "../entity/trap.h"
 #include "../entity/wall.h"
 

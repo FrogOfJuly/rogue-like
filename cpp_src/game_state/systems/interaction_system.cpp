@@ -52,11 +52,24 @@ void roguelike::interaction_system::resolve_all_interactions() {
                 return false;
             },
             interacting_pair.first);
+        std::optional<entity_type> item_in_tmp_spot = std::visit(
+            [](auto *ent_ptr) {
+                using entT = std::remove_pointer_t<decltype(ent_ptr)>;
+                if constexpr (has_member_simple_inventory_component<entT>::value) {
+                    return ent_ptr->s_inv_cpt.spot;
+                }
+                return std::optional<entity_type>();
+            },
+            interacting_pair.first);
         if (is_dead) {
             game_ptr->level.remove_resident(des_idx);
             game_ptr->report_murder(idx_pair.first, idx_pair.second);
             auto &inting_ent = interacting_pair.second;
-            game_ptr->mv_system.more_general_move(inting_ent);
+            if (item_in_tmp_spot.has_value()) {
+                game_ptr->level.spawn_on_level(item_in_tmp_spot.value(), des_idx);
+            } else {
+                game_ptr->mv_system.more_general_move(inting_ent);
+            }
         }
         bool is_picked = std::visit(
             [](auto *inted_ent_ptr) {

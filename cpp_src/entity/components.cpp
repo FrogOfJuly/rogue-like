@@ -96,6 +96,13 @@ roguelike::simple_inventory_component roguelike::simple_inventory_component::get
     inv.locked = true;
     return inv;
 }
+std::optional<roguelike::entity_type> roguelike::simple_inventory_component::get_some_item() const {
+    auto res = std::optional<entity_type>();
+    for (const auto& it : spots) {
+        return std::optional<entity_type>(it.second);
+    }
+    return res;
+}
 std::pair<int, int> roguelike::decision_making_component::get_velocity() const {
     switch (decision) {
         case UP:

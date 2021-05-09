@@ -176,7 +176,7 @@ roguelike::entity_type roguelike::gamestate::get_entity(roguelike::general_id id
                 return plr;
             },
             [this](entity_id id) {
-                lwlog_info("-residnet with id %d", id.value);
+                lwlog_debug("-residnet with id %d", id.value);
                 return level.get_resident(id);
             }},
         id);

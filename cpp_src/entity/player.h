@@ -34,7 +34,7 @@ namespace roguelike {
 
     template <>
     inline std::string repr_component::compute_representation<player>(const player *p) {
-        return std::to_string(p->id.value);
+        return std::to_string(p->id.value + 1);
     }
 
     template <>

@@ -51,6 +51,7 @@ namespace roguelike {
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(sword, id, nm_cpt, a_cpt);
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(shield, id, nm_cpt, dfc_cpt);
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(armor, id, nm_cpt, prt_cpt);
+    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(chest, id, nm_cpt);
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(shovel, id, nm_cpt);
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(goblin, id, dm_cpt, h_cpt, a_cpt, m_cpt, nm_cpt);
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(goblin_guard, id, dm_cpt, h_cpt, a_cpt, m_cpt, nm_cpt);

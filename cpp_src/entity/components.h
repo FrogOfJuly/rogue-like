@@ -30,10 +30,14 @@ namespace roguelike {
         int lvlups = 0;
 
         template <typename entType>
-        inline static std::pair<int, int> get_level(entType *ent) {}
+        inline static std::pair<int, int> get_level(entType *ent) {
+            return std::make_pair(-1, -1);
+        }
 
         template <typename entType>
-        inline static bool gain_experience(entType *ent, int new_exp) {}
+        inline static bool gain_experience(entType *ent, int new_exp) {
+            return false;
+        }
 
         template <typename entType>
         inline static void perform_lvlups(entType *ent) {}
@@ -148,6 +152,7 @@ namespace roguelike {
         [[nodiscard]] int get_damage_bonus() const;
         [[nodiscard]] int get_defence_bonus() const;
         [[nodiscard]] double get_protection_bonus() const;
+        [[nodiscard]] std::optional<entity_type> get_some_item() const;
 
         static simple_inventory_component get_locked_invetory();
     };

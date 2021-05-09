@@ -25,21 +25,26 @@ std::optional<roguelike::tile> roguelike::room::get_tile_if_exists(int x, int y)
     }
     return std::optional<tile>();
 }
+
 roguelike::tile& roguelike::room::get_tile(int x, int y) {
     auto des_tile_idx = x + y * W;
     return tiles[des_tile_idx];
 }
+
 const roguelike::tile& roguelike::room::get_tile(int x, int y) const {
     auto des_tile_idx = x + y * W;
     return tiles[des_tile_idx];
 }
+
 roguelike::tile_idx roguelike::room::idxFromPair(int x, int y) {
-    if (x >= W or y >= W or x < 0 or y < 0){
+    if (x >= W or y >= W or x < 0 or y < 0) {
         return -1;
     }
     return x + y * W;
 }
+
 std::pair<int, int> roguelike::room::pairFromIdx(roguelike::tile_idx idx) { return std::make_pair(idx % W, idx / W); }
+
 roguelike::tile_idx roguelike::room::get_empty_tile() const {
     for (int i = 0; i < W * H; ++i) {
         if (not tiles[i].resident.has_value()) {
@@ -48,6 +53,7 @@ roguelike::tile_idx roguelike::room::get_empty_tile() const {
     }
     return -1;
 }
+
 void roguelike::room::spawn_on_level(entity_type& var_ent, roguelike::tile_idx tidx) {
     if (tidx == -1) {
         tidx = get_empty_tile();
@@ -60,8 +66,13 @@ void roguelike::room::spawn_on_level(entity_type& var_ent, roguelike::tile_idx t
     }
     std::visit(
         [this, tidx](auto* ent) {
+            using entT = std::remove_pointer_t<decltype(ent)>;
+            if constexpr (has_member_name_component<entT>::value) {
+                lwlog_info("spawning %s on tile %d with id %d", ent->nm_cpt.name.c_str(), tidx, ent->id.value);
+            }
+
             tiles[tidx].resident = ent->id;
-            if constexpr (has_member_move_component<std::remove_pointer_t<decltype(ent)>>::value) {
+            if constexpr (has_member_move_component<entT>::value) {
                 ent->m_cpt.residency = tidx;
                 auto coords = pairFromIdx(tidx);
                 ent->m_cpt.x = coords.first;
@@ -70,6 +81,7 @@ void roguelike::room::spawn_on_level(entity_type& var_ent, roguelike::tile_idx t
         },
         var_ent);
 }
+
 void roguelike::room::generate_terrain(int lvl_num) {
     using chunkType = std::array<int, 25>;
     const static int chunk_size = 5;
@@ -141,6 +153,7 @@ void roguelike::room::generate_terrain(int lvl_num) {
         }
     }
 }
+
 roguelike::room::~room() {
     for (auto& var_ent : residents) {
         std::visit(
@@ -153,6 +166,7 @@ roguelike::room::~room() {
             var_ent);
     }
 }
+
 std::array<roguelike::tile_idx, 4> roguelike::room::get_tile_neighbours(roguelike::tile_idx idx) const noexcept {
     std::array<tile_idx, 4> neighbours{-1, -1, -1, -1};
     auto p = pairFromIdx(idx);
@@ -183,6 +197,7 @@ std::array<roguelike::tile_idx, 4> roguelike::room::get_tile_neighbours(roguelik
     }
     return neighbours;
 }
+
 roguelike::tile_idx roguelike::room::get_random_empty_tile() const {
     tile_idx tile_num = rand() % (W * H);
     for (; tile_num < 2 * W * H; ++tile_num) {
@@ -192,9 +207,9 @@ roguelike::tile_idx roguelike::room::get_random_empty_tile() const {
     }
     return -1;
 }
-void roguelike::room::remove_resident(roguelike::tile_idx idx) {
-    tiles[idx].resident.reset();
-}
+
+void roguelike::room::remove_resident(roguelike::tile_idx idx) { tiles[idx].resident.reset(); }
+
 roguelike::room_view roguelike::room::get_area_around_tile(roguelike::tile_idx idx, int radius) const {
     auto p = pairFromIdx(idx);
     std::vector<room_view::cell> view;
@@ -229,6 +244,7 @@ roguelike::room_view roguelike::room::get_area_around_tile(roguelike::tile_idx i
     }
     return roguelike::room_view(view, point_of_view, this);
 }
+
 std::optional<roguelike::tile> roguelike::room::get_target_tile(
     roguelike::tile_idx idx, roguelike::cmd direction) const {
     auto p = pairFromIdx(idx);
@@ -248,6 +264,7 @@ std::optional<roguelike::tile> roguelike::room::get_target_tile(
             return get_tile_if_exists(x, y);
     }
 }
+
 bool roguelike::room::do_target_tile_have_wall(roguelike::tile_idx idx, roguelike::cmd direction) const {
     auto maybe_tile = get_target_tile(idx, direction);
     if (not maybe_tile.has_value()) {
@@ -268,6 +285,7 @@ bool roguelike::room::do_target_tile_have_wall(roguelike::tile_idx idx, roguelik
     bool is_wall = std::visit([](auto* entity_ptr) { return std::is_same_v<decltype(entity_ptr), wall*>; }, var_ent);
     return is_wall;
 }
+
 bool roguelike::room::do_tiles_have_loc(std::pair<int, int> p0, std::pair<int, int> p1) const {
     utils::vec2d point_of_view{p0.first, p0.second};
     utils::vec2d tgt_point{p1.first, p1.second};
@@ -307,7 +325,19 @@ bool roguelike::room::do_tiles_have_loc(std::pair<int, int> p0, std::pair<int, i
     }
     return has_line_of_sight;
 }
-roguelike::entity_type roguelike::room::get_resident(roguelike::entity_id id) const { return residents.at(id.value); }
+
+roguelike::entity_type roguelike::room::get_resident(roguelike::entity_id id) const {
+    auto res = residents.at(id.value);
+    std::visit(
+        [](auto* ent_ptr) {
+            using entT = std::remove_pointer_t<decltype(ent_ptr)>;
+            if constexpr (has_member_name_component<entT>::value) {
+                lwlog_debug("getting entity with name %s", ent_ptr->nm_cpt.name.c_str());
+            }
+        },
+        res);
+    return res;
+}
 
 void roguelike::room::generate_enemies(int lvl_num) {
     for (int i = 0; i < 3; ++i) {
@@ -375,14 +405,19 @@ void roguelike::room::generate_enemies(int lvl_num) {
         residents.emplace_back(gg);
     }
     {
-        lwlog_info("placing armor");
-        auto new_id = residents.size();
+        int new_id = residents.size();
+        lwlog_info("creating armor with id %d", new_id);
         auto gg = new armor(new_id);
         entity_type var_ent = gg;
-        auto rnd_tile = get_random_empty_tile();
-        lwlog_info("spawned armor on tile %d", rnd_tile);
-        spawn_on_level(var_ent, rnd_tile);
         residents.emplace_back(gg);
+        new_id = residents.size();
+        lwlog_info("creating chest with id %d,  with armor in it", new_id);
+        auto ch = new chest(new_id, gg);
+        var_ent = ch;
+        residents.emplace_back(ch);
+        auto rnd_tile = get_random_empty_tile();
+        lwlog_info("spawned chest on tile %d", rnd_tile);
+        spawn_on_level(var_ent, rnd_tile);
     }
     {
         lwlog_info("placing shovel");
