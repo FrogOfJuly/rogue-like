@@ -59,17 +59,7 @@ void roguelike::to_json(nlohmann::json &j, const roguelike::simple_inventory_com
             j.push_back(res);
             continue;
         }
-        std::string spot_name = std::visit(
-            [](auto *ent_ptr) {
-                using entT = std::remove_pointer_t<decltype(ent_ptr)>;
-                if constexpr (has_member_name_component<entT>::value) {
-                    return ent_ptr->nm_cpt.name;
-                } else {
-                    return std::string("unknown item");
-                }
-            },
-            p.spots.at(value));
-        res[name] = spot_name;
+        to_json(res[name], p.spots.at(value));
         j.push_back(res);
     }
 }
