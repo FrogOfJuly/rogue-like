@@ -104,7 +104,7 @@ def render(stdscr, game_state: dict, flags: dict):
             elif 'player' in tile:
                 to_print = f" {tile['player']['repr_cpt']['repr']} "
                 legend['player'] = tile['player']['repr_cpt']['repr']
-                lvl = tile['player']['lvl_cpt']['level']
+                lvl = tile['player']['exp_cpt']['level']
             elif 'entity' in tile:
                 repr = tile['entity']['repr_cpt']['repr']
                 if repr == '█':
@@ -119,41 +119,42 @@ def render(stdscr, game_state: dict, flags: dict):
                     if 'h_cpt' in tile['entity'] and tile['entity']['h_cpt']['max_health'] > 0:
                         lvl = int(tile['entity']['h_cpt']['health'] * 10 / tile['entity']['h_cpt']['max_health'])
                     elif 'lvl_cpt' in tile['entity']:
-                        lvl = tile['entity']['lvl_cpt']['level']
+                        lvl = tile['entity']['exp_cpt']['level']
             if (lvl):
-                stdscr.addstr(i, j*3, to_print, curses.color_pair(color(lvl)))
+                stdscr.addstr(i, j * 3, to_print, curses.color_pair(color(lvl)))
             else:
-                stdscr.addstr(i, j*3, to_print)
-    stdscr.addstr(0, (W)*3+1, f"{'Room:':9} {1}/10")  # TODO
-    stdscr.addstr(1, (W)*3+1, f"{'Score:':9} {123}")  # TODO
-    stdscr.addstr(3, (W)*3+1, f"{'Level:':9} {player['lvl_cpt']['level']}")
-    stdscr.addstr(3, (W)*3+1, f"{'Exp:':9} {player['lvl_cpt']['experience']}/{player['lvl_cpt']['exp_until_next_level']}")
-    stdscr.addstr(4, (W)*3+1, f"{'Health:':9} {player['h_cpt']['health']}")
-    stdscr.addstr(5, (W)*3+1, f"{'Damage:':9} {player['a_cpt']['damage']}")
-    stdscr.addstr(7, (W)*3+1, f'log:')
+                stdscr.addstr(i, j * 3, to_print)
+    stdscr.addstr(0, (W) * 3 + 1, f"{'Room:':9} {1}/10")  # TODO
+    stdscr.addstr(1, (W) * 3 + 1, f"{'Score:':9} {123}")  # TODO
+    stdscr.addstr(3, (W) * 3 + 1, f"{'Level:':9} {player['exp_cpt']['level']}")
+    stdscr.addstr(3, (W) * 3 + 1,
+                  f"{'Exp:':9} {player['exp_cpt']['experience']}/{player['exp_cpt']['exp_until_next_level']}")
+    stdscr.addstr(4, (W) * 3 + 1, f"{'Health:':9} {player['h_cpt']['health']}")
+    stdscr.addstr(5, (W) * 3 + 1, f"{'Damage:':9} {player['a_cpt']['damage']}")
+    stdscr.addstr(7, (W) * 3 + 1, f'log:')
 
     for i, entry in enumerate(log[-printed_log_len:]):
-        stdscr.addstr(8+i, (W)*3+1, f'> {entry}')
+        stdscr.addstr(8 + i, (W) * 3 + 1, f'> {entry}')
     if len(log) < printed_log_len:
         for i in range(printed_log_len - len(log)):
-            stdscr.addstr(8+len(log)+i, (W)*3+1, '>')
+            stdscr.addstr(8 + len(log) + i, (W) * 3 + 1, '>')
 
     if len(flags) == 0:
-        stdscr.addstr(H+2, 0, f'Press H for help.')
+        stdscr.addstr(H + 2, 0, f'Press H for help.')
     elif 'legend' in flags:
         for i, key in enumerate(sorted(legend.keys())):
             if " " in legend[key]:
                 legend[key].remove(" ")
             if not legend[key]:
                 continue
-            stdscr.addstr(H+2+i, 0, f'{f"{key}:":20} {", ".join(legend[key])}')
+            stdscr.addstr(H + 2 + i, 0, f'{f"{key}:":20} {", ".join(legend[key])}')
     else:
-        stdscr.addstr(H+2, 0, f'WASD for movement.')
-        stdscr.addstr(H+3, 0, f'E for potion.')
-        stdscr.addstr(H+4, 0, f'F to skip turn.')
-        stdscr.addstr(H+4, 0, f'L for the legend.')
-        stdscr.addstr(H+5, 0, f'P to pause game (temporarily disconnect).')
-        stdscr.addstr(H+6, 0, f'X to exit game.')
+        stdscr.addstr(H + 2, 0, f'WASD for movement.')
+        stdscr.addstr(H + 3, 0, f'E for potion.')
+        stdscr.addstr(H + 4, 0, f'F to skip turn.')
+        stdscr.addstr(H + 4, 0, f'L for the legend.')
+        stdscr.addstr(H + 5, 0, f'P to pause game (temporarily disconnect).')
+        stdscr.addstr(H + 6, 0, f'X to exit game.')
     stdscr.refresh()
 
 
