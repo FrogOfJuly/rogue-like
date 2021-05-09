@@ -24,12 +24,14 @@ printed_log_len = 7
 
 
 def init_log():
+    return
     log_file = f'{player_id}.json'
     with open(log_file, "w") as file:
         file.write("[]")
 
 
 def dump_log(game_state: dict):
+    return
     log_file = f'{player_id}.json'
 
     with open(log_file, "r+") as file:
