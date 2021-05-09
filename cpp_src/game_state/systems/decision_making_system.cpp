@@ -24,7 +24,7 @@ void roguelike::decision_making_system::make_decision(entity_type& var_ent) {
                 ent_ptr->dm_cpt.active_strategy->set_view(view);
                 ent_ptr->dm_cpt.active_strategy->form_decision(ent_ptr->dm_cpt);
                 ent_ptr->dm_cpt.active_strategy->discard_view();
-                if (ent_ptr->dm_cpt.decision != cmd::PASS) {
+                if (ent_ptr->dm_cpt.decision != cmd::PASS or not ent_ptr->dm_cpt.wait_before_strike) {
                     return;
                 }
                 if (ent_ptr->dm_cpt.idle_strategy == nullptr) {

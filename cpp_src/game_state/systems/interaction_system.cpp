@@ -37,8 +37,9 @@ void roguelike::interaction_system::resolve_all_interactions() {
 
         std::visit(
             [](auto *left_ptr, auto *right_ptr) {
-                interacter<std::remove_pointer_t<decltype(left_ptr)>, std::remove_pointer_t<decltype(right_ptr)>>::
-                    interact(*left_ptr, *right_ptr);
+                using intedT = std::remove_pointer_t<decltype(left_ptr)>;
+                using intingT = std::remove_pointer_t<decltype(right_ptr)>;
+                interacter<intedT, intingT>::interact(*left_ptr, *right_ptr);
             },
             interacting_pair.first,
             interacting_pair.second);

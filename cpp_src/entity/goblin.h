@@ -45,7 +45,7 @@ namespace roguelike {
             case UP:
                 return "^";
             default:
-                return "x";
+                return g->dm_cpt.wait_before_strike ?  u8"x" : u8"☠";
         }
     }
 

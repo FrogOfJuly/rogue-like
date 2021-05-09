@@ -122,6 +122,7 @@ namespace roguelike {
     struct decision_making_component : public component {
         cmd decision = cmd::PASS;
         int eye_sight = -1;
+        bool wait_before_strike = true;
         std::unique_ptr<strategy> idle_strategy;
         std::unique_ptr<strategy> active_strategy;
         std::optional<general_id> charges_into;

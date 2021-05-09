@@ -265,27 +265,6 @@ std::optional<roguelike::tile> roguelike::room::get_target_tile(
     }
 }
 
-bool roguelike::room::do_target_tile_have_wall(roguelike::tile_idx idx, roguelike::cmd direction) const {
-    auto maybe_tile = get_target_tile(idx, direction);
-    if (not maybe_tile.has_value()) {
-        return false;
-    }
-    if (not maybe_tile.value().resident.has_value()) {
-        return false;
-    }
-    auto maybe_ent_idx = std::visit(
-        overloaded{
-            [](player_id) { return std::optional<int>(); }, [](entity_id id) { return std::optional<int>(id.value); }},
-        maybe_tile.value().resident.value());
-
-    if (not maybe_ent_idx.has_value()) {
-        return false;
-    }
-    auto var_ent = residents[maybe_ent_idx.value()];
-    bool is_wall = std::visit([](auto* entity_ptr) { return std::is_same_v<decltype(entity_ptr), wall*>; }, var_ent);
-    return is_wall;
-}
-
 bool roguelike::room::do_tiles_have_loc(std::pair<int, int> p0, std::pair<int, int> p1) const {
     utils::vec2d point_of_view{p0.first, p0.second};
     utils::vec2d tgt_point{p1.first, p1.second};
@@ -298,7 +277,7 @@ bool roguelike::room::do_tiles_have_loc(std::pair<int, int> p0, std::pair<int, i
             has_line_of_sight = false;
             break;
         }
-        if (not maybe_tile.value().resident.has_value()) {
+        if (maybe_tile.value().empty()) {
             continue;
         }
         auto maybe_ent_idx = std::visit(

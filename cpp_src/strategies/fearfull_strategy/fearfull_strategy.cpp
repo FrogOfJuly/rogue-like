@@ -44,7 +44,7 @@ void roguelike::fearfull_strategy::form_decision(roguelike::decision_making_comp
                 dm_cpt.decision = cmd::UP;
             }
         }
-        auto wall_ahead = view->oracle->do_target_tile_have_wall(
+        auto wall_ahead = view->oracle->do_target_tile_have<wall>(
             room::idxFromPair(view->point_of_view.x, view->point_of_view.y), dm_cpt.decision);
 
         if (wall_ahead) {
