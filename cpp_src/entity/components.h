@@ -139,10 +139,13 @@ namespace roguelike {
         enum inventory_spot { active = 0, defence, offence, armor };
         std::optional<entity_type> spot;
         std::unordered_map<inventory_spot, entity_type> spots;
+        bool locked = false;
         void manage();
         [[nodiscard]] int get_damage_bonus() const;
         [[nodiscard]] int get_defence_bonus() const;
         [[nodiscard]] double get_protection_bonus() const;
+
+        static simple_inventory_component get_locked_invetory();
     };
 
     //--------------end of simple inventory component----------------------------

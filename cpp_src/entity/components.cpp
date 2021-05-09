@@ -12,6 +12,10 @@ void roguelike::simple_inventory_component::manage() {
         lwlog_info("do not have item!");
         return;
     }
+    if (locked) {
+        lwlog_info("No managing for locked inventory");
+        return;
+    }
     std::visit(
         [this](auto* ent_ptr) {
             using entT = std::remove_pointer_t<decltype(ent_ptr)>;
@@ -23,7 +27,7 @@ void roguelike::simple_inventory_component::manage() {
                     lwlog_info("desired spot is free!");
                     spots[spt] = ent_ptr;
                     spot.reset();
-                }else{
+                } else {
                     lwlog_info("desired spot is NOT free! Swapping items");
                     auto tmp = spots[spt];
                     spots[spt] = ent_ptr;
@@ -86,6 +90,11 @@ double roguelike::simple_inventory_component::get_protection_bonus() const {
             item);
     }
     return prot_bonus;
+}
+roguelike::simple_inventory_component roguelike::simple_inventory_component::get_locked_invetory() {
+    auto inv = simple_inventory_component();
+    inv.locked = true;
+    return inv;
 }
 std::pair<int, int> roguelike::decision_making_component::get_velocity() const {
     switch (decision) {

@@ -20,6 +20,7 @@ namespace roguelike {
             dm_cpt.idle_strategy = std::make_unique<random_strategy>();
             nm_cpt.name = "goblin";
             lvl_cpt.lvl = 3;
+            s_inv_cpt = simple_inventory_component::get_locked_invetory();
         }
 
         decision_making_component dm_cpt;
@@ -29,6 +30,7 @@ namespace roguelike {
         repr_component repr_cpt;
         name_component nm_cpt;
         level_component lvl_cpt;
+        simple_inventory_component s_inv_cpt;
     };
 
     template <>
