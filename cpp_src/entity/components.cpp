@@ -112,3 +112,4 @@ std::pair<int, int> roguelike::decision_making_component::get_velocity() const {
             return std::make_pair(0, 0);
     }
 }
+int roguelike::level_component::experience_on_kill() const { return lvl * 10; }

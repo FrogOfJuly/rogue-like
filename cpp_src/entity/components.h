@@ -27,12 +27,16 @@ namespace roguelike {
 
     struct expirience_components : public component {
         int exp = 0;
+        int lvlups = 0;
+
         template <typename entType>
-        inline std::pair<int, int> get_level(entType *ent) {
-            int cur_level = exp / 10;
-            int next_level = (cur_level + 1) * 10;
-            return std::make_pair(cur_level, next_level);
-        }
+        inline static std::pair<int, int> get_level(entType *ent) {}
+
+        template <typename entType>
+        inline static bool gain_experience(entType *ent, int new_exp) {}
+
+        template <typename entType>
+        inline static void perform_lvlups(entType *ent) {}
     };
 
     //--------------end of move_component----------------------------------------
@@ -169,6 +173,7 @@ namespace roguelike {
 
     struct level_component : public component {
         int lvl = -1;
+        [[nodiscard]] int experience_on_kill() const;
     };
 
 }  // namespace roguelike

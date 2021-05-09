@@ -37,6 +37,32 @@ namespace roguelike {
         return std::to_string(p->id.value);
     }
 
+    template <>
+    inline std::pair<int, int> expirience_components::get_level<player>(player *ent) {
+        auto &exp = ent->exp_cpt.exp;
+        int exp_offset = 16;
+        int lvl_offset = 4;
+        int cur_level = (int)(log(exp + exp_offset) / log(2.0)) - lvl_offset;
+        int next_level = (int)pow(2.0, (cur_level + lvl_offset + 1)) - exp_offset;
+        return std::make_pair(cur_level, next_level);
+    }
+
+    template <>
+    inline bool expirience_components::gain_experience<player>(player *ent, int new_exp) {
+        auto cur_lvl = get_level(ent).first;
+        ent->exp_cpt.exp += new_exp;
+        auto new_lvl = get_level(ent).first;
+        ent->exp_cpt.lvlups += new_lvl - cur_lvl;
+        return cur_lvl != new_lvl;
+    }
+
+    template <>
+    inline void expirience_components::perform_lvlups<player>(player *ent) {
+        for (int i = 0; i < ent->exp_cpt.lvlups; ++i) {
+            ent->h_cpt.health += 1;
+        }
+    }
+
     template <typename entityType>
     struct interacter<player, entityType> {
         static inline void interact(player &inted, entityType &inting) {

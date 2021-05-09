@@ -46,6 +46,15 @@ namespace roguelike {
                 if constexpr (has_member_logging_component<entityType>::value) {
                     inting.lg_cpt.log << "you damaged goblin guard by " << rec_dmg << "\n";
                 }
+                if (not health_component::is_alive(&inted)) {
+                    if constexpr (has_member_expirience_components<entityType>::value) {
+                        int new_exp = inted.lvl_cpt.experience_on_kill();
+                        bool lvlup = expirience_components::gain_experience(&inting, new_exp);
+                        if (lvlup) {
+                            expirience_components::perform_lvlups(&inting);
+                        }
+                    }
+                }
                 return;
             }
             if constexpr (has_member_logging_component<entityType>::value) {

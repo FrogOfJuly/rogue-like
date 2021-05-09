@@ -58,19 +58,18 @@ namespace roguelike {
                 if constexpr (has_member_logging_component<entityType>::value) {
                     inting.lg_cpt.log << "you damaged goblin by " << rec_dmg << "\n";
                 }
+                if (not health_component::is_alive(&inted)) {
+                    int new_exp = inted.lvl_cpt.experience_on_kill();
+                    bool lvlup = expirience_components::gain_experience(&inting, new_exp);
+                    if (lvlup) {
+                        expirience_components::perform_lvlups(&inting);
+                    }
+                }
                 return;
             }
             if constexpr (has_member_logging_component<entityType>::value) {
                 inting.lg_cpt.log << "you interacted with goblin" << std::to_string(inted.id.value) << "\n";
             }
-            return;
-        }
-    };
-
-    template <>
-    struct interacter<goblin, goblin> {
-        static inline void interact(goblin &inted, goblin &inting) {
-            // no friendly fire
             return;
         }
     };
