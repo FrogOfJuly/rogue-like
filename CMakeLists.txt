@@ -29,6 +29,11 @@ set(LIB_SOURCES
         cpp_src/entity/potion.h
         cpp_src/entity/wall.h
         cpp_src/entity/trap.h
+        cpp_src/entity/chest.h
+        cpp_src/entity/sword.h
+        cpp_src/entity/shield.h
+        cpp_src/entity/armor.h
+        cpp_src/entity/shovel.h
 
         cpp_src/game_state/systems/base_system.h
         cpp_src/game_state/systems/interaction_system.h
