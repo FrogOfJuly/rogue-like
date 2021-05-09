@@ -15,12 +15,33 @@ void roguelike::move_system::move_to_tile(general_id id, tile_idx dest_tile_idx)
     assert(game_ptr->level.get_tile_if_exists(pr.first, pr.second).has_value());
     game_ptr->level.tiles[dest_tile_idx].resident = id;
     std::visit(
-        [this, dest_tile_idx, pr](auto *ent_ptr) {
+        [this, dest_tile_idx, pr](auto *ent_ptr) -> void {
             using entT = std::remove_pointer_t<decltype(ent_ptr)>;
+            std::optional<entity_id> dropped_item_id;
+            if constexpr (has_member_simple_inventory_component<entT>::value) {
+                if (ent_ptr->s_inv_cpt.spot.has_value()) {
+                    dropped_item_id = std::visit(
+                        [](auto *item_ent_ptr) -> entity_id {
+                            using item_entT = std::remove_pointer_t<decltype(item_ent_ptr)>;
+
+                            if constexpr (has_member_pickable_component<item_entT>::value) {
+                                item_ent_ptr->pk_cpt.picked = false;  // now it is not picked
+                            }
+                            if constexpr (std::is_same_v<item_entT, player>) {
+                                assert(false);  // player must never be in inventory spot :)
+                                return entity_id{-1};
+                            } else {
+                                return item_ent_ptr->id;
+                            }
+                        },
+                        ent_ptr->s_inv_cpt.spot.value());
+                    ent_ptr->s_inv_cpt.spot.reset();
+                }
+            }
             if constexpr (has_member_move_component<entT>::value) {
                 auto &m_cpt = ent_ptr->m_cpt;
-                auto &old_tile = game_ptr->level.tiles[m_cpt.residency];
-                old_tile.resident.reset();
+                auto &old_tile = game_ptr->level.tiles.at(m_cpt.residency);
+                old_tile.resident = dropped_item_id;
                 m_cpt.residency = dest_tile_idx;
                 m_cpt.x = pr.first;
                 m_cpt.y = pr.second;

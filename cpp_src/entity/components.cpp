@@ -9,7 +9,7 @@
 void roguelike::simple_inventory_component::manage() {
     lwlog_info("managing time!");
     if (not spot.has_value()) {
-        lwlog_info("do have item!");
+        lwlog_info("do not have item!");
         return;
     }
     std::visit(
@@ -23,13 +23,16 @@ void roguelike::simple_inventory_component::manage() {
                     lwlog_info("desired spot is free!");
                     spots[spt] = ent_ptr;
                     spot.reset();
-                    return;
+                }else{
+                    lwlog_info("desired spot is NOT free! Swapping items");
+                    auto tmp = spots[spt];
+                    spots[spt] = ent_ptr;
+                    spot = tmp;
                 }
-                lwlog_info("desired spot is not free!");
                 return;
             }
 
-            lwlog_info("item does not have pickable component!");
+            lwlog_info("item does NOT have pickable component!");
         },
         spot.value());
 }

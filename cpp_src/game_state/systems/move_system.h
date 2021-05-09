@@ -7,7 +7,7 @@
 namespace roguelike {
     class move_system : public base_system {
       public:
-        void move_to_tile(general_id id, tile_idx dest_tile_idx);
+        void move_to_tile(general_id item_ent_ptr, tile_idx dest_tile_idx);
 
         bool more_general_move(entity_type &var_ent);
 

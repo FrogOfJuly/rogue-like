@@ -47,6 +47,7 @@ namespace roguelike {
 
                     return;
                 }
+                inted.pk_cpt.picked = true;
                 inting.s_inv_cpt.spot = &inted;
                 inting.s_inv_cpt.manage();
                 if (inting.s_inv_cpt.spot.has_value()) {
@@ -54,10 +55,10 @@ namespace roguelike {
                     if constexpr (has_log) {
                         inting.lg_cpt.log << "you can't pick this item" << std::endl;
                     }
-                    inting.s_inv_cpt.spot.reset();
+//                    inting.s_inv_cpt.spot.reset();
                     return;
                 }
-                inted.pk_cpt.picked = true;
+
             }
             if constexpr (has_log) {
                 std::string lg_entry = inted.pk_cpt.picked ? "you picked sword" : "you interacted with sword";
