@@ -34,8 +34,8 @@ std::string roguelike::gamestate::get_serialization() const {
 
 void roguelike::gamestate::clean_decisions() {
     lwlog_info("cleaning decisions");
-    for (int i = 0; i < player_num; ++i) {
-        auto &plr = players[i];
+    for (auto &it : players) {
+        auto &plr = it.second;
         plr.dm_cpt.decision = PASS;
     }
     for (auto &var_ent : level.residents) {
@@ -51,9 +51,10 @@ void roguelike::gamestate::clean_decisions() {
 }
 void roguelike::gamestate::clean_dead() {}
 void roguelike::gamestate::clean_logs() {
-    for (int i = 0; i < player_num; ++i) {
-        players[i].lg_cpt.log.str("");
-        players[i].lg_cpt.log.clear();
+    for (auto &it : players) {
+        auto &plr = it.second;
+        plr.lg_cpt.log.str("");
+        plr.lg_cpt.log.clear();
     }
     level.common_log.str("");
     level.common_log.clear();
@@ -80,21 +81,21 @@ void roguelike::gamestate::move_nonplayers() {
     }
 }
 void roguelike::gamestate::move_players() {
-    for (int i = 0; i < player_num; ++i) {
-        auto &plr = players[i];
-        lwlog_info("moving player %d with decision %d", plr.id.value, players->dm_cpt.decision);
+    for (auto &it : players) {
+        auto &plr = it.second;
+        lwlog_info("moving player %d with decision %d", plr.id.value, plr.dm_cpt.decision);
         entity_type var_ent = &plr;
         mv_system.more_general_move(var_ent);
     }
 }
 int roguelike::gamestate::receive_player_command(int player_id, roguelike::cmd command) {
     lwlog_info("getting command %d for player %d", command, player_id);
-    if (player_id >= player_num) {
+    if (player_id >= players.size()) {
         throw std::runtime_error("No such player id: " + std::to_string(player_id));
     }
     received_command.insert(player_id);
     if (dead_players.count(player_id) == 0) {
-        players[player_id].dm_cpt.decision = command;
+        players.at(player_id).dm_cpt.decision = command;
     }
     while (not command_to_receive.empty()) {
         auto next_player_id = command_to_receive.front();
@@ -105,8 +106,9 @@ int roguelike::gamestate::receive_player_command(int player_id, roguelike::cmd c
     }
     // if you are here that means that all players received their commands
     received_command.clear();  // clean list of players who received command
-    for (int i = 0; i < player_num; ++i) {
-        command_to_receive.push(i);  // enqueue all players for commands
+    for (auto &it : players) {
+        auto &plr = it.second;
+        command_to_receive.push(plr.id.value);  // enqueue all players for commands
     }
     lwlog_info("all players got their commands");
     return -1;
@@ -117,15 +119,11 @@ void roguelike::gamestate::initialize(int player_number) {
     lvl_num = 0;
     level.generate_terrain(lvl_num);
     lwlog_info("generated level");
-    // Player do not have default constructor and
-    // I can't declare vector of players in header bc it requires complete type
-    player_num = player_number;
-    players = (player *)new char[sizeof(player) * player_num];
-    for (int i = 0; i < player_num; ++i) {
+    for (int i = 0; i < player_number; ++i) {
         lwlog_info("placing player");
-        new (&players[i]) player(i);
-        players[i].dm_cpt.decision = LEFT;
-        entity_type var_ent = &players[i];
+        players.emplace(std::make_pair(i, i));
+        players.at(i).dm_cpt.decision = cmd::PASS;
+        entity_type var_ent = &players.at(i);
         auto rnd_tile = level.get_random_empty_tile();
         level.spawn_on_level(var_ent, rnd_tile);
     }
@@ -153,20 +151,15 @@ void roguelike::gamestate::decide_next_move() {
         lwlog_info("-it is not dead. Making decision");
         dm_system.make_decision(var_ent);
     }
-    for (int i = 0; i < player_num; ++i) {
-        lwlog_info("-recording common log for player %d", i);
-        players[i].lg_cpt.log << level.common_log.str();
+    for (auto &it : players) {
+        auto &plr = it.second;
+        lwlog_info("-recording common log for player %d", plr.id.value);
+        plr.lg_cpt.log << level.common_log.str();
     }
 }
 
-roguelike::gamestate::~gamestate() {
-    for (int i = 0; i < player_num; ++i) {
-        players[i].~player();
-    }
-    delete[](char *) players;
-}
+roguelike::player *roguelike::gamestate::get_player(roguelike::player_id id) const { return &players.at(id.value); }
 
-roguelike::player *roguelike::gamestate::get_player(roguelike::player_id id) const { return &players[id.value]; }
 roguelike::entity_type roguelike::gamestate::get_entity(roguelike::general_id id) const {
     return std::visit(
         overloaded{

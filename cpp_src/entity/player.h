@@ -93,6 +93,10 @@ namespace roguelike {
             return;
         }
     };
+
+    struct player_hasher {
+        inline size_t operator()(const player &plr) const { return plr.id.value; }
+    };
 }  // namespace roguelike
 
 #endif  // ROGUE_LIKE_PLAYER_H
