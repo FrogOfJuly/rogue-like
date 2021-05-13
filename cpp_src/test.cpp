@@ -14,5 +14,4 @@ int main() {
     game.move_players();
     game.resolve_all_interactions();
     std::cout << game.get_serialization() << std::endl;
-//    std::cout << game.get_serialization() << std::endl;
 }

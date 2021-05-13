@@ -29,7 +29,7 @@ namespace roguelike {
 
     template <>
     inline std::string repr_component::compute_representation<chest>(const chest *p) {
-        return u8"▣";
+        return "▣";
     }
 
     template <>

@@ -29,12 +29,6 @@ PYBIND11_MODULE(roguelike, m) {
         .def("end_turn", &roguelike::gamestate::end_turn)
         .def("decide_next_move", &roguelike::gamestate::decide_next_move);
 
-    py::enum_<roguelike::entity_names>(m, "entity_names")
-#define register_entity(class_name) .value(#class_name, roguelike::entity_names::class_name##_entity)
-#include "./utility/register_for_entities.h"
-#undef register_entity
-        .export_values();
-
     py::enum_<roguelike::cmd>(m, "cmd")
         .value("UP", roguelike::cmd::UP)
         .value("DOWN", roguelike::cmd::DOWN)

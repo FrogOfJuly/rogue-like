@@ -24,7 +24,7 @@ namespace roguelike {
 
     template <>
     inline std::string repr_component::compute_representation<trap>(const trap *p) {
-        return p->activated ? " " : u8"☒";
+        return p->activated ? " " : "☒";
     }
 
     template <>

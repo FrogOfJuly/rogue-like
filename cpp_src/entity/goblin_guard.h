@@ -25,15 +25,15 @@ namespace roguelike {
     inline std::string repr_component::compute_representation<goblin_guard>(const goblin_guard *g) {
         switch (g->dm_cpt.decision) {
             case LEFT:
-                return u8"←";
+                return "←";
             case RIGHT:
-                return u8"→";
+                return "→";
             case DOWN:
-                return u8"↓";
+                return "↓";
             case UP:
-                return u8"↑";
+                return "↑";
             default:
-                return g->dm_cpt.wait_before_strike ?  u8"♠" : u8"☠";
+                return g->dm_cpt.wait_before_strike ? "♠" : "☠";
         }
     }
 
@@ -41,32 +41,11 @@ namespace roguelike {
     struct interacter<goblin_guard, entityType> {
         static inline void interact(goblin_guard &inted, entityType &inting) {
             if constexpr (has_member_atk_component<entityType>::value and not std::is_base_of_v<goblin, entityType>) {
-                auto dmg = atk_component::calculate_damage(&inting);
-                auto rec_dmg = health_component::receive_damage(&inted, dmg);
-                if constexpr (has_member_logging_component<entityType>::value) {
-                    inting.lg_cpt.log << "you damaged goblin guard by " << rec_dmg << "\n";
-                }
-                if (not health_component::is_alive(&inted)) {
-                    if constexpr (has_member_expirience_components<entityType>::value) {
-                        int new_exp = inted.lvl_cpt.experience_on_kill();
-                        bool lvlup = expirience_components::gain_experience(&inting, new_exp);
-                        if (lvlup) {
-                            expirience_components::perform_lvlups(&inting);
-                        }
-                    }
-                }
-                return;
+                default_interactors::agressive<goblin_guard, entityType>::interact(inted, inting);
+            } else {
+                default_interactors::logging<goblin_guard, entityType>::interact(inted, inting);
             }
-            if constexpr (has_member_logging_component<entityType>::value) {
-                inting.lg_cpt.log << "you interacted with goblin guard" << std::to_string(inted.id.value) << "\n";
-            }
-            return;
         }
-    };
-
-    template <>
-    struct interacter<goblin_guard, goblin_guard> {
-        static inline void interact(goblin_guard &inted, goblin_guard &inting) {}
     };
 }  // namespace roguelike
 

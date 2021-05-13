@@ -49,9 +49,12 @@ namespace roguelike {
         int damage = -1;
 
         template <typename T>
+        requires has_atk_component<T>
         static inline int calculate_damage(const T *ent) {
             if constexpr (has_member_simple_inventory_component<T>::value) {
-                return ent->a_cpt.damage + ent->s_inv_cpt.get_damage_bonus();
+                auto dmg_bonus = ent->s_inv_cpt.get_damage_bonus();
+                lwlog_info("got damage bonus %d", dmg_bonus);
+                return ent->a_cpt.damage + dmg_bonus;
             }
             return ent->a_cpt.damage;
         }
@@ -63,6 +66,7 @@ namespace roguelike {
         int damage_reduction = 0;
 
         template <typename T>
+        requires has_dfc_component<T>
         static inline int calculate_damage_reduction(const T *ent) {
             if constexpr (has_member_simple_inventory_component<T>::value) {
                 return ent->dfc_cpt.damage_reduction + ent->s_inv_cpt.get_defence_bonus();
@@ -77,6 +81,7 @@ namespace roguelike {
         double protection_scale = 1.0;
 
         template <typename T>
+        requires has_prot_component<T>
         static inline double calculate_protection_scale(const T *ent) {
             if constexpr (has_member_simple_inventory_component<T>::value) {
                 return ent->prt_cpt.protection_scale + ent->s_inv_cpt.get_protection_bonus();
@@ -92,9 +97,8 @@ namespace roguelike {
         int health = -1;
 
         template <typename T>
-        static inline bool is_alive(const T *ent) {
-            return ent->h_cpt.health > 0;
-        }
+        requires has_health_component<T>
+        static inline bool is_alive(const T *ent) { return ent->h_cpt.health > 0; }
 
         template <typename T>
         static inline int receive_damage(T *ent, int damage) {
@@ -134,12 +138,27 @@ namespace roguelike {
 
     struct logging_component : public component {
         std::stringstream log{};
+
+        template <typename T>
+        static inline void log_entry(T *ent, const std::string &entry) {
+            if constexpr (has_member_logging_component<T>::value) {
+                ent->lg_cpt.log << entry;
+            }
+        }
     };
 
     //--------------end of logging_component-------------------------------------
 
     struct name_component : public component {
         std::string name;
+
+        template <typename T>
+        static inline std::string get_name(const T *ent) {
+            if constexpr (has_member_name_component<T>::value) {
+                return ent->nm_cpt.name;
+            }
+            return "unknown";
+        }
     };
 
     //--------------end of name_component----------------------------------------
@@ -150,6 +169,21 @@ namespace roguelike {
         std::unordered_map<inventory_spot, entity_type> spots;
         bool locked = false;
         void manage();
+
+        template <typename T>
+        requires has_pickable_component<T>
+        inline bool pick_item(T *ent) {
+            ent->pk_cpt.picked = false;
+            if (spot.has_value()) {
+                lwlog_info("something is in temporal spot");
+                return false;
+            }
+            ent->pk_cpt.picked = true;
+            spot = ent;
+            manage();
+            return not spot.has_value();
+        }
+
         [[nodiscard]] int get_damage_bonus() const;
         [[nodiscard]] int get_defence_bonus() const;
         [[nodiscard]] double get_protection_bonus() const;

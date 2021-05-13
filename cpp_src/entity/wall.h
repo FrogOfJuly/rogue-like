@@ -16,7 +16,7 @@ namespace roguelike {
 
     template<>
     inline std::string repr_component::compute_representation<wall>(const wall* p){
-        return u8"█";
+        return "█";
     }
 
     template <>

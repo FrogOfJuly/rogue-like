@@ -45,7 +45,7 @@ namespace roguelike {
             case UP:
                 return "^";
             default:
-                return g->dm_cpt.wait_before_strike ?  u8"x" : u8"☠";
+                return g->dm_cpt.wait_before_strike ? "x" : "☠";
         }
     }
 
@@ -53,24 +53,11 @@ namespace roguelike {
     struct interacter<goblin, entityType> {
         static inline void interact(goblin &inted, entityType &inting) {
             if constexpr (has_member_atk_component<entityType>::value and not std::is_base_of_v<goblin, entityType>) {
-                auto dmg = atk_component::calculate_damage(&inting);
-                auto rec_dmg = health_component::receive_damage(&inted, dmg);
-                if constexpr (has_member_logging_component<entityType>::value) {
-                    inting.lg_cpt.log << "you damaged goblin by " << rec_dmg << "\n";
-                }
-                if (not health_component::is_alive(&inted)) {
-                    int new_exp = inted.lvl_cpt.experience_on_kill();
-                    bool lvlup = expirience_components::gain_experience(&inting, new_exp);
-                    if (lvlup) {
-                        expirience_components::perform_lvlups(&inting);
-                    }
-                }
+                default_interactors::agressive<goblin, entityType>::interact(inted, inting);
                 return;
+            }else {
+                default_interactors::logging<goblin, entityType>::interact(inted, inting);
             }
-            if constexpr (has_member_logging_component<entityType>::value) {
-                inting.lg_cpt.log << "you interacted with goblin" << std::to_string(inted.id.value) << "\n";
-            }
-            return;
         }
     };
 }  // namespace roguelike

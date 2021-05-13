@@ -41,6 +41,7 @@ void roguelike::simple_inventory_component::manage() {
         spot.value());
 }
 int roguelike::simple_inventory_component::get_damage_bonus() const {
+    lwlog_info("computing bonus damage for inventory of size %ld", spots.size());
     int dmg_bonus = 0;
     for (const auto& it : spots) {
         entity_type item = it.second;
@@ -48,9 +49,12 @@ int roguelike::simple_inventory_component::get_damage_bonus() const {
             [](auto* ent_ptr) {
                 using entT = std::remove_pointer_t<decltype(ent_ptr)>;
                 int dmg = 0;
+                lwlog_info("checking if there is an atk component for %s", typeid(entT).name());
                 if constexpr (has_member_atk_component<entT>::value) {
+                    lwlog_info("There is an atk component!");
                     dmg = atk_component::calculate_damage(ent_ptr);
                 }
+                lwlog_info("additional damage is %d", dmg);
                 return dmg;
             },
             item);
