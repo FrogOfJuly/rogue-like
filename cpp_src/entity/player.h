@@ -67,7 +67,7 @@ namespace roguelike {
 
     template <typename entityType>
     struct interacter<player, entityType> {
-        static inline interaction_info interact(player &inted, entityType &inting) {
+        static inline interaction_info interact(player *inted, entityType *inting) {
             if constexpr (has_member_atk_component<entityType>::value) {
                 return default_interactors::agressive<player, entityType>::interact(inted, inting);
             }

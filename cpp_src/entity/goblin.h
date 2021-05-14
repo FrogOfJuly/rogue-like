@@ -51,7 +51,7 @@ namespace roguelike {
 
     template <typename entityType>
     struct interacter<goblin, entityType> {
-        static inline interaction_info interact(goblin &inted, entityType &inting) {
+        static inline interaction_info interact(goblin *inted, entityType *inting) {
             if constexpr (has_member_atk_component<entityType>::value and not std::is_base_of_v<goblin, entityType>) {
                 return default_interactors::agressive<goblin, entityType>::interact(inted, inting);
             }else {

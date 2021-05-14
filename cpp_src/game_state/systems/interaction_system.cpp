@@ -7,16 +7,15 @@
 #include "../../utility/entity_info.h"
 #include "../gamestate.h"
 
-void roguelike::interaction_system::perform_interaction(entity_type &interacted, entity_type &interacting) {
+void roguelike::interaction_system::perform_interaction(entity_type interacted, entity_type interacting) {
     std::visit(
-        [](auto &left_ptr, auto &right_ptr) {
+        [](auto *left_ptr, auto *right_ptr) {
             lwlog_info("calling interaction method");
             assert(left_ptr);
             assert(right_ptr);
-            auto &left = *left_ptr;
-            auto &right = *right_ptr;
-            interacter<std::remove_reference_t<decltype(left)>, std::remove_reference_t<decltype(right)>>::interact(
-                left, right);
+            using leftT = std::remove_pointer_t<decltype(left_ptr)>;
+            using rightT = std::remove_pointer_t<decltype(right_ptr)>;
+            interacter<leftT, rightT>::interact(left_ptr, right_ptr);
         },
         interacted,
         interacting);
@@ -39,7 +38,7 @@ void roguelike::interaction_system::resolve_all_interactions() {
             [](auto *left_ptr, auto *right_ptr) {
                 using intedT = std::remove_pointer_t<decltype(left_ptr)>;
                 using intingT = std::remove_pointer_t<decltype(right_ptr)>;
-                return interacter<intedT, intingT>::interact(*left_ptr, *right_ptr);
+                return interacter<intedT, intingT>::interact(left_ptr, right_ptr);
             },
             interacting_pair.first,
             interacting_pair.second);

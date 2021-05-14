@@ -27,13 +27,13 @@ namespace roguelike {
 
     template <>
     struct interacter<wall, player> {
-        static inline interaction_info interact(wall &inted, player &inting) {
-            if (destruction_component::destroyed_on_impact(&inted, &inting)) {
-                inted.dstr_cpt.destroyed = true;
-                inting.lg_cpt.log << "you destroyed the wall\n";
+        static inline interaction_info interact(wall *inted, player *inting) {
+            if (destruction_component::destroyed_on_impact(inted, inting)) {
+                inted->dstr_cpt.destroyed = true;
+                inting->lg_cpt.log << "you destroyed the wall\n";
                 return interaction_info::interacted_got_destroyed;
             }
-            inting.lg_cpt.log << "you interacted with a wall\n";
+            inting->lg_cpt.log << "you interacted with a wall\n";
             return interaction_info::nothing_happened;
         }
     };

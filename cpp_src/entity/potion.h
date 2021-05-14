@@ -32,7 +32,7 @@ namespace roguelike {
 
     template <typename entityType>
     struct interacter<potion, entityType> {
-        static inline interaction_info interact(potion &inted, entityType &inting) {
+        static inline interaction_info interact(potion *inted, entityType *inting) {
             if constexpr (has_member_simple_inventory_component<entityType>::value) {
                 return default_interactors::item_picking<potion, entityType>::interact(inted, inting);
             } else {
