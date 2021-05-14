@@ -1,7 +1,7 @@
 //
 // Created by Kirill Golubev on 27.04.2021.
 //
-#include "../../deps/json/single_include/nlohmann/json.hpp"
+#include "nlohmann/json.hpp"
 #include "../entity/components.h"
 #include "../utility/entity_info.h"
 

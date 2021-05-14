@@ -1,12 +1,34 @@
-cmake_minimum_required(VERSION 3.4...3.18)
+cmake_minimum_required(VERSION 3.14)
 project(roguelike)
+
+include(FetchContent)
+
+FetchContent_Declare(json
+        GIT_REPOSITORY https://github.com/ArthurSonzogni/nlohmann_json_cmake_fetchcontent.git
+        GIT_TAG v3.9.1)
+
+FetchContent_GetProperties(json)
+if(NOT json_POPULATED)
+    FetchContent_Populate(json)
+    add_subdirectory(${json_SOURCE_DIR} ${json_BINARY_DIR} EXCLUDE_FROM_ALL)
+endif()
+
+FetchContent_Declare(
+        pybind11
+        GIT_REPOSITORY https://github.com/pybind/pybind11
+        GIT_TAG        v2.6.2
+)
+
+FetchContent_GetProperties(pybind11)
+if(NOT pybind11_POPULATED)
+    FetchContent_Populate(pybind11)
+    add_subdirectory(${pybind11_SOURCE_DIR} ${pybind11_BINARY_DIR})
+endif()
 
 set(CMAKE_CXX_STANDARD 20)
 #set(CMAKE_CXX_FLAGS "-fconcepts-diagnostics-depth=3")
 
-add_subdirectory(deps/pybind11)
 add_subdirectory(deps/magic_enum)
-add_subdirectory(deps/json)
 #add_subdirectory(deps/lwlog)
 
 set(LIB_SOURCES
@@ -69,6 +91,8 @@ pybind11_add_module(roguelike
         ${LIB_SOURCES}
         )
 
+target_link_libraries(roguelike PRIVATE nlohmann_json::nlohmann_json)
+
 # EXAMPLE_VERSION_INFO is defined by setup.py and passed into the C++ code as a
 # define (VERSION_INFO) here.
 target_compile_definitions(roguelike PRIVATE VERSION_INFO=${EXAMPLE_VERSION_INFO})
@@ -77,3 +101,4 @@ add_executable(roguelike_testing
         ${LIB_SOURCES}
         cpp_src/test.cpp
         )
+target_link_libraries(roguelike_testing PRIVATE nlohmann_json::nlohmann_json)

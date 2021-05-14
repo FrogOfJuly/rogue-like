@@ -2,7 +2,7 @@
 // Created by Kirill Golubev on 27.04.2021.
 //
 
-#include "../../deps/json/single_include/nlohmann/json.hpp"
+#include "nlohmann/json.hpp"
 #include "../common.h"
 
 #ifndef ROGUE_LIKE_SERIALIZE_H
