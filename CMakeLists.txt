@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.4...3.18)
 project(roguelike)
 
 set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_FLAGS "-fconcepts-diagnostics-depth=3")
+
 
 add_subdirectory(deps/pybind11)
 add_subdirectory(deps/magic_enum)
@@ -23,6 +25,7 @@ set(LIB_SOURCES
         cpp_src/entity/components.h
 
         cpp_src/entity/entity.hpp
+        cpp_src/entity/entity.cpp
         cpp_src/entity/player.h
         cpp_src/entity/goblin.h
         cpp_src/entity/goblin_guard.h
