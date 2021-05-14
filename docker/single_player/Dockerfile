@@ -8,18 +8,13 @@ WORKDIR /root/
 RUN apt-get update && \
     apt-get install -y --no-install-recommends gcc-10 g++-10 cmake git make python3-dev python3-pip
 
-RUN git clone https://github.com/FrogOfJuly/roguelike.git
+RUN git clone --recurse-submodules https://github.com/FrogOfJuly/roguelike.git
 
-RUN cd roguelike && mkdir deps && cd deps &&               \
-    git clone https://github.com/pybind/pybind11.git &&    \
-    git clone https://github.com/Neargye/magic_enum.git && \
-    git clone https://github.com/Akagi201/lwlog.git &&     \
-    git clone --depth 1 https://github.com/nlohmann/json.git &&      \
-    git checkout devel
+RUN cd roguelike && git checkout devel
 RUN pip3 install ./roguelike
 CMD cd roguelike/python_src &&   \
     echo "nohup python3 server.py &\n" | bash  && \
-    sleep 2s && \
+    sleep 3s && \
     python3 client.py
 
 

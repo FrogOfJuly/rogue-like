@@ -1,0 +1,12 @@
+[submodule "pybind11"]
+	path = deps/pybind11
+	url = https://github.com/pybind/pybind11.git
+[submodule "deps/magic_enum"]
+	path = deps/magic_enum
+	url = https://github.com/Neargye/magic_enum.git
+[submodule "deps/lwlog"]
+	path = deps/lwlog
+	url = https://github.com/Akagi201/lwlog.git
+[submodule "deps/json"]
+	path = deps/json
+	url = https://github.com/nlohmann/json.git
