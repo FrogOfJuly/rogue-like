@@ -2,21 +2,12 @@
 // Created by Kirill Golubev on 17.04.2021.
 //
 
-#include "../common.h"
 #include "components.h"
+#include "../common.h"
 
 #ifndef ROGUE_LIKE_ENTITY_HPP
 #define ROGUE_LIKE_ENTITY_HPP
 namespace roguelike {
-
-    struct interaction_info {
-        // actor is who interacting
-        // subject is the one who is interacted
-        bool actor_killed = false;
-        bool subject_killed = false;
-        bool subject_picked = false;
-        std::optional<int> should_drop;
-    };
 
     struct entity {
         entity() = delete;

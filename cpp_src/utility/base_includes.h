@@ -11,6 +11,7 @@
 #include <optional>
 #include <sstream>
 #include <variant>
+#include <concepts>
 
 #define LOG_LEVEL 7
 

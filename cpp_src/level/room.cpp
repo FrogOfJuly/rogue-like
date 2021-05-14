@@ -258,9 +258,7 @@ std::optional<roguelike::tile> roguelike::room::get_target_tile(
             return get_tile_if_exists(x - 1, y);
         case RIGHT:
             return get_tile_if_exists(x + 1, y);
-        case ENTER:
-        case ESC:
-        case PASS:
+        default:
             return get_tile_if_exists(x, y);
     }
 }

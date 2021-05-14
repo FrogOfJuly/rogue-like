@@ -117,9 +117,7 @@ std::pair<int, int> roguelike::decision_making_component::get_velocity() const {
             return std::make_pair(-1, 0);
         case RIGHT:
             return std::make_pair(1, 0);
-        case ENTER:
-        case ESC:
-        case PASS:
+        default:
             return std::make_pair(0, 0);
     }
 }

@@ -6,22 +6,29 @@
 
 #ifndef ROGUELIKE_COMMON_DEBUG_H
 #define ROGUELIKE_COMMON_DEBUG_H
+namespace roguelike {
 
-#define define_has_member(member_name, member_type)                                                             \
-    template <typename T>                                                                                       \
-    class has_member_##member_type {                                                                            \
-        typedef char yes_type;                                                                                  \
-        typedef long no_type;                                                                                   \
-        template <typename U>                                                                                   \
-        static typename std::enable_if_t<std::is_same_v<member_type, decltype(U::member_name)>, yes_type> test( \
-            decltype(&U::member_name));                                                                         \
-        template <typename U>                                                                                   \
-        static no_type test(...);                                                                               \
-                                                                                                                \
-      public:                                                                                                   \
-        static constexpr bool value = sizeof(test<T>(0)) == sizeof(yes_type);                                   \
-    };
+#define define_has_member_with_concepts(member_name, member_type)                    \
+    template <typename T>                                                            \
+    concept has_##member_type = std::same_as<decltype(T::member_name), member_type>; \
+    template <typename T>                                                            \
+    struct has_member_##member_type {                                                \
+        template <typename U>                                                        \
+        inline constexpr static bool f(U *) {                                        \
+            return false;                                                            \
+        }                                                                            \
+        template <typename U>                                                        \
+        inline constexpr static bool f(U *) requires has_##member_type<U> {          \
+            return true;                                                             \
+        }                                                                            \
+                                                                                     \
+      public:                                                                        \
+        inline static constexpr bool value = f((T *)(nullptr));                      \
+    };                                                                               \
+    template <typename T>                                                            \
+    inline constexpr bool has_##member_type##_v = has_member_##member_type<T>::value;
 
+}  // namespace roguelike
 template <class... Ts>
 struct overloaded : Ts... {
     using Ts::operator()...;
@@ -69,18 +76,11 @@ namespace roguelike {
 #define register_component(cpt_name, component_type) struct component_type;
 #include "register_for_components.h"
 #undef register_component
-//--------------end of forward declarations---------------------
-//--------------checking utilities for components---------------
-#define register_component(cmpt_name, component_type) define_has_member(cmpt_name, component_type);
-#include "register_for_components.h"
-#undef register_component
-    //--------------end of checking utilities for components--------
+    //--------------end of forward declarations---------------------
+
     //--------------concepts----------------------------------------
 
-#define register_component(cmpt_name, component_type) \
-    template <typename T>                             \
-    concept has_##component_type = has_member_##component_type<T>::value;
-
+#define register_component(cmpt_name, component_type) define_has_member_with_concepts(cmpt_name, component_type)
 #include "register_for_components.h"
 #undef register_component
 

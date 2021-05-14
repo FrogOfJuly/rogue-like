@@ -1,9 +1,11 @@
-
 #include "base_includes.h"
 
 #ifndef ROGUELIKE_COMMON_RELEASE_H
 #define ROGUELIKE_COMMON_RELEASE_H
 
+namespace roguelike {
+# 31 "common_debug.h"
+}
 template <class... Ts>
 struct overloaded : Ts... {
     using Ts::operator()...;
@@ -28,6 +30,8 @@ namespace roguelike {
 
     using general_id = std::variant<entity_id, player_id>;
 
+# 1 "./register_for_entities.h" 1
+
     struct goblin;
     struct goblin_guard;
     struct goblin_worker;
@@ -40,10 +44,13 @@ namespace roguelike {
     struct armor;
     struct shovel;
     struct chest;
+# 61 "common_debug.h" 2
 
     struct entity;
 
     using entity_type = std::variant<
+
+# 1 "./register_for_entities.h" 1
 
         goblin *,
         goblin_guard *,
@@ -57,10 +64,13 @@ namespace roguelike {
         armor *,
         shovel *,
         chest *,
+# 67 "common_debug.h" 2
 
         entity *>;
 
     using const_entity_type = std::variant<
+
+# 1 "./register_for_entities.h" 1
 
         const goblin *,
         const goblin_guard *,
@@ -74,8 +84,11 @@ namespace roguelike {
         const armor *,
         const shovel *,
         const chest *,
+# 73 "common_debug.h" 2
 
         const entity *>;
+
+# 1 "./register_for_components.h" 1
 
     struct move_component;
     struct atk_component;
@@ -91,232 +104,249 @@ namespace roguelike {
     struct expirience_components;
     struct level_component;
     struct prot_component;
+# 78 "common_debug.h" 2
+
+# 1 "./register_for_components.h" 1
 
     template <typename T>
-    class has_member_move_component {
-        typedef char yes_type;
-        typedef long no_type;
+    concept has_move_component = std::same_as<decltype(T::m_cpt), move_component>;
+    template <typename T>
+    struct has_member_move_component {
         template <typename U>
-        static typename std::enable_if_t<std::is_same_v<move_component, decltype(U::m_cpt)>, yes_type> test(
-            decltype(&U::m_cpt));
+        inline constexpr static bool f(U *) {
+            return false;
+        }
         template <typename U>
-        static no_type test(...);
+        inline constexpr static bool f(U *) requires has_move_component<U> {
+            return true;
+        }
 
-      public:
-        static constexpr bool value = sizeof(test<T>(0)) == sizeof(yes_type);
+      public : inline static constexpr bool value = f((T *)(nullptr));
     };
-    ;
     template <typename T>
-    class has_member_atk_component {
-        typedef char yes_type;
-        typedef long no_type;
+    inline constexpr bool has_move_component_v = has_member_move_component<T>::value;
+    template <typename T>
+    concept has_atk_component = std::same_as<decltype(T::a_cpt), atk_component>;
+    template <typename T>
+    struct has_member_atk_component {
         template <typename U>
-        static typename std::enable_if_t<std::is_same_v<atk_component, decltype(U::a_cpt)>, yes_type> test(
-            decltype(&U::a_cpt));
+        inline constexpr static bool f(U *) {
+            return false;
+        }
         template <typename U>
-        static no_type test(...);
+        inline constexpr static bool f(U *) requires has_atk_component<U> {
+            return true;
+        }
 
-      public:
-        static constexpr bool value = sizeof(test<T>(0)) == sizeof(yes_type);
+      public : inline static constexpr bool value = f((T *)(nullptr));
     };
-    ;
     template <typename T>
-    class has_member_dfc_component {
-        typedef char yes_type;
-        typedef long no_type;
+    inline constexpr bool has_atk_component_v = has_member_atk_component<T>::value;
+    template <typename T>
+    concept has_dfc_component = std::same_as<decltype(T::dfc_cpt), dfc_component>;
+    template <typename T>
+    struct has_member_dfc_component {
         template <typename U>
-        static typename std::enable_if_t<std::is_same_v<dfc_component, decltype(U::dfc_cpt)>, yes_type> test(
-            decltype(&U::dfc_cpt));
+        inline constexpr static bool f(U *) {
+            return false;
+        }
         template <typename U>
-        static no_type test(...);
+        inline constexpr static bool f(U *) requires has_dfc_component<U> {
+            return true;
+        }
 
-      public:
-        static constexpr bool value = sizeof(test<T>(0)) == sizeof(yes_type);
+      public : inline static constexpr bool value = f((T *)(nullptr));
     };
-    ;
     template <typename T>
-    class has_member_health_component {
-        typedef char yes_type;
-        typedef long no_type;
+    inline constexpr bool has_dfc_component_v = has_member_dfc_component<T>::value;
+    template <typename T>
+    concept has_health_component = std::same_as<decltype(T::h_cpt), health_component>;
+    template <typename T>
+    struct has_member_health_component {
         template <typename U>
-        static typename std::enable_if_t<std::is_same_v<health_component, decltype(U::h_cpt)>, yes_type> test(
-            decltype(&U::h_cpt));
+        inline constexpr static bool f(U *) {
+            return false;
+        }
         template <typename U>
-        static no_type test(...);
+        inline constexpr static bool f(U *) requires has_health_component<U> {
+            return true;
+        }
 
-      public:
-        static constexpr bool value = sizeof(test<T>(0)) == sizeof(yes_type);
+      public : inline static constexpr bool value = f((T *)(nullptr));
     };
-    ;
     template <typename T>
-    class has_member_repr_component {
-        typedef char yes_type;
-        typedef long no_type;
+    inline constexpr bool has_health_component_v = has_member_health_component<T>::value;
+    template <typename T>
+    concept has_repr_component = std::same_as<decltype(T::repr_cpt), repr_component>;
+    template <typename T>
+    struct has_member_repr_component {
         template <typename U>
-        static typename std::enable_if_t<std::is_same_v<repr_component, decltype(U::repr_cpt)>, yes_type> test(
-            decltype(&U::repr_cpt));
+        inline constexpr static bool f(U *) {
+            return false;
+        }
         template <typename U>
-        static no_type test(...);
+        inline constexpr static bool f(U *) requires has_repr_component<U> {
+            return true;
+        }
 
-      public:
-        static constexpr bool value = sizeof(test<T>(0)) == sizeof(yes_type);
+      public : inline static constexpr bool value = f((T *)(nullptr));
     };
-    ;
     template <typename T>
-    class has_member_decision_making_component {
-        typedef char yes_type;
-        typedef long no_type;
+    inline constexpr bool has_repr_component_v = has_member_repr_component<T>::value;
+    template <typename T>
+    concept has_decision_making_component = std::same_as<decltype(T::dm_cpt), decision_making_component>;
+    template <typename T>
+    struct has_member_decision_making_component {
         template <typename U>
-        static typename std::enable_if_t<std::is_same_v<decision_making_component, decltype(U::dm_cpt)>, yes_type> test(
-            decltype(&U::dm_cpt));
+        inline constexpr static bool f(U *) {
+            return false;
+        }
         template <typename U>
-        static no_type test(...);
+        inline constexpr static bool f(U *) requires has_decision_making_component<U> {
+            return true;
+        }
 
-      public:
-        static constexpr bool value = sizeof(test<T>(0)) == sizeof(yes_type);
+      public : inline static constexpr bool value = f((T *)(nullptr));
     };
-    ;
     template <typename T>
-    class has_member_logging_component {
-        typedef char yes_type;
-        typedef long no_type;
+    inline constexpr bool has_decision_making_component_v = has_member_decision_making_component<T>::value;
+    template <typename T>
+    concept has_logging_component = std::same_as<decltype(T::lg_cpt), logging_component>;
+    template <typename T>
+    struct has_member_logging_component {
         template <typename U>
-        static typename std::enable_if_t<std::is_same_v<logging_component, decltype(U::lg_cpt)>, yes_type> test(
-            decltype(&U::lg_cpt));
+        inline constexpr static bool f(U *) {
+            return false;
+        }
         template <typename U>
-        static no_type test(...);
+        inline constexpr static bool f(U *) requires has_logging_component<U> {
+            return true;
+        }
 
-      public:
-        static constexpr bool value = sizeof(test<T>(0)) == sizeof(yes_type);
+      public : inline static constexpr bool value = f((T *)(nullptr));
     };
-    ;
     template <typename T>
-    class has_member_name_component {
-        typedef char yes_type;
-        typedef long no_type;
+    inline constexpr bool has_logging_component_v = has_member_logging_component<T>::value;
+    template <typename T>
+    concept has_name_component = std::same_as<decltype(T::nm_cpt), name_component>;
+    template <typename T>
+    struct has_member_name_component {
         template <typename U>
-        static typename std::enable_if_t<std::is_same_v<name_component, decltype(U::nm_cpt)>, yes_type> test(
-            decltype(&U::nm_cpt));
+        inline constexpr static bool f(U *) {
+            return false;
+        }
         template <typename U>
-        static no_type test(...);
+        inline constexpr static bool f(U *) requires has_name_component<U> {
+            return true;
+        }
 
-      public:
-        static constexpr bool value = sizeof(test<T>(0)) == sizeof(yes_type);
+      public : inline static constexpr bool value = f((T *)(nullptr));
     };
-    ;
     template <typename T>
-    class has_member_simple_inventory_component {
-        typedef char yes_type;
-        typedef long no_type;
+    inline constexpr bool has_name_component_v = has_member_name_component<T>::value;
+    template <typename T>
+    concept has_simple_inventory_component = std::same_as<decltype(T::s_inv_cpt), simple_inventory_component>;
+    template <typename T>
+    struct has_member_simple_inventory_component {
         template <typename U>
-        static typename std::enable_if_t<std::is_same_v<simple_inventory_component, decltype(U::s_inv_cpt)>, yes_type>
-        test(decltype(&U::s_inv_cpt));
+        inline constexpr static bool f(U *) {
+            return false;
+        }
         template <typename U>
-        static no_type test(...);
+        inline constexpr static bool f(U *) requires has_simple_inventory_component<U> {
+            return true;
+        }
 
-      public:
-        static constexpr bool value = sizeof(test<T>(0)) == sizeof(yes_type);
+      public : inline static constexpr bool value = f((T *)(nullptr));
     };
-    ;
     template <typename T>
-    class has_member_pickable_component {
-        typedef char yes_type;
-        typedef long no_type;
+    inline constexpr bool has_simple_inventory_component_v = has_member_simple_inventory_component<T>::value;
+    template <typename T>
+    concept has_pickable_component = std::same_as<decltype(T::pk_cpt), pickable_component>;
+    template <typename T>
+    struct has_member_pickable_component {
         template <typename U>
-        static typename std::enable_if_t<std::is_same_v<pickable_component, decltype(U::pk_cpt)>, yes_type> test(
-            decltype(&U::pk_cpt));
+        inline constexpr static bool f(U *) {
+            return false;
+        }
         template <typename U>
-        static no_type test(...);
+        inline constexpr static bool f(U *) requires has_pickable_component<U> {
+            return true;
+        }
 
-      public:
-        static constexpr bool value = sizeof(test<T>(0)) == sizeof(yes_type);
+      public : inline static constexpr bool value = f((T *)(nullptr));
     };
-    ;
     template <typename T>
-    class has_member_one_time_effect_component {
-        typedef char yes_type;
-        typedef long no_type;
+    inline constexpr bool has_pickable_component_v = has_member_pickable_component<T>::value;
+    template <typename T>
+    concept has_one_time_effect_component = std::same_as<decltype(T::ot_eff_cpt), one_time_effect_component>;
+    template <typename T>
+    struct has_member_one_time_effect_component {
         template <typename U>
-        static typename std::enable_if_t<std::is_same_v<one_time_effect_component, decltype(U::ot_eff_cpt)>, yes_type>
-        test(decltype(&U::ot_eff_cpt));
+        inline constexpr static bool f(U *) {
+            return false;
+        }
         template <typename U>
-        static no_type test(...);
+        inline constexpr static bool f(U *) requires has_one_time_effect_component<U> {
+            return true;
+        }
 
-      public:
-        static constexpr bool value = sizeof(test<T>(0)) == sizeof(yes_type);
+      public : inline static constexpr bool value = f((T *)(nullptr));
     };
-    ;
     template <typename T>
-    class has_member_expirience_components {
-        typedef char yes_type;
-        typedef long no_type;
+    inline constexpr bool has_one_time_effect_component_v = has_member_one_time_effect_component<T>::value;
+    template <typename T>
+    concept has_expirience_components = std::same_as<decltype(T::exp_cpt), expirience_components>;
+    template <typename T>
+    struct has_member_expirience_components {
         template <typename U>
-        static typename std::enable_if_t<std::is_same_v<expirience_components, decltype(U::exp_cpt)>, yes_type> test(
-            decltype(&U::exp_cpt));
+        inline constexpr static bool f(U *) {
+            return false;
+        }
         template <typename U>
-        static no_type test(...);
+        inline constexpr static bool f(U *) requires has_expirience_components<U> {
+            return true;
+        }
 
-      public:
-        static constexpr bool value = sizeof(test<T>(0)) == sizeof(yes_type);
+      public : inline static constexpr bool value = f((T *)(nullptr));
     };
-    ;
     template <typename T>
-    class has_member_level_component {
-        typedef char yes_type;
-        typedef long no_type;
+    inline constexpr bool has_expirience_components_v = has_member_expirience_components<T>::value;
+    template <typename T>
+    concept has_level_component = std::same_as<decltype(T::lvl_cpt), level_component>;
+    template <typename T>
+    struct has_member_level_component {
         template <typename U>
-        static typename std::enable_if_t<std::is_same_v<level_component, decltype(U::lvl_cpt)>, yes_type> test(
-            decltype(&U::lvl_cpt));
+        inline constexpr static bool f(U *) {
+            return false;
+        }
         template <typename U>
-        static no_type test(...);
+        inline constexpr static bool f(U *) requires has_level_component<U> {
+            return true;
+        }
 
-      public:
-        static constexpr bool value = sizeof(test<T>(0)) == sizeof(yes_type);
+      public : inline static constexpr bool value = f((T *)(nullptr));
     };
-    ;
     template <typename T>
-    class has_member_prot_component {
-        typedef char yes_type;
-        typedef long no_type;
+    inline constexpr bool has_level_component_v = has_member_level_component<T>::value;
+    template <typename T>
+    concept has_prot_component = std::same_as<decltype(T::prt_cpt), prot_component>;
+    template <typename T>
+    struct has_member_prot_component {
         template <typename U>
-        static typename std::enable_if_t<std::is_same_v<prot_component, decltype(U::prt_cpt)>, yes_type> test(
-            decltype(&U::prt_cpt));
+        inline constexpr static bool f(U *) {
+            return false;
+        }
         template <typename U>
-        static no_type test(...);
+        inline constexpr static bool f(U *) requires has_prot_component<U> {
+            return true;
+        }
 
-      public:
-        static constexpr bool value = sizeof(test<T>(0)) == sizeof(yes_type);
+      public : inline static constexpr bool value = f((T *)(nullptr));
     };
-    ;
-
     template <typename T>
-    concept has_move_component = has_member_move_component<T>::value;
-    template <typename T>
-    concept has_atk_component = has_member_atk_component<T>::value;
-    template <typename T>
-    concept has_dfc_component = has_member_dfc_component<T>::value;
-    template <typename T>
-    concept has_health_component = has_member_health_component<T>::value;
-    template <typename T>
-    concept has_repr_component = has_member_repr_component<T>::value;
-    template <typename T>
-    concept has_decision_making_component = has_member_decision_making_component<T>::value;
-    template <typename T>
-    concept has_logging_component = has_member_logging_component<T>::value;
-    template <typename T>
-    concept has_name_component = has_member_name_component<T>::value;
-    template <typename T>
-    concept has_simple_inventory_component = has_member_simple_inventory_component<T>::value;
-    template <typename T>
-    concept has_pickable_component = has_member_pickable_component<T>::value;
-    template <typename T>
-    concept has_one_time_effect_component = has_member_one_time_effect_component<T>::value;
-    template <typename T>
-    concept has_expirience_components = has_member_expirience_components<T>::value;
-    template <typename T>
-    concept has_level_component = has_member_level_component<T>::value;
-    template <typename T>
-    concept has_prot_component = has_member_prot_component<T>::value;
+    inline constexpr bool has_prot_component_v = has_member_prot_component<T>::value;
+# 85 "common_debug.h" 2
 
 }  // namespace roguelike
 

@@ -53,10 +53,9 @@ void roguelike::move_system::move_to_tile(general_id id, tile_idx dest_tile_idx)
 roguelike::tile_idx roguelike::move_system::desired_tile_idx(entity_type &var_ent) {
     return std::visit(
         [](const auto *ent_ptr) {
-            constexpr bool able_to_dm = has_member_decision_making_component<
-                std::remove_pointer_t<std::remove_const_t<decltype(ent_ptr)>>>::value;
-            constexpr bool able_to_move =
-                has_member_move_component<std::remove_pointer_t<std::remove_const_t<decltype(ent_ptr)>>>::value;
+            using entT = std::remove_pointer_t<std::remove_const_t<decltype(ent_ptr)>>;
+            constexpr bool able_to_dm = has_member_decision_making_component<entT>::value;
+            constexpr bool able_to_move = has_member_move_component<entT>::value;
             if constexpr (able_to_move and able_to_dm) {
                 auto v = ent_ptr->dm_cpt.get_velocity();
                 if (v.first == 0 and v.second == 0) {
@@ -81,6 +80,8 @@ bool roguelike::move_system::more_general_move(entity_type &var_ent) {
             constexpr bool able_to_dm = has_member_decision_making_component<entT>::value;
             constexpr bool able_to_move = has_member_move_component<entT>::value;
             constexpr bool has_inventory = has_member_simple_inventory_component<entT>::value;
+            lwlog_crit("checking flag for %s", typeid(entT).name());
+            lwlog_crit("Flags: %d, %d, %d", able_to_dm, able_to_move, has_inventory);
 
             if constexpr (able_to_dm and has_inventory) {
                 auto active_slot = simple_inventory_component::inventory_spot::active;

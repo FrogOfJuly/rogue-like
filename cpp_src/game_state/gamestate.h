@@ -68,6 +68,9 @@ namespace roguelike {
         friend void from_json(const nlohmann::json &j, gamestate &p);
     };
 
+    void to_json(nlohmann::json &j, const gamestate &p);
+    void from_json(const nlohmann::json &j, gamestate &p);
+
 }  // namespace roguelike
 
 #endif  // ROGUE_LIKE_GAMESTATE_H

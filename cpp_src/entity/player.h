@@ -2,6 +2,8 @@
 // Created by Kirill Golubev on 17.04.2021.
 //
 
+#include <cmath>
+
 #include "entity.hpp"
 
 #ifndef ROGUE_LIKE_PLAYER_H
@@ -42,8 +44,8 @@ namespace roguelike {
         auto &exp = ent->exp_cpt.exp;
         int exp_offset = 16;
         int lvl_offset = 4;
-        int cur_level = (int)(log(exp + exp_offset) / log(2.0)) - lvl_offset;
-        int next_level = (int)pow(2.0, (cur_level + lvl_offset + 1)) - exp_offset;
+        int cur_level = (int)(std::log(exp + exp_offset) / std::log(2.0)) - lvl_offset;
+        int next_level = (int)std::pow(2.0, (cur_level + lvl_offset + 1)) - exp_offset;
         return std::make_pair(cur_level, next_level);
     }
 
