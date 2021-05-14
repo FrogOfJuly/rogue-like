@@ -5,7 +5,13 @@ ENV CXX=g++-10
 WORKDIR /root/
 
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends gcc-10 g++-10 cmake git make python3-dev python3-pip
+    apt-get install -y --no-install-recommends gcc-10 g++-10
+
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends cmake
+
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends git make python3-dev python3-pip
 
 RUN git clone https://github.com/FrogOfJuly/roguelike.git
 
