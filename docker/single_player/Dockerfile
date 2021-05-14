@@ -2,16 +2,11 @@ FROM ubuntu
 ENV TERM=xterm-256color
 ENV CC=gcc-10
 ENV CXX=g++-10
+ENV DEBIAN_FRONTEND=noninteractive
 WORKDIR /root/
 
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends gcc-10 g++-10
-
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends cmake
-
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends git make python3-dev python3-pip
+    apt-get install -y --no-install-recommends gcc-10 g++-10 cmake git make python3-dev python3-pip
 
 RUN git clone https://github.com/FrogOfJuly/roguelike.git
 
