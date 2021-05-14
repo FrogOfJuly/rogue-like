@@ -20,7 +20,7 @@ namespace roguelike {
 
         std::array<tile, H * W> tiles;
         std::vector<entity_type> residents;
-        std::unordered_set<int> dead;
+        std::unordered_set<int> despawned;
 
         mutable std::stringstream common_log;
 
@@ -75,6 +75,8 @@ namespace roguelike {
         void remove_resident(tile_idx idx);
 
         tile &get_tile(int x, int y);
+
+        bool is_tile_empty(tile_idx idx) const;
 
         [[nodiscard]] const tile &get_tile(int x, int y) const;
 

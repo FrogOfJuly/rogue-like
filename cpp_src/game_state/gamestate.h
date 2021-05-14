@@ -38,7 +38,7 @@ namespace roguelike {
         player *get_player(player_id id) const;
         entity_type get_entity(general_id id) const;
 
-        void report_murder(general_id mdred_id, general_id mdrer_id);
+        void report_despawn(general_id mdred_id);
 
       public:
         void initialize(int player_num);

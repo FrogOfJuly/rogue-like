@@ -34,10 +34,11 @@ namespace roguelike {
 
     template <>
     struct interacter<chest, player> {
-        static inline void interact(chest &inted, player &inting) {
+        static inline interaction_info interact(chest &inted, player &inting) {
             inting.lg_cpt.log << "It's a chest!!\n";
             inted.h_cpt.health = 0;
             inted.s_inv_cpt.spot = inted.s_inv_cpt.get_some_item();
+            return interaction_info::interacted_got_destroyed;
         }
     };
 }  // namespace roguelike

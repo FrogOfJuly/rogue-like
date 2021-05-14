@@ -25,11 +25,11 @@ namespace roguelike {
 
     template <typename entityType>
     struct interacter<shovel, entityType> {
-        static inline void interact(shovel &inted, entityType &inting) {
+        static inline interaction_info interact(shovel &inted, entityType &inting) {
             if constexpr (has_member_simple_inventory_component<entityType>::value) {
-                default_interactors::item_picking<shovel, entityType>::interact(inted, inting);
+                return default_interactors::item_picking<shovel, entityType>::interact(inted, inting);
             } else {
-                default_interactors::logging<shovel, entityType>::interact(inted, inting);
+                return default_interactors::logging<shovel, entityType>::interact(inted, inting);
             }
         }
     };

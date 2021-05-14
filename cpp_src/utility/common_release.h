@@ -104,6 +104,7 @@ namespace roguelike {
     struct expirience_components;
     struct level_component;
     struct prot_component;
+    struct destruction_component;
 # 78 "common_debug.h" 2
 
 # 1 "./register_for_components.h" 1
@@ -346,6 +347,23 @@ namespace roguelike {
     };
     template <typename T>
     inline constexpr bool has_prot_component_v = has_member_prot_component<T>::value;
+    template <typename T>
+    concept has_destruction_component = std::same_as<decltype(T::dstr_cpt), destruction_component>;
+    template <typename T>
+    struct has_member_destruction_component {
+        template <typename U>
+        inline constexpr static bool f(U *) {
+            return false;
+        }
+        template <typename U>
+        inline constexpr static bool f(U *) requires has_destruction_component<U> {
+            return true;
+        }
+
+      public : inline static constexpr bool value = f((T *)(nullptr));
+    };
+    template <typename T>
+    inline constexpr bool has_destruction_component_v = has_member_destruction_component<T>::value;
 # 85 "common_debug.h" 2
 
 }  // namespace roguelike

@@ -50,7 +50,7 @@ void roguelike::move_system::move_to_tile(general_id id, tile_idx dest_tile_idx)
         var_ent);
 }
 
-roguelike::tile_idx roguelike::move_system::desired_tile_idx(entity_type &var_ent) {
+std::optional<roguelike::tile_idx> roguelike::move_system::desired_tile_idx(entity_type &var_ent) {
     return std::visit(
         [](const auto *ent_ptr) {
             using entT = std::remove_pointer_t<std::remove_const_t<decltype(ent_ptr)>>;
@@ -59,13 +59,13 @@ roguelike::tile_idx roguelike::move_system::desired_tile_idx(entity_type &var_en
             if constexpr (able_to_move and able_to_dm) {
                 auto v = ent_ptr->dm_cpt.get_velocity();
                 if (v.first == 0 and v.second == 0) {
-                    return -1;
+                    return std::optional<tile_idx>();
                 }
                 auto des_x = ent_ptr->m_cpt.x + v.first;
                 auto des_y = ent_ptr->m_cpt.y + v.second;
-                return room::idxFromPair(des_x, des_y);
+                return std::optional<tile_idx>(room::idxFromPair(des_x, des_y));
             } else {
-                return -1;
+                return std::optional<tile_idx>();
             }
         },
         var_ent);
@@ -80,8 +80,8 @@ bool roguelike::move_system::more_general_move(entity_type &var_ent) {
             constexpr bool able_to_dm = has_member_decision_making_component<entT>::value;
             constexpr bool able_to_move = has_member_move_component<entT>::value;
             constexpr bool has_inventory = has_member_simple_inventory_component<entT>::value;
-            lwlog_crit("checking flag for %s", typeid(entT).name());
-            lwlog_crit("Flags: %d, %d, %d", able_to_dm, able_to_move, has_inventory);
+            lwlog_info("checking flag for %s", typeid(entT).name());
+            lwlog_info("Flags: %d, %d, %d", able_to_dm, able_to_move, has_inventory);
 
             if constexpr (able_to_dm and has_inventory) {
                 auto active_slot = simple_inventory_component::inventory_spot::active;
@@ -107,11 +107,11 @@ bool roguelike::move_system::more_general_move(entity_type &var_ent) {
                 }
             }
 
-            if (des_idx < 0) {
+            if (not des_idx.has_value()) {
                 return false;
             }
             if constexpr (able_to_dm and able_to_move) {
-                auto des_xy = room::pairFromIdx(des_idx);
+                auto des_xy = room::pairFromIdx(des_idx.value());
                 auto des_x = des_xy.first;
                 auto des_y = des_xy.second;
                 auto opt_tile = game_ptr->level.get_tile_if_exists(des_x, des_y);
@@ -130,6 +130,21 @@ bool roguelike::move_system::more_general_move(entity_type &var_ent) {
                 return moved;
             }
             return false;
+        },
+        var_ent);
+}
+std::optional<roguelike::tile_idx> roguelike::move_system::current_tile_idx(roguelike::entity_type &var_ent) {
+    return std::visit(
+        [](const auto *ent_ptr) {
+            using entT = std::remove_pointer_t<std::remove_const_t<decltype(ent_ptr)>>;
+            constexpr bool able_to_move = has_member_move_component<entT>::value;
+            if constexpr (able_to_move) {
+                auto des_x = ent_ptr->m_cpt.x;
+                auto des_y = ent_ptr->m_cpt.y;
+                return std::optional<tile_idx>(room::idxFromPair(des_x, des_y));
+            } else {
+                return std::optional<tile_idx>();
+            }
         },
         var_ent);
 }

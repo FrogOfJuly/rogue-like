@@ -68,15 +68,15 @@ void roguelike::gamestate::move_nonplayers() {
     for (auto &var_ent : level.residents) {
         bool is_dead = std::visit(
             [this](auto *ent_ptr) {
-                lwlog_info("-checking if entity %d is dead", ent_ptr->id.value);
-                return level.dead.count(ent_ptr->id.value) != 0;
+                lwlog_info("-checking if entity %d is despawned", ent_ptr->id.value);
+                return level.despawned.count(ent_ptr->id.value) != 0;
             },
             var_ent);
         if (is_dead) {
-            lwlog_info("-it is dead. Skipping");
+            lwlog_info("-it is despawned. Skipping");
             continue;
         }
-        lwlog_info("-it is not dead. Making move");
+        lwlog_info("-it is not despawned. Making move");
         mv_system.more_general_move(var_ent);
     }
 }
@@ -140,15 +140,15 @@ void roguelike::gamestate::decide_next_move() {
     for (auto &var_ent : level.residents) {
         bool is_dead = std::visit(
             [this](auto *ent_ptr) {
-                lwlog_info("-checking if entity %d is dead", ent_ptr->id.value);
-                return level.dead.count(ent_ptr->id.value) != 0;
+                lwlog_info("-checking if entity %d is despawned", ent_ptr->id.value);
+                return level.despawned.count(ent_ptr->id.value) != 0;
             },
             var_ent);
         if (is_dead) {
-            lwlog_info("-it is dead. Skipping");
+            lwlog_info("-it is despawned. Skipping");
             continue;
         }
-        lwlog_info("-it is not dead. Making decision");
+        lwlog_info("-it is not despawned. Making decision");
         dm_system.make_decision(var_ent);
     }
     for (auto &it : players) {
@@ -174,7 +174,7 @@ roguelike::entity_type roguelike::gamestate::get_entity(roguelike::general_id id
             }},
         id);
 }
-void roguelike::gamestate::report_murder(roguelike::general_id mdred_id, roguelike::general_id mdrer_id) {
+void roguelike::gamestate::report_despawn(roguelike::general_id mdred_id) {
     lwlog_info("reporting murder");
     std::visit(
         overloaded{
@@ -184,26 +184,8 @@ void roguelike::gamestate::report_murder(roguelike::general_id mdred_id, rogueli
                 get_player(id)->lg_cpt.log << "you are dead!\n";
             },
             [this](entity_id id) {
-                lwlog_info("entity %d got murdered", id.value);
-                level.dead.insert(id.value);
+                lwlog_info("entity %d got despwaned", id.value);
+                level.despawned.insert(id.value);
             }},
         mdred_id);
-
-    entity_type mdred_ent = get_entity(mdred_id);
-    entity_type mdrer_ent = get_entity(mdrer_id);
-
-    std::visit(
-        [](auto *mdred_ent_ptr, auto *mdrer_ent_ptr) {
-            using mdrerT = std::remove_pointer_t<decltype(mdrer_ent_ptr)>;
-            using mdredT = std::remove_pointer_t<decltype(mdred_ent_ptr)>;
-            std::string victim_name = "your victim";
-            if constexpr (has_member_name_component<mdredT>::value) {
-                victim_name = mdred_ent_ptr->nm_cpt.name;
-            }
-            if constexpr (has_member_logging_component<mdrerT>::value) {
-                mdrer_ent_ptr->lg_cpt.log << "you have killed " << victim_name << std::endl;
-            }
-        },
-        mdred_ent,
-        mdrer_ent);
 }

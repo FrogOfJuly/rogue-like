@@ -67,37 +67,12 @@ namespace roguelike {
 
     template <typename entityType>
     struct interacter<player, entityType> {
-        static inline void interact(player &inted, entityType &inting) {
+        static inline interaction_info interact(player &inted, entityType &inting) {
             if constexpr (has_member_atk_component<entityType>::value) {
-                int dmg = atk_component::calculate_damage(&inting);
-                int health = inted.h_cpt.health;
-                int rec_dmg = health_component::receive_damage(&inted, dmg);
-                inted.lg_cpt.log << "you received " << rec_dmg << " damage\n";
-                return;
+                return default_interactors::agressive<player, entityType>::interact(inted, inting);
             }
-            if constexpr (has_member_name_component<entityType>::value) {
-                inted.lg_cpt.log << "you was interacted by " << inting.nm_cpt.name << std::endl;
-            } else {
-                inted.lg_cpt.log << "you was interacted by the unknown\n";
-            }
-
-            return;
+            return default_interactors::logging<player, entityType>::interact(inted, inting);
         }
-    };
-
-    template <>
-    struct interacter<player, player> {
-        static inline void interact(player &inted, player &inting) {
-            auto dmg = atk_component::calculate_damage(&inting);
-            health_component::receive_damage(&inted, dmg);
-            inted.lg_cpt.log << "you was interacted by the player " << std::to_string(inting.id.value) << "\n";
-            inting.lg_cpt.log << "you interacted with player" << std::to_string(inted.id.value) << "\n";
-            return;
-        }
-    };
-
-    struct player_hasher {
-        inline size_t operator()(const player &plr) const { return plr.id.value; }
     };
 }  // namespace roguelike
 

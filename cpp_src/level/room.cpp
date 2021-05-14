@@ -406,3 +406,11 @@ void roguelike::room::generate_enemies(int lvl_num) {
         residents.emplace_back(gg);
     }
 }
+bool roguelike::room::is_tile_empty(roguelike::tile_idx idx) const {
+    auto p = pairFromIdx(idx);
+    auto maybe_tile = get_tile_if_exists(p.first, p.second);
+    if (not maybe_tile.has_value()) {
+        return false;
+    }
+    return maybe_tile.value().empty();
+}

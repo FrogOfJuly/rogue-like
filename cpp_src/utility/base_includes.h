@@ -13,7 +13,7 @@
 #include <variant>
 #include <concepts>
 
-#define LOG_LEVEL 7
+#define LOG_LEVEL 3
 
 #include "../../deps/lwlog/lwlog.h"
 #endif  // ROGUELIKE_BASE_INCLUDES_H

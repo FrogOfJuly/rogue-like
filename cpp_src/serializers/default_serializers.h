@@ -22,6 +22,7 @@ namespace roguelike {
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(name_component, name);
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(one_time_effect_component, msg_on_effect);
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(level_component, lvl);
+    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(destruction_component, destroyed);
 
     //--------------end of components default serializers-----------------
     //---------------------------------------------------------------------------
@@ -44,7 +45,7 @@ namespace roguelike {
 
     //--------------entity default serializers-----------------------------------
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(entity, id, level);
-    // no expirience_components bc it need player object to for serialisation,
+    // no experience_components bc it needs player object for serialisation,
     // thus it is done in entity_type serialization -----v
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(player, id, h_cpt, m_cpt, a_cpt, dm_cpt, lg_cpt, s_inv_cpt);
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(potion, id, nm_cpt);

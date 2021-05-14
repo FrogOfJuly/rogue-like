@@ -11,7 +11,9 @@ namespace roguelike {
 
         bool more_general_move(entity_type &var_ent);
 
-        static tile_idx desired_tile_idx(entity_type &var_ent);
+        static std::optional<tile_idx> desired_tile_idx(entity_type &var_ent);
+
+        static std::optional<tile_idx> current_tile_idx(entity_type& var_ent);
 
         move_system() = delete;
 

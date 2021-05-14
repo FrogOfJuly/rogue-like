@@ -2,7 +2,7 @@
 // Created by Kirill Golubev on 13.05.2021.
 //
 
-#include "base_includes.h"
+#include "../base_includes.h"
 
 #ifndef ROGUELIKE_COMMON_DEBUG_H
 #define ROGUELIKE_COMMON_DEBUG_H

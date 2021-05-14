@@ -204,16 +204,26 @@ namespace roguelike {
     struct one_time_effect_component : public component {
         std::string msg_on_effect = "?";
         template <typename U, typename T>
+        requires has_one_time_effect_component<U>
         inline bool apply_effect(U *src, T *tgt) {
             return false;
         }
     };
 
     //--------------end of one time effect component-----------------------------
-
+    //--------------level component----------------------------------------------
     struct level_component : public component {
         int lvl = -1;
         [[nodiscard]] int experience_on_kill() const;
+    };
+
+    //--------------destruction component----------------------------------------
+
+    struct destruction_component : public component {
+        bool destroyed = false;
+        template <typename U, typename T>
+        requires has_destruction_component<U>
+        static inline bool destroyed_on_impact(U *impacted, T *impacting) { return false; }
     };
 
 }  // namespace roguelike
