@@ -14,7 +14,7 @@ RUN cd roguelike
 RUN pip3 install ./roguelike
 CMD cd roguelike/python_src &&   \
     echo "nohup python3 server.py &\n" | bash  && \
-    sleep 3s && \
+    sleep 1s && \
     python3 client.py
 
 
