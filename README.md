@@ -6,8 +6,11 @@ Rough starting point for a rogue-like game
   ```
   If you want, you can install the game library right after this with
   ```bash
-  CC=gcc-10 CXX=g++-10 pip install roguelike
+  CC=gcc-10 CXX=g++-10 pip install ./roguelike
   ```
+  after this you should be able to import this module from anywhere.
+
+  
   Whether you do it like this or build it manually, please ensure your `CC` and `CXX` variables are set to compilers supporting the `C++-20` concepts feature.
 - build (optional):
   
@@ -15,16 +18,10 @@ Rough starting point for a rogue-like game
    ```bash
    > cd roguelike 
    > mkdir build && cd build
-   > cmake .. && make 
+   > cmake .. && make roguelike
   ```
   You should get a ``.so`` file which can be used as python module.
-  Move it to the `python_src` directory or install it via pip:
-- install via pip (if you built manually):
-  ```bash
-  > cd ../.. # you should be outside of project directory 
-  > pip install ./roguelike # install project folder
-  ```
-  after this you should be able to import this module from anywhere.
+  Move it to the `python_src` directory to use local build, instead of global installation.
 
 After installation, you can test if everything is ok:
 

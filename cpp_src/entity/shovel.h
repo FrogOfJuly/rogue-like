@@ -8,7 +8,7 @@ namespace roguelike {
     struct shovel {
         shovel(int id) : id{id} {
             nm_cpt.name = "shovel";
-            pk_cpt.desired_spot = simple_inventory_component::offence;
+            pk_cpt.desired_spot = simple_inventory_component::sword;
             lvl_cpt.lvl = 0;
         }
         entity_id id;

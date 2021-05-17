@@ -10,12 +10,14 @@ namespace roguelike {
         potion(int id) : id{id} {
             nm_cpt.name = "health potion";
             ot_eff_cpt.msg_on_effect = "you have drank a potion of health";
+            lvl_cpt.lvl = 3;
         }
         entity_id id;
         repr_component repr_cpt;
         pickable_component pk_cpt;
         one_time_effect_component ot_eff_cpt;
         name_component nm_cpt;
+        level_component lvl_cpt;
     };
 
     template <>

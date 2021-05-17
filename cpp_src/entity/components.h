@@ -164,7 +164,7 @@ namespace roguelike {
     //--------------end of name_component----------------------------------------
 
     struct simple_inventory_component : public component {
-        enum inventory_spot { active = 0, defence, offence, armor };
+        enum inventory_spot { sword = 0, shield, armor, potion };
         std::optional<entity_type> spot;
         std::unordered_map<inventory_spot, entity_type> spots;
         bool locked = false;
@@ -196,7 +196,7 @@ namespace roguelike {
     struct pickable_component : public component {
         using spot_type = simple_inventory_component::inventory_spot;
         bool picked = false;
-        spot_type desired_spot = spot_type::active;
+        spot_type desired_spot = spot_type::potion;
     };
 
     //--------------end of pickable component------------------------------------
@@ -205,9 +205,7 @@ namespace roguelike {
         std::string msg_on_effect = "?";
         template <typename U, typename T>
         requires has_one_time_effect_component<U>
-        inline bool apply_effect(U *src, T *tgt) {
-            return false;
-        }
+        inline bool apply_effect(U *src, T *tgt) { return false; }
     };
 
     //--------------end of one time effect component-----------------------------

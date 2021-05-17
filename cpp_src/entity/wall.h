@@ -19,7 +19,7 @@ namespace roguelike {
     }
     template <>
     inline bool destruction_component::destroyed_on_impact<wall, player>(wall *impacted, player *impacting) {
-        auto of_spot = simple_inventory_component::inventory_spot::offence;
+        auto of_spot = simple_inventory_component::inventory_spot::sword;
         bool has_off_tool = impacting->s_inv_cpt.spots.count(of_spot) != 0;
         bool has_shovel = has_off_tool ? holds_alternative<shovel *>(impacting->s_inv_cpt.spots.at(of_spot)) : false;
         return has_shovel;
