@@ -2,7 +2,7 @@
 Rough starting point for a rogue-like game
 - clone:
   ```bash
-  > git clone --single-branch --branch devel --recurse-submodules https://github.com/FrogOfJuly/roguelike.git
+  > git clone --single-branch --branch soft_deadline_2 --recurse-submodules https://github.com/FrogOfJuly/roguelike.git
   ```
   If you want, you can install the game library right after this with
   ```bash
