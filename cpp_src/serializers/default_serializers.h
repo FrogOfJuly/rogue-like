@@ -44,19 +44,19 @@ namespace roguelike {
     //---------------------------------------------------------------------------
 
     //--------------entity default serializers-----------------------------------
-    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(entity, id, level);
+    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(entity, id);
     // no experience_components bc it needs player object for serialisation,
     // thus it is done in entity_type serialization -----v
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(player, id, h_cpt, m_cpt, a_cpt, dm_cpt, lg_cpt, s_inv_cpt);
-    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(potion, id, nm_cpt);
+    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(potion, id, nm_cpt, lvl_cpt);
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(sword, id, nm_cpt, a_cpt, lvl_cpt);
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(shield, id, nm_cpt, dfc_cpt, lvl_cpt);
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(armor, id, nm_cpt, prt_cpt, lvl_cpt);
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(chest, id, nm_cpt);
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(shovel, id, nm_cpt, lvl_cpt);
-    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(goblin, id, dm_cpt, h_cpt, a_cpt, m_cpt, nm_cpt);
-    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(goblin_guard, id, dm_cpt, h_cpt, a_cpt, m_cpt, nm_cpt);
-    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(goblin_worker, id, dm_cpt, h_cpt, a_cpt, m_cpt, nm_cpt);
+    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(goblin, id, dm_cpt, h_cpt, a_cpt, m_cpt, nm_cpt, lvl_cpt);
+    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(goblin_guard, id, dm_cpt, h_cpt, a_cpt, m_cpt, nm_cpt, lvl_cpt);
+    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(goblin_worker, id, dm_cpt, h_cpt, a_cpt, m_cpt, nm_cpt, lvl_cpt);
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(wall, id);
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(trap, id, a_cpt, activated, nm_cpt, h_cpt);
     //--------------end of entity default serializers----------------------------
