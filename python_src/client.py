@@ -125,9 +125,10 @@ def render(stdscr, game_state: dict, flags: dict):
                         elif tile['entity']['repr_cpt']['repr'] not in legend[tile['entity']['nm_cpt']['name']]:
                             legend[tile['entity']['nm_cpt']['name']].append(tile['entity']['repr_cpt']['repr'])
                     to_print = f' {repr} '
-                    if 'h_cpt' in tile['entity'] and tile['entity']['h_cpt']['max_health'] > 0:
-                        lvl = int(tile['entity']['h_cpt']['health'] * 10 / tile['entity']['h_cpt']['max_health'])
-                    elif 'lvl_cpt' in tile['entity']:
+                    # if 'h_cpt' in tile['entity'] and tile['entity']['h_cpt']['max_health'] > 0:
+                    #     lvl = int(tile['entity']['h_cpt']['health'] * 10 / tile['entity']['h_cpt']['max_health'])
+                    # elif 'lvl_cpt' in tile['entity']:
+                    if 'lvl_cpt' in tile['entity']:
                         lvl = tile['entity']['lvl_cpt']['lvl']
             if (lvl):
                 stdscr.addstr(i, j * 3, to_print, curses.color_pair(color(lvl)))
@@ -136,37 +137,41 @@ def render(stdscr, game_state: dict, flags: dict):
 
     add_damage = 0
 
+    x = 0
     # Inventory
-    potion = ""
-    weapon = ""
-    shield = ""
-    armor = ""
     for item in player["s_inv_cpt"]:
-        if "potion" in item and item["potion"] != "none":
-            potion = item["potion"]["entity"]["repr_cpt"]["repr"]
-        if "sword" in item and item["sword"] != "none":
-            weapon = item["sword"]["entity"]["repr_cpt"]["repr"]
-        if "armor" in item and item["armor"] != "none":
-            shield = item["armor"]["entity"]["repr_cpt"]["repr"]
-        if "shield" in item and item["shield"] != "none":
-            armor = item["shield"]["entity"]["repr_cpt"]["repr"]
-    stdscr.addstr(H, 0, f"P: {potion:2} W: {weapon:2} S: {shield:2} A: {armor:2}")
+        for key, value in item.items():
+            section = " "
+            if key == "sword":
+                section = "W: "
+            elif key == "shield":
+                section = "S: "
+            elif key == "armor":
+                section = "A: "
+            elif key == "potion":
+                section = "P: "
+
+            stdscr.addstr(H, x, section)
+            to_print = ("" if value == "none" else value["entity"]["repr_cpt"]["repr"])
+            lvl = 0 if value == "none" else value["entity"]["lvl_cpt"]["lvl"]
+            stdscr.addstr(H, x+3, to_print, curses.color_pair(color(lvl)))
+            x = x + 5
 
     # Stats and info
-    stdscr.addstr(0, (W) * 3 + 1, f"{'Room:':9} {1}/10")  # TODO
-    stdscr.addstr(1, (W) * 3 + 1, f"{'Score:':9} {123}")  # TODO
-    stdscr.addstr(3, (W) * 3 + 1, f"{'Level:':9} {player['exp_cpt']['level']}")
-    stdscr.addstr(3, (W) * 3 + 1,
+    stdscr.addstr(0, W * 3 + 1, f"{'Room:':9} {1}/10")  # TODO
+    stdscr.addstr(1, W * 3 + 1, f"{'Score:':9} {123}")  # TODO
+    stdscr.addstr(3, W * 3 + 1, f"{'Level:':9} {player['exp_cpt']['level']}")
+    stdscr.addstr(3, W * 3 + 1,
                   f"{'Exp:':9} {player['exp_cpt']['experience']}/{player['exp_cpt']['exp_until_next_level']}")
-    stdscr.addstr(4, (W) * 3 + 1, f"{'Health:':9} {player['h_cpt']['health']}")
-    stdscr.addstr(5, (W) * 3 + 1, f"{'Damage:':9} {player['a_cpt']['damage']}")
-    stdscr.addstr(7, (W) * 3 + 1, f'log:')
+    stdscr.addstr(4, W * 3 + 1, f"{'Health:':9} {player['h_cpt']['health']}")
+    stdscr.addstr(5, W * 3 + 1, f"{'Damage:':9} {player['a_cpt']['damage']}")
+    stdscr.addstr(7, W * 3 + 1, f'log:')
 
     for i, entry in enumerate(log[-printed_log_len:]):
-        stdscr.addstr(8 + i, (W) * 3 + 1, f'> {entry}')
+        stdscr.addstr(8 + i, W * 3 + 1, f'> {entry}')
     if len(log) < printed_log_len:
         for i in range(printed_log_len - len(log)):
-            stdscr.addstr(8 + len(log) + i, (W) * 3 + 1, '>')
+            stdscr.addstr(8 + len(log) + i, W * 3 + 1, '>')
 
     # Help or legend
     if len(flags) == 0:
@@ -198,23 +203,23 @@ def main(stdscr):
     while True:
         ins, outs, ex = select.select([s], [], [], 0)
         for inm in ins:
-            gameEvent = pickle.loads(inm.recv(BUFFERSIZE))
-            if gameEvent[0] == 'reject':
-                disconnect(gameEvent[1])
-            if gameEvent[0] == 'id':
-                player_id = gameEvent[1]
+            game_event = pickle.loads(inm.recv(BUFFERSIZE))
+            if game_event[0] == 'reject':
+                disconnect(game_event[1])
+            if game_event[0] == 'id':
+                player_id = game_event[1]
                 if args.log:
                     init_log()
                 stdscr.addstr(0, 0, f"You're player {player_id}, awaiting game start")
                 stdscr.refresh()
             else:
                 if args.log:
-                    dump_log(gameEvent[1])
-                render(stdscr, gameEvent[1], {})
+                    dump_log(game_event[1])
+                render(stdscr, game_event[1], {})
 
-            if gameEvent[0] == 'state':
+            if game_event[0] == 'state':
                 pass
-            if gameEvent[0] == 'move':
+            if game_event[0] == 'move':
                 action = cmd.PASS
                 valid = False
                 while not valid:
@@ -239,10 +244,10 @@ def main(stdscr):
                         elif key == ord('f'):
                             pass
                         elif key == ord('h'):
-                            render(stdscr, gameEvent[1], {"help": True})
+                            render(stdscr, game_event[1], {"help": True})
                             valid = False
                         elif key == ord('l'):
-                            render(stdscr, gameEvent[1], {"legend": True})
+                            render(stdscr, game_event[1], {"legend": True})
                             valid = False
                         else:
                             valid = False
