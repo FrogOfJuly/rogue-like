@@ -51,3 +51,4 @@ We track a score and level the player up, but there are currently no progression
  - [pybind11](https://github.com/pybind/pybind11)
  - [magic enum](https://github.com/Neargye/magic_enum)
  - [awesome json](https://github.com/nlohmann/json)
+ - [lwlog](https://github.com/Akagi201/lwlog)
