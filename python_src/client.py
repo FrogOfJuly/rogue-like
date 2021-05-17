@@ -142,14 +142,14 @@ def render(stdscr, game_state: dict, flags: dict):
     shield = ""
     armor = ""
     for item in player["s_inv_cpt"]:
-        if "active" in item and item["active"] != "none":
-            potion = item["active"]["entity"]["repr_cpt"]["repr"]
-        if "offence" in item and item["offence"] != "none":
-            weapon = item["offence"]["entity"]["repr_cpt"]["repr"]
-        if "defence" in item and item["defence"] != "none":
-            shield = item["defence"]["entity"]["repr_cpt"]["repr"]
+        if "potion" in item and item["potion"] != "none":
+            potion = item["potion"]["entity"]["repr_cpt"]["repr"]
+        if "sword" in item and item["sword"] != "none":
+            weapon = item["sword"]["entity"]["repr_cpt"]["repr"]
         if "armor" in item and item["armor"] != "none":
-            armor = item["armor"]["entity"]["repr_cpt"]["repr"]
+            shield = item["armor"]["entity"]["repr_cpt"]["repr"]
+        if "shield" in item and item["shield"] != "none":
+            armor = item["shield"]["entity"]["repr_cpt"]["repr"]
     stdscr.addstr(H, 0, f"P: {potion:2} W: {weapon:2} S: {shield:2} A: {armor:2}")
 
     # Stats and info
