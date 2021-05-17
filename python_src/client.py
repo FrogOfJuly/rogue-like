@@ -6,6 +6,7 @@ import sys
 import json  # for logging only
 import curses
 from roguelike import cmd
+import os
 import argparse
 
 parser = argparse.ArgumentParser(description="Client for Crypt of the Darkness")
@@ -15,6 +16,8 @@ parser.add_argument("-p", "--port", default=4321, type=int, dest='port',
                     help="Port number of the server")
 parser.add_argument("-a", "--address", default='127.0.0.1', type=str, dest='server_addr',
                     help="IP address of the server")
+parser.add_argument("-l", "--log", default="store_false", action="store_true",
+                    help="Enable game state logging")
 args = parser.parse_args()
 
 player_id = args.player_id
@@ -29,21 +32,19 @@ printed_log_len = 7
 
 
 def init_log():
-    return
     log_file = f'{player_id}.json'
     with open(log_file, "w") as file:
         file.write("[]")
 
 
 def dump_log(game_state: dict):
-    return
     log_file = f'{player_id}.json'
-
-    with open(log_file, "r+") as file:
-        data = json.load(file)
-        data.append(game_state)
-        file.seek(0)
-        json.dump(data, file)
+    with open(log_file, "a+") as file:
+        file.seek(file.tell() - 2, os.SEEK_SET)
+        file.truncate()
+        file.write(",\n")
+        json.dump(game_state, file)
+        file.writelines("]")
 
 
 def disconnect(string):
@@ -180,11 +181,13 @@ def main(stdscr):
                 disconnect(gameEvent[1])
             if gameEvent[0] == 'id':
                 player_id = gameEvent[1]
-                init_log()
+                if args.log:
+                    init_log()
                 stdscr.addstr(0, 0, f"You're player {player_id}, awaiting game start")
                 stdscr.refresh()
             else:
-                dump_log(gameEvent[1])
+                if args.log:
+                    dump_log(gameEvent[1])
                 render(stdscr, gameEvent[1], {})
 
             if gameEvent[0] == 'state':
