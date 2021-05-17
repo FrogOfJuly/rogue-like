@@ -1,24 +1,29 @@
 import math
 import pickle
-from time import sleep
-
 import select
 import socket
 import sys
 import json  # for logging only
 import curses
 from roguelike import cmd
+import argparse
+
+parser = argparse.ArgumentParser(description="Client for Crypt of the Darkness")
+parser.add_argument("-i", "--player_id", default=0, type=int, dest='player_id',
+                    help="Player id to rejoin a session. Will be assigned by the server by default")
+parser.add_argument("-p", "--port", default=4321, type=int, dest='port',
+                    help="Port number of the server")
+parser.add_argument("-a", "--address", default='127.0.0.1', type=str, dest='server_addr',
+                    help="IP address of the server")
+args = parser.parse_args()
+
+player_id = args.player_id
 
 BUFFERSIZE = 8192
 
-serverAddr = '127.0.0.1'
-if len(sys.argv) == 2:
-    serverAddr = sys.argv[1]
-
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-s.connect((serverAddr, 4321))
+s.connect((args.server_addr, args.port))
 
-player_id = 0
 log = []
 printed_log_len = 7
 
