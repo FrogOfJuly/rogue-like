@@ -11,7 +11,8 @@ Rough starting point for a rogue-like game
   after this you should be able to import this module from anywhere.
 
   
-  Whether you do it like this or build it manually, please ensure your `CC` and `CXX` variables are set to compilers supporting the `C++-20` concepts feature.
+  Whether you do it like this or build it manually, please ensure your `CC` and `CXX` variables are set
+  to compilers supporting the `C++-20` concepts feature (Apple clang won't fit).
 - build (optional):
   
   You can just install the whole thing via `pip`, but you can optionally build it yourself first.
