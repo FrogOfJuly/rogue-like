@@ -128,7 +128,7 @@ def render(stdscr, game_state: dict, flags: dict):
                     if 'h_cpt' in tile['entity'] and tile['entity']['h_cpt']['max_health'] > 0:
                         lvl = int(tile['entity']['h_cpt']['health'] * 10 / tile['entity']['h_cpt']['max_health'])
                     elif 'lvl_cpt' in tile['entity']:
-                        lvl = tile['entity']['exp_cpt']['level']
+                        lvl = tile['entity']['lvl_cpt']['lvl']
             if (lvl):
                 stdscr.addstr(i, j * 3, to_print, curses.color_pair(color(lvl)))
             else:
