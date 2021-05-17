@@ -102,6 +102,7 @@ def render(stdscr, game_state: dict, flags: dict):
     if not player:
         s.send(pickle.dumps(['exit']))
         disconnect("You died!")
+    # Level
     for i in range(H):
         for j in range(W):
             tile = game_state[i * W + j]['tile']
@@ -132,6 +133,26 @@ def render(stdscr, game_state: dict, flags: dict):
                 stdscr.addstr(i, j * 3, to_print, curses.color_pair(color(lvl)))
             else:
                 stdscr.addstr(i, j * 3, to_print)
+
+    add_damage = 0
+
+    # Inventory
+    potion = ""
+    weapon = ""
+    shield = ""
+    armor = ""
+    for item in player["s_inv_cpt"]:
+        if "active" in item and item["active"] != "none":
+            potion = item["active"]["entity"]["repr_cpt"]["repr"]
+        if "offence" in item and item["offence"] != "none":
+            weapon = item["offence"]["entity"]["repr_cpt"]["repr"]
+        if "defence" in item and item["defence"] != "none":
+            shield = item["defence"]["entity"]["repr_cpt"]["repr"]
+        if "armor" in item and item["armor"] != "none":
+            armor = item["armor"]["entity"]["repr_cpt"]["repr"]
+    stdscr.addstr(H, 0, f"P: {potion:2} W: {weapon:2} S: {shield:2} A: {armor:2}")
+
+    # Stats and info
     stdscr.addstr(0, (W) * 3 + 1, f"{'Room:':9} {1}/10")  # TODO
     stdscr.addstr(1, (W) * 3 + 1, f"{'Score:':9} {123}")  # TODO
     stdscr.addstr(3, (W) * 3 + 1, f"{'Level:':9} {player['exp_cpt']['level']}")
@@ -147,6 +168,7 @@ def render(stdscr, game_state: dict, flags: dict):
         for i in range(printed_log_len - len(log)):
             stdscr.addstr(8 + len(log) + i, (W) * 3 + 1, '>')
 
+    # Help or legend
     if len(flags) == 0:
         stdscr.addstr(H + 2, 0, f'Press H for help.')
     elif 'legend' in flags:
