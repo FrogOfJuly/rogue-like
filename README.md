@@ -52,3 +52,19 @@ We track a score and level the player up, but there are currently no progression
  - [magic enum](https://github.com/Neargye/magic_enum)
  - [awesome json](https://github.com/nlohmann/json)
  - [lwlog](https://github.com/Akagi201/lwlog)
+
+
+### Known issues
+
+1. When starting client there is message similar to
+```
+You're player 970123, awaiting game start
+```
+And the game won't start. This is fixed by rerunning server and client processes.
+You might need a couple of times :)
+2. When switching items message
+```
+log:
+> you can't pick this item 
+```
+is displayed despite actually picking an item and dropping old one. 
