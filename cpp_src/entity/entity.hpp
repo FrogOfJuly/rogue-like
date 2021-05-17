@@ -14,7 +14,6 @@ namespace roguelike {
         explicit entity(int id) : id{id} {}
 
         entity_id id{-1};
-        int level = -1;
     };
 
     struct interaction_info {
