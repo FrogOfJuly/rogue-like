@@ -34,7 +34,7 @@ printed_log_len = 7
 def init_log():
     log_file = f'{player_id}.json'
     with open(log_file, "w") as file:
-        file.write("[]")
+        file.write("[\n]")
 
 
 def dump_log(game_state: dict):
@@ -42,8 +42,8 @@ def dump_log(game_state: dict):
     with open(log_file, "a+") as file:
         file.seek(file.tell() - 2, os.SEEK_SET)
         file.truncate()
-        file.write(",\n")
         json.dump(game_state, file)
+        file.write(",\n")
         file.writelines("]")
 
 
