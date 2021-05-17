@@ -9,7 +9,7 @@ namespace roguelike {
     struct shield {
         shield(int id) : id{id} {
             nm_cpt.name = "shield";
-            pk_cpt.desired_spot = simple_inventory_component::defence;
+            pk_cpt.desired_spot = simple_inventory_component::shield;
             lvl_cpt.lvl = 5;
             dfc_cpt.damage_reduction = 2;
         }

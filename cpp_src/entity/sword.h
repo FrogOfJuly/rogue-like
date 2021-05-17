@@ -9,7 +9,7 @@ namespace roguelike {
     struct sword {
         sword(int id) : id{id} {
             nm_cpt.name = "sword";
-            pk_cpt.desired_spot = simple_inventory_component::offence;
+            pk_cpt.desired_spot = simple_inventory_component::sword;
             a_cpt.damage = 2;
             lvl_cpt.lvl = 5;
         }

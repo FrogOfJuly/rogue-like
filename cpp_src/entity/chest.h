@@ -19,7 +19,7 @@ namespace roguelike {
             nm_cpt.name = "chest";
             h_cpt.health = 1;
             s_inv_cpt = simple_inventory_component::get_locked_invetory();
-            s_inv_cpt.spots[simple_inventory_component::inventory_spot::active] = item;
+            s_inv_cpt.spots[simple_inventory_component::inventory_spot::potion] = item;
         }
         repr_component repr_cpt;
         name_component nm_cpt;
