@@ -9,7 +9,12 @@
 #include "../entity/goblin_guard.h"
 #include "../entity/goblin_worker.h"
 #include "../entity/player.h"
-#include "../entity/items.h"
+#include "../entity/potion.h"
+#include "../entity/sword.h"
+#include "../entity/shield.h"
+#include "../entity/armor.h"
+#include "../entity/shovel.h"
+#include "../entity/chest.h"
 #include "../entity/trap.h"
 #include "../entity/wall.h"
 

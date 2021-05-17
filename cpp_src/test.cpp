@@ -13,8 +13,5 @@ int main() {
 
     game.move_players();
     game.resolve_all_interactions();
-    game.redraw_players();
-    game.redraw_nonplayers();
     std::cout << game.get_serialization() << std::endl;
-//    std::cout << game.get_serialization() << std::endl;
 }

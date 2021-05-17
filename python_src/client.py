@@ -1,24 +1,32 @@
 import math
 import pickle
-from time import sleep
-
 import select
 import socket
 import sys
 import json  # for logging only
 import curses
 from roguelike import cmd
+import os
+import argparse
+
+parser = argparse.ArgumentParser(description="Client for Crypt of the Darkness")
+parser.add_argument("-i", "--player_id", default=0, type=int, dest='player_id',
+                    help="Player id to rejoin a session. Will be assigned by the server by default")
+parser.add_argument("-p", "--port", default=4321, type=int, dest='port',
+                    help="Port number of the server")
+parser.add_argument("-a", "--address", default='127.0.0.1', type=str, dest='server_addr',
+                    help="IP address of the server")
+parser.add_argument("-l", "--log", default="store_false", action="store_true",
+                    help="Enable game state logging")
+args = parser.parse_args()
+
+player_id = args.player_id
 
 BUFFERSIZE = 8192
 
-serverAddr = '127.0.0.1'
-if len(sys.argv) == 2:
-    serverAddr = sys.argv[1]
-
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-s.connect((serverAddr, 4321))
+s.connect((args.server_addr, args.port))
 
-player_id = 0
 log = []
 printed_log_len = 7
 
@@ -26,17 +34,17 @@ printed_log_len = 7
 def init_log():
     log_file = f'{player_id}.json'
     with open(log_file, "w") as file:
-        file.write("[]")
+        file.write("[\n]")
 
 
 def dump_log(game_state: dict):
     log_file = f'{player_id}.json'
-
-    with open(log_file, "r+") as file:
-        data = json.load(file)
-        data.append(game_state)
-        file.seek(0)
-        json.dump(data, file)
+    with open(log_file, "a+") as file:
+        file.seek(file.tell() - 2, os.SEEK_SET)
+        file.truncate()
+        json.dump(game_state, file)
+        file.write(",\n")
+        file.writelines("]")
 
 
 def disconnect(string):
@@ -94,6 +102,7 @@ def render(stdscr, game_state: dict, flags: dict):
     if not player:
         s.send(pickle.dumps(['exit']))
         disconnect("You died!")
+    # Level
     for i in range(H):
         for j in range(W):
             tile = game_state[i * W + j]['tile']
@@ -104,7 +113,7 @@ def render(stdscr, game_state: dict, flags: dict):
             elif 'player' in tile:
                 to_print = f" {tile['player']['repr_cpt']['repr']} "
                 legend['player'] = tile['player']['repr_cpt']['repr']
-                lvl = tile['player']['lvl']
+                lvl = tile['player']['exp_cpt']['level']
             elif 'entity' in tile:
                 repr = tile['entity']['repr_cpt']['repr']
                 if repr == '█':
@@ -118,39 +127,64 @@ def render(stdscr, game_state: dict, flags: dict):
                     to_print = f' {repr} '
                     if 'h_cpt' in tile['entity'] and tile['entity']['h_cpt']['max_health'] > 0:
                         lvl = int(tile['entity']['h_cpt']['health'] * 10 / tile['entity']['h_cpt']['max_health'])
+                    elif 'lvl_cpt' in tile['entity']:
+                        lvl = tile['entity']['exp_cpt']['level']
             if (lvl):
-                stdscr.addstr(i, j*3, to_print, curses.color_pair(color(lvl)))
+                stdscr.addstr(i, j * 3, to_print, curses.color_pair(color(lvl)))
             else:
-                stdscr.addstr(i, j*3, to_print)
-    stdscr.addstr(0, (W)*3+1, f"{'Room:':9} {1}/10")  # TODO
-    stdscr.addstr(1, (W)*3+1, f"{'Score:':9} {123}")  # TODO
-    stdscr.addstr(3, (W)*3+1, f"{'Level:':9} {player['lvl']}")
-    stdscr.addstr(4, (W)*3+1, f"{'Health:':9} {player['h_cpt']['health']}")
-    stdscr.addstr(5, (W)*3+1, f"{'Damage:':9} {player['a_cpt']['damage']}")
-    stdscr.addstr(7, (W)*3+1, f'log:')
+                stdscr.addstr(i, j * 3, to_print)
+
+    add_damage = 0
+
+    # Inventory
+    potion = ""
+    weapon = ""
+    shield = ""
+    armor = ""
+    for item in player["s_inv_cpt"]:
+        if "active" in item and item["active"] != "none":
+            potion = item["active"]["entity"]["repr_cpt"]["repr"]
+        if "offence" in item and item["offence"] != "none":
+            weapon = item["offence"]["entity"]["repr_cpt"]["repr"]
+        if "defence" in item and item["defence"] != "none":
+            shield = item["defence"]["entity"]["repr_cpt"]["repr"]
+        if "armor" in item and item["armor"] != "none":
+            armor = item["armor"]["entity"]["repr_cpt"]["repr"]
+    stdscr.addstr(H, 0, f"P: {potion:2} W: {weapon:2} S: {shield:2} A: {armor:2}")
+
+    # Stats and info
+    stdscr.addstr(0, (W) * 3 + 1, f"{'Room:':9} {1}/10")  # TODO
+    stdscr.addstr(1, (W) * 3 + 1, f"{'Score:':9} {123}")  # TODO
+    stdscr.addstr(3, (W) * 3 + 1, f"{'Level:':9} {player['exp_cpt']['level']}")
+    stdscr.addstr(3, (W) * 3 + 1,
+                  f"{'Exp:':9} {player['exp_cpt']['experience']}/{player['exp_cpt']['exp_until_next_level']}")
+    stdscr.addstr(4, (W) * 3 + 1, f"{'Health:':9} {player['h_cpt']['health']}")
+    stdscr.addstr(5, (W) * 3 + 1, f"{'Damage:':9} {player['a_cpt']['damage']}")
+    stdscr.addstr(7, (W) * 3 + 1, f'log:')
 
     for i, entry in enumerate(log[-printed_log_len:]):
-        stdscr.addstr(8+i, (W)*3+1, f'> {entry}')
+        stdscr.addstr(8 + i, (W) * 3 + 1, f'> {entry}')
     if len(log) < printed_log_len:
         for i in range(printed_log_len - len(log)):
-            stdscr.addstr(8+len(log)+i, (W)*3+1, '>')
+            stdscr.addstr(8 + len(log) + i, (W) * 3 + 1, '>')
 
+    # Help or legend
     if len(flags) == 0:
-        stdscr.addstr(H+2, 0, f'Press H for help.')
+        stdscr.addstr(H + 2, 0, f'Press H for help.')
     elif 'legend' in flags:
         for i, key in enumerate(sorted(legend.keys())):
             if " " in legend[key]:
                 legend[key].remove(" ")
             if not legend[key]:
                 continue
-            stdscr.addstr(H+2+i, 0, f'{f"{key}:":20} {", ".join(legend[key])}')
+            stdscr.addstr(H + 2 + i, 0, f'{f"{key}:":20} {", ".join(legend[key])}')
     else:
-        stdscr.addstr(H+2, 0, f'WASD for movement.')
-        stdscr.addstr(H+3, 0, f'E for potion.')
-        stdscr.addstr(H+4, 0, f'F to skip turn.')
-        stdscr.addstr(H+4, 0, f'L for the legend.')
-        stdscr.addstr(H+5, 0, f'P to pause game (temporarily disconnect).')
-        stdscr.addstr(H+6, 0, f'X to exit game.')
+        stdscr.addstr(H + 2, 0, f'WASD for movement.')
+        stdscr.addstr(H + 3, 0, f'E for potion.')
+        stdscr.addstr(H + 4, 0, f'F to skip turn.')
+        stdscr.addstr(H + 4, 0, f'L for the legend.')
+        stdscr.addstr(H + 5, 0, f'P to pause game (temporarily disconnect).')
+        stdscr.addstr(H + 6, 0, f'X to exit game.')
     stdscr.refresh()
 
 
@@ -169,11 +203,13 @@ def main(stdscr):
                 disconnect(gameEvent[1])
             if gameEvent[0] == 'id':
                 player_id = gameEvent[1]
-                init_log()
+                if args.log:
+                    init_log()
                 stdscr.addstr(0, 0, f"You're player {player_id}, awaiting game start")
                 stdscr.refresh()
             else:
-                dump_log(gameEvent[1])
+                if args.log:
+                    dump_log(gameEvent[1])
                 render(stdscr, gameEvent[1], {})
 
             if gameEvent[0] == 'state':
@@ -214,4 +250,7 @@ def main(stdscr):
                 s.send(pickle.dumps(ge))
 
 
-curses.wrapper(main)
+stdscr = curses.initscr()
+curses.noecho()
+curses.cbreak()
+main(stdscr)

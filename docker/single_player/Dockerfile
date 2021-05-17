@@ -1,27 +1,19 @@
 FROM ubuntu
 ENV TERM=xterm-256color
+ENV CC=gcc-10
+ENV CXX=g++-10
+ENV DEBIAN_FRONTEND=noninteractive
 WORKDIR /root/
 
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends gcc g++
+    apt-get install -y --no-install-recommends gcc-10 g++-10 cmake git make python3-dev python3-pip
 
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends cmake
+RUN git clone --single-branch --branch devel --recurse-submodules https://github.com/FrogOfJuly/roguelike.git
 
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends git make python3-dev python3-pip
-
-RUN git clone https://github.com/FrogOfJuly/roguelike.git
-
-RUN cd roguelike && mkdir deps && cd deps &&               \
-    git clone https://github.com/pybind/pybind11.git &&    \
-    git clone https://github.com/Neargye/magic_enum.git && \
-    git clone https://github.com/Akagi201/lwlog.git &&     \
-    git clone https://github.com/nlohmann/json.git &&      \
-    git checkout soft_deadline_2
+RUN cd roguelike
 RUN pip3 install ./roguelike
-CMD cd roguelike/python_src &&   \
-    echo "nohup python3 server.py &\n" | bash  && \
+CMD cd roguelike/python_src && \
+    echo "nohup python3 server.py &\n" | bash && \
     sleep 1s && \
     python3 client.py
 

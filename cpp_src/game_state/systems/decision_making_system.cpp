@@ -14,6 +14,8 @@ void roguelike::decision_making_system::make_decision(entity_type& var_ent) {
                 has_member_move_component<std::remove_pointer_t<decltype(ent_ptr)>>::value) {
                 auto residency = ent_ptr->m_cpt.residency;
                 auto radius = ent_ptr->dm_cpt.eye_sight;
+                lwlog_info("making decision for entity with eyesight %d", radius);
+                lwlog_info("making decision for entity with residency %d", residency);
                 auto view = game_ptr->level.get_area_around_tile(residency, radius);
                 if (ent_ptr->dm_cpt.active_strategy == nullptr) {
                     ent_ptr->dm_cpt.decision = cmd::PASS;
@@ -22,7 +24,7 @@ void roguelike::decision_making_system::make_decision(entity_type& var_ent) {
                 ent_ptr->dm_cpt.active_strategy->set_view(view);
                 ent_ptr->dm_cpt.active_strategy->form_decision(ent_ptr->dm_cpt);
                 ent_ptr->dm_cpt.active_strategy->discard_view();
-                if (ent_ptr->dm_cpt.decision != cmd::PASS) {
+                if (ent_ptr->dm_cpt.decision != cmd::PASS or not ent_ptr->dm_cpt.wait_before_strike) {
                     return;
                 }
                 if (ent_ptr->dm_cpt.idle_strategy == nullptr) {

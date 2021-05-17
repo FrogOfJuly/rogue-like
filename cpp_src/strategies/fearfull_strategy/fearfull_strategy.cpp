@@ -30,7 +30,7 @@ void roguelike::fearfull_strategy::form_decision(roguelike::decision_making_comp
         }
         dm_cpt.charges_into = view->oracle->get_tile(c.x + view->point_of_view.x, c.y + view->point_of_view.y).resident;
         // no pathfinding yet
-        assert(c.x != 0 and c.y != 0) ;
+        assert(c.x != 0 or c.y != 0) ;
         if (abs(c.x) > abs(c.y)) {
             if (c.x < 0) {
                 dm_cpt.decision = cmd::RIGHT;
@@ -44,7 +44,7 @@ void roguelike::fearfull_strategy::form_decision(roguelike::decision_making_comp
                 dm_cpt.decision = cmd::UP;
             }
         }
-        auto wall_ahead = view->oracle->do_target_tile_have_wall(
+        auto wall_ahead = view->oracle->do_target_tile_have<wall>(
             room::idxFromPair(view->point_of_view.x, view->point_of_view.y), dm_cpt.decision);
 
         if (wall_ahead) {

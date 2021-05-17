@@ -2,7 +2,7 @@
 // Created by Kirill Golubev on 27.04.2021.
 //
 
-#include "../../deps/json/single_include/nlohmann/json.hpp"
+#include "nlohmann/json.hpp"
 #include "../common.h"
 
 #ifndef ROGUE_LIKE_SERIALIZE_H
@@ -15,6 +15,12 @@ namespace roguelike {
 
     void to_json(nlohmann::json &j, const logging_component &p);
     void from_json(const nlohmann::json &j, logging_component &p);
+
+    void to_json(nlohmann::json &j, const simple_inventory_component &p);
+    void from_json(const nlohmann::json &j, simple_inventory_component &p);
+
+    void to_json(nlohmann::json &j, const expirience_components &p);
+    void from_json(const nlohmann::json &j, expirience_components &p);
 }  // namespace roguelike
 #define ROGUE_LIKE_SERIALIZE_H
 

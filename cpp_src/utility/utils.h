@@ -24,6 +24,10 @@ namespace roguelike::utils {
     vec2d operator/(const vec2d& lhs, int c);
     int operator*(const vec2d& rhs, const vec2d& lhs);
 
+    struct vec2d_hasher {
+        std::size_t operator()(const vec2d& v) { return v.x + 12345 * v.y; }
+    };
+
     std::vector<std::pair<int, int>> get_circle(int radius, int x_start, int y_start);
 
     std::vector<std::pair<int, int>> get_los(std::pair<int, int> start, std::pair<int, int> end);
@@ -33,12 +37,12 @@ namespace roguelike::utils {
     cmd get_random_action();
 }  // namespace roguelike::utils
 
-namespace roguelike{
+namespace roguelike {
     bool operator==(const entity_id& lhs, const entity_id& rhs);
     bool operator==(const player_id& lhs, const player_id& rhs);
 
     bool operator!=(const entity_id& lhs, const entity_id& rhs);
     bool operator!=(const player_id& lhs, const player_id& rhs);
-}
+}  // namespace roguelike
 
 #endif  // ROGUE_LIKE_UTILS_H

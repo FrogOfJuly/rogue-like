@@ -6,16 +6,24 @@ import json
 import roguelike as rl
 from enum import Enum
 from roguelike import cmd
+import argparse
 
+parser = argparse.ArgumentParser(description="Server for Crypt of the Darkness")
+parser.add_argument("-n", "--num_of_players", default=1, type=int, dest='num_players',
+                    help="Number of players (currently only one is supported properly)")
+parser.add_argument("-p", "--port", default=4321, type=int, dest='port',
+                    help="Port number for the server")
+args = parser.parse_args()
 
 BUFFERSIZE = 8192
 
-num_players = 1
 outgoing = []
 
+num_players = args.num_players
+port = args.port
 
 class Backend:
-    def __init__(self, difficulty: str="normal"):
+    def __init__(self, difficulty: str = "normal"):
         self.state = rl.GameState()
         self.state.initialize(num_players)
 
@@ -23,8 +31,6 @@ class Backend:
         pass
 
     def get_state(self):
-        self.state.redraw_players()
-        self.state.redraw_nonplayers()
         return json.loads(self.state.get_serialization())
 
     def player_action(self, player_id: int, action: cmd):
@@ -37,10 +43,10 @@ class Backend:
         self.state.resolve_all_interactions()
         self.state.move_nonplayers()
         self.state.resolve_all_interactions()
-        self.state.redraw_players()
+
         self.state.clean_decisions()
         self.state.decide_next_move()
-        self.state.redraw_nonplayers()
+
         data = json.loads(self.state.get_serialization())
         self.state.clean_logs()
         return data, player_id
@@ -49,7 +55,6 @@ class Backend:
         # self.state.set_player_inactive(player_id)
         # if (len(outgoing) == 0):
         pass
-
 
 
 backend = Backend()
@@ -76,10 +81,7 @@ class RemoteDrawClient(Client):
             pass
 
 
-minionmap = {}
-
-
-def updateWorld(message):
+def update_world(message):
     arr = pickle.loads(message)
     player_id = arr[1]
     action = arr[2]
@@ -114,7 +116,7 @@ class MainServer(asyncore.dispatcher):
         outgoing.append(RemoteDrawClient(conn, addr, player_id))
         conn.send(pickle.dumps(['id', player_id]))
         SecondaryServer(conn, player_id)
-        if(len(outgoing) == num_players):
+        if (len(outgoing) == num_players):
             conn.send(pickle.dumps(['move', backend.get_state()]))
 
 
@@ -130,7 +132,7 @@ class SecondaryServer(asyncore.dispatcher_with_send):
                 print(f'Player {self.id} has closed the game.')
                 self.close()
                 exit()
-            updateWorld(recievedData)
+            update_world(recievedData)
         else:
             self.handle_close()
 
@@ -145,5 +147,5 @@ class SecondaryServer(asyncore.dispatcher_with_send):
         # raise Exception("Unregistered Player")
 
 
-MainServer(4321)
+MainServer(port)
 asyncore.loop()

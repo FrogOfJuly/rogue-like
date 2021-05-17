@@ -1,28 +1,25 @@
 ### Rogue-like 
-Rough starting point for the rogue-like game
+Rough starting point for a rogue-like game
 - clone:
   ```bash
-  > git clone https://github.com/FrogOfJuly/roguelike.git
+  > git clone --single-branch --branch devel --recurse-submodules https://github.com/FrogOfJuly/roguelike.git
   ```
-- get dependencies:
+  If you want, you can install the game library right after this with
   ```bash
-  > cd rogue-like
-  > mkdir deps
-  > cd deps
-  > git clone https://github.com/pybind/pybind11.git
-  > git clone https://github.com/Neargye/magic_enum.git
-  > git clone https://github.com/nlohmann/json.git
-  > git clone https://github.com/Akagi201/lwlog.git
-  > cd ..
+  CC=gcc-10 CXX=g++-10 pip install roguelike
   ```
-- build:
-  ```bash
-   > cd rogue-like 
+  Whether you do it like this or build it manually, please ensure your `CC` and `CXX` variables are set to compilers supporting the `C++-20` concepts feature.
+- build (optional):
+  
+  You can just install the whole thing via `pip`, but you can optionally build it yourself first.
+   ```bash
+   > cd roguelike 
    > mkdir build && cd build
    > cmake .. && make 
   ```
-  you should get ``.so`` file which can be used as python module.
-- install:
+  You should get a ``.so`` file which can be used as python module.
+  Move it to the `python_src` directory or install it via pip:
+- install via pip (if you built manually):
   ```bash
   > cd ../.. # you should be outside of project directory 
   > pip install ./roguelike # install project folder
@@ -48,12 +45,9 @@ For client
 > python client.py
 ```
 
-Currently, you can walk around a labyrinth with interactable immortal goblins.
-Don't worry, you're immortal too! But that will change soon.
-
-Sike!! Not anymore. But goblins are mortal too :)
-
-And they are hunting you now
+You can walk around a labyrinth with interactable goblins, chests and traps.
+There are items and potions to pick up, and there's also a shovel.
+We track a score and level the player up, but there are currently no progression goals to speak of. 
 
 ### Dependencies
 

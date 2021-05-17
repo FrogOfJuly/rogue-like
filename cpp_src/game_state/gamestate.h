@@ -3,13 +3,14 @@
 //
 #include <iostream>
 #include <queue>
+#include <unordered_map>
 #include <unordered_set>
 
 #include "../common.h"
+#include "../entity/player.h"
 #include "../level/room.h"
 #include "../serializers/serialize_info.h"
 #include "systems/decision_making_system.h"
-#include "systems/drawing_system.h"
 #include "systems/interaction_system.h"
 #include "systems/move_system.h"
 
@@ -21,9 +22,10 @@ namespace roguelike {
 
     class gamestate {
         room level;
-        player *players = nullptr;
+        mutable std::unordered_map<int, player> players;
+        // to remove this mutable, there need to be std::variant<const player*, const entity* ... and so on>.
+        // but for now there is none, so I ma basically discarding const qualifier
         std::unordered_set<int> dead_players;
-        int player_num = -1;
         int lvl_num = -1;
 
         std::unordered_set<int> received_command;
@@ -31,14 +33,12 @@ namespace roguelike {
 
         move_system mv_system;
         interaction_system inter_system;
-        /*drawing_system draw_system; -- all methods are static, so no need to create object*/
         decision_making_system dm_system;
 
-        player* get_player(player_id id);
-        entity_type get_entity(general_id id);
+        player *get_player(player_id id) const;
+        entity_type get_entity(general_id id) const;
 
-        void report_murder(general_id mdred_id, general_id mdrer_id);
-
+        void report_despawn(general_id mdred_id);
 
       public:
         void initialize(int player_num);
@@ -46,8 +46,6 @@ namespace roguelike {
         void move_players();
         void move_nonplayers();
         void decide_next_move();
-        void redraw_nonplayers();
-        void redraw_players();
         void resolve_all_interactions();
         void clean_dead();
         void clean_decisions();
@@ -61,7 +59,6 @@ namespace roguelike {
         gamestate(const gamestate &) = delete;
         gamestate &operator=(gamestate &&rhs) noexcept;
         gamestate(gamestate &&rhs) noexcept;
-        ~gamestate();
 
         friend class move_system;
         friend class interaction_system;
@@ -70,6 +67,9 @@ namespace roguelike {
         friend void to_json(nlohmann::json &j, const gamestate &p);
         friend void from_json(const nlohmann::json &j, gamestate &p);
     };
+
+    void to_json(nlohmann::json &j, const gamestate &p);
+    void from_json(const nlohmann::json &j, gamestate &p);
 
 }  // namespace roguelike
 

@@ -20,7 +20,7 @@ namespace roguelike {
 
         std::array<tile, H * W> tiles;
         std::vector<entity_type> residents;
-        std::unordered_set<int> dead;
+        std::unordered_set<int> despawned;
 
         mutable std::stringstream common_log;
 
@@ -33,17 +33,50 @@ namespace roguelike {
 
         [[nodiscard]] std::optional<tile> get_target_tile(tile_idx idx, cmd direction) const;
 
-        [[nodiscard]] bool do_target_tile_have_wall(tile_idx idx, cmd direction) const;
+        template <typename entityT>
+        [[nodiscard]] inline bool do_target_tile_have(tile_idx idx, cmd direction) const {
+            auto maybe_tile = get_target_tile(idx, direction);
+            if (not maybe_tile.has_value()) {
+                // no such tile
+                return false;
+            }
+            if (not maybe_tile.value().resident.has_value()) {
+                // nobody on the tile
+                return false;
+            }
+            if (std::is_same_v<entityT, player> and
+                std::holds_alternative<player_id>(maybe_tile.value().resident.value())) {
+                // you are checking for the player and resident has player id?
+                return true;
+            }
+            auto maybe_ent_idx = std::visit(
+                overloaded{
+                    [](player_id) { return std::optional<entity_id>(); },
+                    [](entity_id id) { return std::optional<entity_id>(id); }},
+                maybe_tile.value().resident.value());
+
+            if (not maybe_ent_idx.has_value()) {
+                // there are either player or nobody on the tile, but player was checked earlier
+                return false;
+            }
+
+            auto var_ent = get_resident(maybe_ent_idx.value());
+            // is it holding somebody you are looking for?
+            bool is_ent = std::holds_alternative<entityT *>(var_ent);
+            return is_ent;
+        }
 
         [[nodiscard]] bool do_tiles_have_loc(std::pair<int, int> p0, std::pair<int, int> p1) const;
 
         [[nodiscard]] tile_idx get_random_empty_tile() const;
 
-        [[nodiscard]] entity_type get_resident(entity_id id);
+        [[nodiscard]] entity_type get_resident(entity_id id) const;
 
         void remove_resident(tile_idx idx);
 
         tile &get_tile(int x, int y);
+
+        bool is_tile_empty(tile_idx idx) const;
 
         [[nodiscard]] const tile &get_tile(int x, int y) const;
 
@@ -55,7 +88,9 @@ namespace roguelike {
 
         void spawn_on_level(entity_type &ent, tile_idx tidx = -1);
 
-        void generate_level(int lvl_num);
+        void generate_terrain(int lvl_num);
+
+        void generate_enemies(int lvl_num);
 
         [[nodiscard]] room_view get_area_around_tile(tile_idx idx, int radius) const;
 

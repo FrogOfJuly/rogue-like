@@ -10,7 +10,7 @@
 namespace roguelike {
     struct goblin : entity {
         goblin(int id) : entity(id) {
-            h_cpt.max_health = 2;
+            h_cpt.max_health = 3;
             h_cpt.health = h_cpt.max_health;
             a_cpt.damage = 4;
             m_cpt.y = -1;
@@ -19,6 +19,8 @@ namespace roguelike {
             dm_cpt.active_strategy = std::make_unique<agressive_strategy>();
             dm_cpt.idle_strategy = std::make_unique<random_strategy>();
             nm_cpt.name = "goblin";
+            lvl_cpt.lvl = 3;
+            s_inv_cpt = simple_inventory_component::get_locked_invetory();
         }
 
         decision_making_component dm_cpt;
@@ -27,6 +29,8 @@ namespace roguelike {
         move_component m_cpt;
         repr_component repr_cpt;
         name_component nm_cpt;
+        level_component lvl_cpt;
+        simple_inventory_component s_inv_cpt;
     };
 
     template <>
@@ -41,35 +45,18 @@ namespace roguelike {
             case UP:
                 return "^";
             default:
-                return "x";
+                return g->dm_cpt.wait_before_strike ? "x" : "☠";
         }
     }
 
     template <typename entityType>
     struct interacter<goblin, entityType> {
-        static inline void interact(goblin &inted, entityType &inting) {
-            if constexpr (has_member_logging_component<entityType>::value) {
-                inting.lg_cpt.log << "you interacted with goblin" << std::to_string(inted.id.value) << "\n";
-            }
-            std::string inting_name = "unknown";
-            if constexpr (has_member_name_component<entityType>::value) {
-                inting_name = inting.nm_cpt.name;
-            }
+        static inline interaction_info interact(goblin *inted, entityType *inting) {
             if constexpr (has_member_atk_component<entityType>::value and not std::is_base_of_v<goblin, entityType>) {
-                std::cout << inted.nm_cpt.name << " was damaged by " << inting_name << std::endl;
-                auto dmg = atk_component::calculate_damage(&inting);
-                health_component::receive_damage(&inted, dmg);
-                return;
+                return default_interactors::agressive<goblin, entityType>::interact(inted, inting);
+            }else {
+                return default_interactors::logging<goblin, entityType>::interact(inted, inting);
             }
-            return;
-        }
-    };
-
-    template <>
-    struct interacter<goblin, goblin> {
-        static inline void interact(goblin &inted, goblin &inting) {
-            // no friendly fire
-            return;
         }
     };
 }  // namespace roguelike

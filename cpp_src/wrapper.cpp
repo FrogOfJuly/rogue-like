@@ -20,8 +20,6 @@ PYBIND11_MODULE(roguelike, m) {
         .def("resolve_all_interactions", &roguelike::gamestate::resolve_all_interactions)
         .def("move_players", &roguelike::gamestate::move_players)
         .def("move_nonplayers", &roguelike::gamestate::move_nonplayers)
-        .def("redraw_nonplayers", &roguelike::gamestate::redraw_nonplayers)
-        .def("redraw_players", &roguelike::gamestate::redraw_players)
         .def("clean_dead", &roguelike::gamestate::clean_dead)
         .def("clean_decisions", &roguelike::gamestate::clean_decisions)
         .def("get_serialization", &roguelike::gamestate::get_serialization)
@@ -30,12 +28,6 @@ PYBIND11_MODULE(roguelike, m) {
         .def("clean_decisions", &roguelike::gamestate::clean_decisions)
         .def("end_turn", &roguelike::gamestate::end_turn)
         .def("decide_next_move", &roguelike::gamestate::decide_next_move);
-
-    py::enum_<roguelike::entity_names>(m, "entity_names")
-#define register_entity(class_name) .value(#class_name, roguelike::entity_names::class_name##_entity)
-#include "./utility/register_for_entities.h"
-#undef register_entity
-        .export_values();
 
     py::enum_<roguelike::cmd>(m, "cmd")
         .value("UP", roguelike::cmd::UP)

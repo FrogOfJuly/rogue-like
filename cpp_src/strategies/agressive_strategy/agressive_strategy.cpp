@@ -21,11 +21,14 @@ void roguelike::agressive_strategy::form_decision(roguelike::decision_making_com
         if (not std::holds_alternative<player*>(c.observed_entity.value())) {
             continue;
         }
+        lwlog_info("observed player on relative coords: (%d, %d)", c.x, c.y);
+        lwlog_info("absolute coords: (%d, %d)", c.x + view->point_of_view.x, c.y + view->point_of_view.y);
 
         bool has_line_of_sight = view->oracle->do_tiles_have_loc(
             {view->point_of_view.x, view->point_of_view.y}, {c.x + view->point_of_view.x, c.y + view->point_of_view.y});
 
         if (not has_line_of_sight) {
+            lwlog_info("but there is no line of sight");
             continue;
         }
         auto charges_into = view->oracle->get_tile(c.x + view->point_of_view.x, c.y + view->point_of_view.y).resident;
@@ -41,7 +44,7 @@ void roguelike::agressive_strategy::form_decision(roguelike::decision_making_com
         }
         dm_cpt.charges_into = charges_into;
         // no pathfinding yet
-        assert(c.x != 0 and c.y != 0);
+        assert(c.x != 0 or c.y != 0);
         if (abs(c.x) > abs(c.y)) {
             if (c.x < 0) {
                 dm_cpt.decision = cmd::LEFT;
@@ -55,7 +58,7 @@ void roguelike::agressive_strategy::form_decision(roguelike::decision_making_com
                 dm_cpt.decision = cmd::DOWN;
             }
         }
-        auto wall_ahead = view->oracle->do_target_tile_have_wall(
+        bool wall_ahead = view->oracle->do_target_tile_have<wall>(
             room::idxFromPair(view->point_of_view.x, view->point_of_view.y), dm_cpt.decision);
 
         if (wall_ahead) {
@@ -64,6 +67,15 @@ void roguelike::agressive_strategy::form_decision(roguelike::decision_making_com
             } else {
                 dm_cpt.decision = rand() % 2 == 0 ? cmd::UP : cmd::DOWN;
             }
+        }
+
+        bool player_ahead = view->oracle->do_target_tile_have<player>(
+            room::idxFromPair(view->point_of_view.x, view->point_of_view.y), dm_cpt.decision);
+        if (player_ahead and dm_cpt.wait_before_strike) {
+            dm_cpt.wait_before_strike = false;
+            dm_cpt.decision = cmd::PASS;
+        } else if (not dm_cpt.wait_before_strike) {
+            dm_cpt.wait_before_strike = true;
         }
         return;
     }

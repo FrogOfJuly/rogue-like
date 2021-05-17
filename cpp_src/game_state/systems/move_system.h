@@ -7,11 +7,13 @@
 namespace roguelike {
     class move_system : public base_system {
       public:
-        void move_to_tile(general_id id, tile_idx dest_tile);
+        void move_to_tile(general_id item_ent_ptr, tile_idx dest_tile_idx);
 
         bool more_general_move(entity_type &var_ent);
 
-        static tile_idx desired_tile_idx(entity_type &var_ent);
+        static std::optional<tile_idx> desired_tile_idx(entity_type &var_ent);
+
+        static std::optional<tile_idx> current_tile_idx(entity_type& var_ent);
 
         move_system() = delete;
 

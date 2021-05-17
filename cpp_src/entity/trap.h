@@ -24,19 +24,22 @@ namespace roguelike {
 
     template <>
     inline std::string repr_component::compute_representation<trap>(const trap *p) {
-        return p->activated ? " " : u8"☒";
+        return p->activated ? " " : "☒";
     }
 
     template <>
     struct interacter<trap, player> {
-        static inline void interact(trap &inted, player &inting) {
-            if (inted.activated) {
-                inting.lg_cpt.log << "It's a trap!!\n";
-                health_component::receive_damage(&inting, inted.a_cpt.damage);
-                inted.activated = false;
+        static inline interaction_info interact(trap *inted, player *inting) {
+            if (inted->activated) {
+                inting->lg_cpt.log << "It's a trap!!\n";
+                health_component::receive_damage(inting, inted->a_cpt.damage);
+                inted->activated = false;
+                return health_component::is_alive(inting) ? interaction_info::nothing_happened
+                                                           : interaction_info::interacting_got_killed;
             } else {
-                inting.lg_cpt.log << "you interacted with disarmed trap\n";
-                inted.h_cpt.health = 0;
+                inting->lg_cpt.log << "you interacted with disarmed trap\n";
+                inted->h_cpt.health = 0;
+                return interaction_info::interacted_got_destroyed;
             }
         }
     };
