@@ -16,7 +16,7 @@ parser.add_argument("-p", "--port", default=4321, type=int, dest='port',
                     help="Port number of the server")
 parser.add_argument("-a", "--address", default='127.0.0.1', type=str, dest='server_addr',
                     help="IP address of the server")
-parser.add_argument("-l", "--log", default="store_false", action="store_true",
+parser.add_argument("-l", "--log", default=False, action="store_true",
                     help="Enable game state logging")
 args = parser.parse_args()
 
