@@ -2,7 +2,7 @@
 For diagram rendering one need to run
 ```bash
     > pwd
-    > <project_folder>/uml
+    > <project_folder>/docs
     > plantuml -tsvg diagram.md 
 ```
 <div hidden>
