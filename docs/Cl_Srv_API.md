@@ -12,6 +12,16 @@ The second is determined by it.
     The player is expected to reply with an `acknowledge`, either accepting
     it or supplying their own.
   
+- `reject`
+
+  Parameter: `reason` (str)
+
+  Possible response to an `acknowledge` request.
+  If the player with the specified ID is already dead or there are too many players connected, 
+  this message signifies the client cannot connect.
+  
+  May also happpen before `id` if all the players are already connected and active.
+  
 - `move`
 
     Parameter: `game_state` (dict)
