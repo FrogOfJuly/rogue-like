@@ -57,27 +57,26 @@ def disconnect(string):
     exit()
 
 
-def color(level):
+def color(level, health):
+    clr = [[0, 250, 245],
+           [83, 41, 43],
+           [22, 21, 28],
+           [202, 166, 199],
+           [209, 203, 167],
+           [10, 161, 89],
+           [214, 207, 205],
+           [88, 76, 70],
+           [227, 12, 187],
+           [239, 241, 243]]
+    if health > 2:
+        health = 2
+    elif health < 0:
+        health = 0
     if level >= 9:
-        return 83
-    elif level == 8:
-        return 77
-    elif level == 7:
-        return 35
-    elif level == 6:
-        return 29
-    elif level == 5:
-        return 12
-    elif level == 4:
-        return 203
-    elif level == 3:
-        return 173
-    elif level == 2:
-        return 161
-    elif level == 1:
-        return 10
+        return clr[9][health]
     elif level <= 0:
-        return 197
+        return clr[0][health]
+    return clr[level][health]
 
 
 def render(stdscr, game_state: dict, flags: dict):
@@ -108,6 +107,7 @@ def render(stdscr, game_state: dict, flags: dict):
             tile = game_state[i * W + j]['tile']
             to_print = None
             lvl = None
+            hlth = 0
             if tile is None:
                 to_print = "   "
             elif 'player' in tile:
@@ -125,13 +125,12 @@ def render(stdscr, game_state: dict, flags: dict):
                         elif tile['entity']['repr_cpt']['repr'] not in legend[tile['entity']['nm_cpt']['name']]:
                             legend[tile['entity']['nm_cpt']['name']].append(tile['entity']['repr_cpt']['repr'])
                     to_print = f' {repr} '
-                    # if 'h_cpt' in tile['entity'] and tile['entity']['h_cpt']['max_health'] > 0:
-                    #     lvl = int(tile['entity']['h_cpt']['health'] * 10 / tile['entity']['h_cpt']['max_health'])
-                    # elif 'lvl_cpt' in tile['entity']:
-                    if 'lvl_cpt' in tile['entity']:
+                    if 'h_cpt' in tile['entity'] and tile['entity']['h_cpt']['max_health'] > 0:
+                        hlth = 2 - int(tile['entity']['h_cpt']['health'] * 3 / tile['entity']['h_cpt']['max_health'])
+                    elif 'lvl_cpt' in tile['entity']:
                         lvl = tile['entity']['lvl_cpt']['lvl']
             if (lvl):
-                stdscr.addstr(i, j * 3, to_print, curses.color_pair(color(lvl)))
+                stdscr.addstr(i, j * 3, to_print, curses.color_pair(color(lvl, hlth)))
             else:
                 stdscr.addstr(i, j * 3, to_print)
 
@@ -154,7 +153,7 @@ def render(stdscr, game_state: dict, flags: dict):
             stdscr.addstr(H, x, section)
             to_print = ("" if value == "none" else value["entity"]["repr_cpt"]["repr"])
             lvl = 0 if value == "none" else value["entity"]["lvl_cpt"]["lvl"]
-            stdscr.addstr(H, x+3, to_print, curses.color_pair(color(lvl)))
+            stdscr.addstr(H, x+3, to_print, curses.color_pair(color(lvl, 0)))
             x = x + 5
 
     # Stats and info
