@@ -24,7 +24,7 @@ namespace roguelike {
         room level;
         mutable std::unordered_map<int, player> players;
         // to remove this mutable, there need to be std::variant<const player*, const entity* ... and so on>.
-        // but for now there is none, so I ma basically discarding const qualifier
+        // but for now there is none, so I am basically discarding const qualifier here.
         std::unordered_set<int> dead_players;
         int lvl_num = -1;
 
@@ -67,9 +67,6 @@ namespace roguelike {
         friend void to_json(nlohmann::json &j, const gamestate &p);
         friend void from_json(const nlohmann::json &j, gamestate &p);
     };
-
-    void to_json(nlohmann::json &j, const gamestate &p);
-    void from_json(const nlohmann::json &j, gamestate &p);
 
 }  // namespace roguelike
 

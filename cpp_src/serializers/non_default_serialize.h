@@ -5,8 +5,11 @@
 #include "nlohmann/json.hpp"
 #include "../common.h"
 
+
 #ifndef ROGUE_LIKE_SERIALIZE_H
 namespace roguelike {
+    class gamestate;
+
     void to_json(nlohmann::json &j, const general_id &p);
     void from_json(const nlohmann::json &j, general_id &p);
 
@@ -21,6 +24,9 @@ namespace roguelike {
 
     void to_json(nlohmann::json &j, const expirience_components &p);
     void from_json(const nlohmann::json &j, expirience_components &p);
+
+    void to_json(nlohmann::json &j, const gamestate &p);
+    void from_json(const nlohmann::json &j, gamestate &p);
 }  // namespace roguelike
 #define ROGUE_LIKE_SERIALIZE_H
 

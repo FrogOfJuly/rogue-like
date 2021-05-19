@@ -47,6 +47,7 @@ void roguelike::from_json(const nlohmann::json &j, roguelike::entity_type &p) {
 
 void roguelike::to_json(nlohmann::json &j, const logging_component &p) { j["log"] = p.log.str(); }
 void roguelike::from_json(const nlohmann::json &j, logging_component &p) { p.log << j["log"]; }
+
 void roguelike::to_json(nlohmann::json &j, const roguelike::simple_inventory_component &p) {
     static constexpr auto item_spots = magic_enum::enum_entries<simple_inventory_component::inventory_spot>();
     j = nlohmann::json::array();
@@ -84,6 +85,15 @@ void roguelike::to_json(nlohmann::json &j, const gamestate &p) {
         cur_tile_json["tile"] = resident_json;
         room_json.push_back(cur_tile_json);
     }
+
+    auto players_json = nlohmann::json();
+    for(auto& it : p.players){
+        auto& plr = it.second;
+        entity_type var_ent = &plr;
+        to_json(players_json[std::to_string(it.first)], var_ent);
+    }
+
+    j["players"] = players_json;
     j["level"] = room_json;
 }
 void roguelike::from_json(const nlohmann::json &j, roguelike::gamestate &p) {
