@@ -88,7 +88,7 @@ void roguelike::gamestate::move_players() {
         mv_system.more_general_move(var_ent);
     }
 }
-int roguelike::gamestate::receive_player_command(int player_id = -1, roguelike::cmd command = cmd::PASS) {
+int roguelike::gamestate::receive_player_command(int player_id, roguelike::cmd command) {
     lwlog_info("getting command %d for player %d", command, player_id);
     if (player_id >= players.size()) {
         throw std::runtime_error("No such player id: " + std::to_string(player_id));
