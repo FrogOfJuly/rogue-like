@@ -88,18 +88,21 @@ void roguelike::gamestate::move_players() {
         mv_system.more_general_move(var_ent);
     }
 }
-int roguelike::gamestate::receive_player_command(int player_id, roguelike::cmd command) {
+int roguelike::gamestate::receive_player_command(int player_id = -1, roguelike::cmd command = cmd::PASS) {
     lwlog_info("getting command %d for player %d", command, player_id);
     if (player_id >= players.size()) {
         throw std::runtime_error("No such player id: " + std::to_string(player_id));
     }
-    received_command.insert(player_id);
-    if (dead_players.count(player_id) == 0) {
-        players.at(player_id).dm_cpt.decision = command;
+    if (player_id >= 0) {  // if player_id < 0, then just return next player in queue
+        received_command.insert(player_id);
+        if (dead_players.count(player_id) == 0) {
+            players.at(player_id).dm_cpt.decision = command;
+        }
     }
     while (not command_to_receive.empty()) {
         auto next_player_id = command_to_receive.front();
         if (received_command.count(next_player_id) == 0 and dead_players.count(next_player_id) == 0) {
+            lwlog_info("next player to receive command is %d", next_player_id);
             return next_player_id;
         }
         command_to_receive.pop();
