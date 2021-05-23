@@ -18,7 +18,7 @@ namespace roguelike {
         void discard_view();
 
         virtual void form_decision(decision_making_component&) = 0;
-        virtual ~strategy() = default;
+        virtual ~strategy();
     };
 }  // namespace roguelike
 
