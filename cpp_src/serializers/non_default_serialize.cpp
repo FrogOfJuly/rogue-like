@@ -31,7 +31,7 @@ void roguelike::to_json(nlohmann::json &j, const roguelike::const_entity_type &p
             j_local["repr_cpt"]["repr"] = repr_component::compute_representation(ent_ptr);
             j_local["repr_cpt"]["repr"] = repr_component::compute_representation(ent_ptr);
             if constexpr (has_member_expirience_components<entT>::value) {
-                auto exp_p = expirience_components::get_level(ent_ptr);
+                auto exp_p = expirience_components::get_level<entT>(ent_ptr);
                 j_local["exp_cpt"]["level"] = exp_p.first;
                 j_local["exp_cpt"]["exp_until_next_level"] = exp_p.second;
                 j_local["exp_cpt"]["experience"] = ent_ptr->exp_cpt.exp;
@@ -98,7 +98,7 @@ void roguelike::to_json(nlohmann::json &j, const gamestate &p) {
     }
 
     auto players_json = nlohmann::json();
-    lwlog_info("Serializing players: %d", p.players.size());
+    lwlog_info("Serializing players: %ld", p.players.size());
     for(auto& it : p.players){
         auto& plr = it.second;
         auto var_ent = &plr;

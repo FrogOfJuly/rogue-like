@@ -40,7 +40,7 @@ namespace roguelike {
     }
 
     template <>
-    inline std::pair<int, int> expirience_components::get_level<player>(player *ent) {
+    inline std::pair<int, int> expirience_components::get_level<player>(const player *ent) {
         auto &exp = ent->exp_cpt.exp;
         int exp_offset = 16;
         int lvl_offset = 4;

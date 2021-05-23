@@ -30,7 +30,7 @@ namespace roguelike {
         int lvlups = 0;
 
         template <typename entType>
-        inline static std::pair<int, int> get_level(entType *ent) {
+        inline static std::pair<int, int> get_level(const entType *ent) {
             return std::make_pair(-1, -1);
         }
 
