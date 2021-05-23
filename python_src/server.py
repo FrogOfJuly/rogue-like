@@ -33,6 +33,8 @@ class Backend:
         self.state = rl.GameState()
 
     def initialize_backend(self):
+        global num_players
+        print(f"Initializing the backend for {num_players} players")
         self.state.initialize(num_players)
         # player_id = self.state.get_next_player()
         player_id = outgoing[0].player_id

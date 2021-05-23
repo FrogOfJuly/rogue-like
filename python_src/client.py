@@ -100,7 +100,7 @@ def render(stdscr, game_state: dict, flags: dict):
             log += list(filter(lambda x: x != '', newlog))
             break
     if not player:
-        s.send(pickle.dumps(['exit']))
+        s.send(pickle.dumps(['exit', False]))
         disconnect("You died!")
     # Level
     for i in range(H):
