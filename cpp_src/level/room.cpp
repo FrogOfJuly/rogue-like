@@ -303,7 +303,7 @@ bool roguelike::room::do_tiles_have_loc(std::pair<int, int> p0, std::pair<int, i
     return has_line_of_sight;
 }
 
-roguelike::entity_type roguelike::room::get_resident(roguelike::entity_id id) const {
+roguelike::entity_type roguelike::room::get_resident(roguelike::entity_id id) {
     auto res = residents.at(id.value);
     std::visit(
         [](auto* ent_ptr) {
@@ -314,6 +314,19 @@ roguelike::entity_type roguelike::room::get_resident(roguelike::entity_id id) co
         },
         res);
     return res;
+}
+
+roguelike::const_entity_type roguelike::room::get_resident(roguelike::entity_id id) const {
+    return std::visit(
+        [](auto* ent_ptr) {
+            using entT = std::remove_pointer_t<decltype(ent_ptr)>;
+            if constexpr (has_member_name_component<entT>::value) {
+                lwlog_debug("getting entity with name %s", ent_ptr->nm_cpt.name.c_str());
+            }
+            const_entity_type var_ent = ent_ptr;
+            return var_ent;
+        },
+        residents.at(id.value));
 }
 
 void roguelike::room::generate_enemies(int lvl_num) {

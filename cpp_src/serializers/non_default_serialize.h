@@ -16,6 +16,9 @@ namespace roguelike {
     void to_json(nlohmann::json &j, const entity_type &p);
     void from_json(const nlohmann::json &j, entity_type &p);
 
+    void to_json(nlohmann::json &j, const const_entity_type &p);
+    void from_json(const nlohmann::json &j, const_entity_type &p);
+
     void to_json(nlohmann::json &j, const logging_component &p);
     void from_json(const nlohmann::json &j, logging_component &p);
 

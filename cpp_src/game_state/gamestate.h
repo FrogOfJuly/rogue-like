@@ -22,9 +22,7 @@ namespace roguelike {
 
     class gamestate {
         room level;
-        mutable std::unordered_map<int, player> players;
-        // to remove this mutable, there need to be std::variant<const player*, const entity* ... and so on>.
-        // but for now there is none, so I am basically discarding const qualifier here.
+        std::unordered_map<int, player> players;
         std::unordered_set<int> dead_players;
         int lvl_num = -1;
 
@@ -35,13 +33,17 @@ namespace roguelike {
         interaction_system inter_system;
         decision_making_system dm_system;
 
-        player *get_player(player_id id) const;
-        entity_type get_entity(general_id id) const;
+        player *get_player(player_id id);
+        entity_type get_entity(general_id id);
+
+        const player *get_player(player_id id) const;
+        const_entity_type get_entity(general_id id) const;
 
         void report_despawn(general_id mdred_id);
 
       public:
         void initialize(int player_num);
+        void initialize_player(int player_id);
         int receive_player_command(int player_id, cmd command);
         void move_players();
         void move_nonplayers();

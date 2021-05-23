@@ -9,9 +9,20 @@
 namespace py = pybind11;
 
 PYBIND11_MODULE(roguelike, m) {
+    py::enum_<roguelike::cmd>(m, "cmd")
+        .value("UP", roguelike::cmd::UP)
+        .value("DOWN", roguelike::cmd::DOWN)
+        .value("LEFT", roguelike::cmd::LEFT)
+        .value("RIGHT", roguelike::cmd::RIGHT)
+        .value("ESC", roguelike::cmd::ESC)
+        .value("PASS", roguelike::cmd::PASS)
+        .value("ENTER", roguelike::cmd::ENTER)
+        .export_values();
+
     py::class_<roguelike::gamestate>(m, "GameState")
         .def(py::init<>())
         .def("initialize", &roguelike::gamestate::initialize, py::arg("player_number"))
+        .def("initialize_player", &roguelike::gamestate::initialize_player)
         .def(
             "receive_player_command",
             &roguelike::gamestate::receive_player_command,
@@ -27,14 +38,4 @@ PYBIND11_MODULE(roguelike, m) {
         .def("clean_decisions", &roguelike::gamestate::clean_decisions)
         .def("end_turn", &roguelike::gamestate::end_turn)
         .def("decide_next_move", &roguelike::gamestate::decide_next_move);
-
-    py::enum_<roguelike::cmd>(m, "cmd")
-        .value("UP", roguelike::cmd::UP)
-        .value("DOWN", roguelike::cmd::DOWN)
-        .value("LEFT", roguelike::cmd::LEFT)
-        .value("RIGHT", roguelike::cmd::RIGHT)
-        .value("ESC", roguelike::cmd::ESC)
-        .value("PASS", roguelike::cmd::PASS)
-        .value("ENTER", roguelike::cmd::ENTER)
-        .export_values();
 }

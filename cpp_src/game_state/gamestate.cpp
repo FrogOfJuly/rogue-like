@@ -122,15 +122,15 @@ void roguelike::gamestate::initialize(int player_number) {
     lvl_num = 0;
     level.generate_terrain(lvl_num);
     lwlog_info("generated level");
-    for (int i = 0; i < player_number; ++i) {
-        lwlog_info("placing player");
-        players.emplace(std::make_pair(i, i));
-        players.at(i).dm_cpt.decision = cmd::PASS;
-        entity_type var_ent = &players.at(i);
-        auto rnd_tile = level.get_random_empty_tile();
-        level.spawn_on_level(var_ent, rnd_tile);
-    }
-    lwlog_info("spawned players");
+    //    for (int i = 0; i < player_number; ++i) {
+    //        lwlog_info("placing player");
+    //        players.emplace(std::make_pair(i, i));
+    //        players.at(i).dm_cpt.decision = cmd::PASS;
+    //        entity_type var_ent = &players.at(i);
+    //        auto rnd_tile = level.get_random_empty_tile();
+    //        level.spawn_on_level(var_ent, rnd_tile);
+    //    }
+    //    lwlog_info("spawned players");
     level.generate_enemies(lvl_num);
 }
 void roguelike::gamestate::end_turn() {
@@ -161,9 +161,27 @@ void roguelike::gamestate::decide_next_move() {
     }
 }
 
-roguelike::player *roguelike::gamestate::get_player(roguelike::player_id id) const { return &players.at(id.value); }
+const roguelike::player *roguelike::gamestate::get_player(roguelike::player_id id) const {
+    return &players.at(id.value);
+}
+roguelike::const_entity_type roguelike::gamestate::get_entity(roguelike::general_id id) const {
+    return std::visit(
+        overloaded{
+            [this](player_id id) {
+                lwlog_info("-player with id %d", id.value);
+                const_entity_type plr = get_player(id);
+                return plr;
+            },
+            [this](entity_id id) {
+                lwlog_debug("-residnet with id %d", id.value);
+                const_entity_type var_ent = level.get_resident(id);
+                return var_ent;
+            }},
+        id);
+}
 
-roguelike::entity_type roguelike::gamestate::get_entity(roguelike::general_id id) const {
+roguelike::player *roguelike::gamestate::get_player(roguelike::player_id id) { return &players.at(id.value); }
+roguelike::entity_type roguelike::gamestate::get_entity(roguelike::general_id id) {
     return std::visit(
         overloaded{
             [this](player_id id) {
@@ -173,7 +191,8 @@ roguelike::entity_type roguelike::gamestate::get_entity(roguelike::general_id id
             },
             [this](entity_id id) {
                 lwlog_debug("-residnet with id %d", id.value);
-                return level.get_resident(id);
+                entity_type var_ent = level.get_resident(id);
+                return var_ent;
             }},
         id);
 }
@@ -191,4 +210,12 @@ void roguelike::gamestate::report_despawn(roguelike::general_id mdred_id) {
                 level.despawned.insert(id.value);
             }},
         mdred_id);
+}
+void roguelike::gamestate::initialize_player(int player_id) {
+    lwlog_info("placing player %d", player_id);
+    players.emplace(std::make_pair(player_id, player_id));
+    players.at(player_id).dm_cpt.decision = cmd::PASS;
+    entity_type var_ent = &players.at(player_id);
+    auto rnd_tile = level.get_random_empty_tile();
+    level.spawn_on_level(var_ent, rnd_tile);
 }

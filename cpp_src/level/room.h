@@ -62,7 +62,7 @@ namespace roguelike {
 
             auto var_ent = get_resident(maybe_ent_idx.value());
             // is it holding somebody you are looking for?
-            bool is_ent = std::holds_alternative<entityT *>(var_ent);
+            bool is_ent = std::holds_alternative<const entityT *>(var_ent);
             return is_ent;
         }
 
@@ -70,7 +70,8 @@ namespace roguelike {
 
         [[nodiscard]] tile_idx get_random_empty_tile() const;
 
-        [[nodiscard]] entity_type get_resident(entity_id id) const;
+        [[nodiscard]] entity_type get_resident(entity_id id);
+        [[nodiscard]] const_entity_type get_resident(entity_id id) const;
 
         void remove_resident(tile_idx idx);
 

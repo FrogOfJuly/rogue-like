@@ -16,6 +16,13 @@ void roguelike::to_json(nlohmann::json &j, const roguelike::general_id &p) {
 void roguelike::from_json(const nlohmann::json &j, roguelike::general_id &p) { p = j.at("general_id").get_to(p); }
 
 void roguelike::to_json(nlohmann::json &j, const roguelike::entity_type &p) {
+    to_json(j, repack(p));
+}
+void roguelike::from_json(const nlohmann::json &j, roguelike::entity_type &p) {
+    throw std::runtime_error("One CAN NOT construct entity type from it's serialization");
+}
+
+void roguelike::to_json(nlohmann::json &j, const roguelike::const_entity_type &p) {
     j = std::visit(
         [](auto *ent_ptr) {
             using entT = std::remove_pointer_t<decltype(ent_ptr)>;
@@ -41,7 +48,7 @@ void roguelike::to_json(nlohmann::json &j, const roguelike::entity_type &p) {
         },
         p);
 }
-void roguelike::from_json(const nlohmann::json &j, roguelike::entity_type &p) {
+void roguelike::from_json(const nlohmann::json &j, roguelike::const_entity_type &p) {
     throw std::runtime_error("One CAN NOT construct entity type from it's serialization");
 }
 
@@ -79,7 +86,7 @@ void roguelike::to_json(nlohmann::json &j, const gamestate &p) {
             continue;
         }
         auto id = tle.resident.value();
-        entity_type resident = p.get_entity(id);
+        auto resident = p.get_entity(id);
         auto resident_json = nlohmann::json();
         to_json(resident_json, resident);
         cur_tile_json["tile"] = resident_json;
@@ -89,7 +96,7 @@ void roguelike::to_json(nlohmann::json &j, const gamestate &p) {
     auto players_json = nlohmann::json();
     for(auto& it : p.players){
         auto& plr = it.second;
-        entity_type var_ent = &plr;
+        auto var_ent = &plr;
         to_json(players_json[std::to_string(it.first)], var_ent);
     }
 

@@ -76,6 +76,15 @@ namespace roguelike {
 #define register_component(cpt_name, component_type) struct component_type;
 #include "register_for_components.h"
 #undef register_component
+
+    inline const_entity_type repack(const entity_type &var) {
+        return std::visit(
+            [](const auto *ent_ptr) {
+                const_entity_type cnst_var_ent = ent_ptr;
+                return cnst_var_ent;
+            },
+            var);
+    }
     //--------------end of forward declarations---------------------
 
     //--------------concepts----------------------------------------
