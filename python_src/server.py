@@ -15,7 +15,7 @@ parser.add_argument("-p", "--port", default=4321, type=int, dest='port',
                     help="Port number for the server")
 args = parser.parse_args()
 
-BUFFERSIZE = 16384
+BUFFERSIZE = 32768
 
 outgoing = []
 active_players = 0
@@ -52,7 +52,7 @@ class Backend:
         # We'll have to decide on the multiplayer model eventually
         # And most of this will be moved to the turn function.
         print(f"Sent action {action} from player {player_id} to backend")
-        self.state.receive_player_command(0, action)
+        self.state.receive_player_command(player_id, action)
         self.state.move_players()
         self.state.resolve_all_interactions()
         self.state.move_nonplayers()
@@ -67,7 +67,7 @@ class Backend:
 
     def player_connect(self, player_id: int):
         print(f"Initializing player {player_id} at the backend")
-        # self.state.initialize_player(player_id)
+        self.state.initialize_player(player_id)
 
     def player_disconnect(self, player_id):
         print(f"Disconnecting player {player_id} at the backend")
