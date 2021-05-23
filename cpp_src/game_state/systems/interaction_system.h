@@ -15,7 +15,7 @@ namespace roguelike {
     class interaction_system : public base_system{
         std::queue<entity_pair> interactions;
       public:
-        static void perform_interaction(entity_type &interacted, entity_type &interacting);
+        static void perform_interaction(entity_type interacted, entity_type interacting);
 
         void push_interaction(general_id inted, general_id inting);
 

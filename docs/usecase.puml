@@ -1,0 +1,48 @@
+@startuml
+left to right direction
+actor "Player" as PLR
+package "Actions" {
+  usecase MOV as "Move
+  --
+  Directional input"
+
+  usecase CHP as "Change Position"
+
+  usecase STR as "Strike"
+
+  usecase PUI as "Pick up item"
+
+  usecase OPD as "Open door"
+
+  usecase OPC as "Open chest"
+
+  usecase LEL as "Leave level"
+
+  usecase USP as "Use potion"
+
+  usecase GHT as "Get hit"
+}
+
+package "Info" {
+  usecase VMAP as "View map
+  --
+  Always visible on player screen"
+
+  usecase VINV as "View inventory
+  --
+  Always visible on player screen"
+}
+
+(PLR) --> (MOV)
+(PLR) --> (USP)
+(PLR) --> (VINV)
+(PLR) --> (VMAP)
+
+(MOV) <-- (CHP) : "to empty spot or item"
+(MOV) <-- (PUI) : "to item"
+(MOV) <-- (STR) : "to enemy"
+(MOV) <-- (OPD) : "to door && has key"
+(MOV) <-- (OPC) : "to chest"
+(MOV) <-- (LEL) : "to exit"
+(MOV) <-- (GHT) : "to cell under attack or trap"
+@enduml

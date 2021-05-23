@@ -1,8 +1,11 @@
 //
 // Created by Kirill Golubev on 23.04.2021.
 //
-#include "../../deps/json/single_include/nlohmann/json.hpp"
+#include <optional>
+#include <unordered_map>
+
 #include "../common.h"
+#include "../strategies/abstract_strategy.h"
 
 #ifndef ROGUE_LIKE_COMPONENTS_H
 #define ROGUE_LIKE_COMPONENTS_H
@@ -15,88 +18,212 @@ namespace roguelike {
 
     //--------------end of component---------------------------------------------
 
-    //    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(component);
-
     struct move_component : public component {
         int x = -1, y = -1;
         tile_idx residency = -1;
     };
 
-    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(move_component, x, y, residency);
+    //--------------end of move_component----------------------------------------
+
+    struct expirience_components : public component {
+        int exp = 0;
+        int lvlups = 0;
+
+        template <typename entType>
+        inline static std::pair<int, int> get_level(const entType *ent) {
+            return std::make_pair(-1, -1);
+        }
+
+        template <typename entType>
+        inline static bool gain_experience(entType *ent, int new_exp) {
+            return false;
+        }
+
+        template <typename entType>
+        inline static void perform_lvlups(entType *ent) {}
+    };
 
     //--------------end of move_component----------------------------------------
 
     struct atk_component : public component {
         int damage = -1;
-    };
 
-    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(atk_component, damage);
+        template <typename T>
+        requires has_atk_component<T>
+        static inline int calculate_damage(const T *ent) {
+            if constexpr (has_member_simple_inventory_component<T>::value) {
+                auto dmg_bonus = ent->s_inv_cpt.get_damage_bonus();
+                lwlog_info("got damage bonus %d", dmg_bonus);
+                return ent->a_cpt.damage + dmg_bonus;
+            }
+            return ent->a_cpt.damage;
+        }
+    };
 
     //--------------end of atk_component-----------------------------------------
 
-    struct health_component : public component {
-        int health = -1;
+    struct dfc_component : public component {
+        int damage_reduction = 0;
+
+        template <typename T>
+        requires has_dfc_component<T>
+        static inline int calculate_damage_reduction(const T *ent) {
+            if constexpr (has_member_simple_inventory_component<T>::value) {
+                return ent->dfc_cpt.damage_reduction + ent->s_inv_cpt.get_defence_bonus();
+            }
+            return ent->dfc_cpt.damage_reduction;
+        }
     };
 
-    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(health_component, health);
+    //--------------end of prot_component-----------------------------------------
+
+    struct prot_component : public component {
+        double protection_scale = 1.0;
+
+        template <typename T>
+        requires has_prot_component<T>
+        static inline double calculate_protection_scale(const T *ent) {
+            if constexpr (has_member_simple_inventory_component<T>::value) {
+                return ent->prt_cpt.protection_scale + ent->s_inv_cpt.get_protection_bonus();
+            }
+            return ent->prt_cpt.protection_scale;
+        }
+    };
+
+    //--------------end of dfc_component-----------------------------------------
+
+    struct health_component : public component {
+        int max_health = -1;
+        int health = -1;
+
+        template <typename T>
+        requires has_health_component<T>
+        static inline bool is_alive(const T *ent) { return ent->h_cpt.health > 0; }
+
+        template <typename T>
+        static inline int receive_damage(T *ent, int damage) {
+            if constexpr (has_member_simple_inventory_component<T>::value) {
+                double prot = ent->s_inv_cpt.get_protection_bonus();
+                int red = ent->s_inv_cpt.get_defence_bonus();
+                damage = std::max(0, (int)((damage - red) * prot));
+            }
+            ent->h_cpt.health -= damage;
+            return damage;
+        }
+    };
 
     //--------------end of health_component--------------------------------------
 
     struct repr_component : public component {
-        std::string repr = "?";
-
         template <typename T>
         static inline std::string compute_representation(const T *) {
             return "?";
         }
     };
 
-    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(repr_component, repr);
-
     //--------------end of repr_component----------------------------------------
 
     struct decision_making_component : public component {
         cmd decision = cmd::PASS;
         int eye_sight = -1;
-        strategy strat = strategy::passive;
+        bool wait_before_strike = true;
+        std::unique_ptr<strategy> idle_strategy;
+        std::unique_ptr<strategy> active_strategy;
+        std::optional<general_id> charges_into;
 
-        [[nodiscard]] std::pair<int, int> get_velocity() const {
-            switch (decision) {
-                case UP:
-                    return std::make_pair(0, -1);
-                case DOWN:
-                    return std::make_pair(0, 1);
-                case LEFT:
-                    return std::make_pair(-1, 0);
-                case RIGHT:
-                    return std::make_pair(1, 0);
-                case ENTER:
-                case ESC:
-                case PASS:
-                    return std::make_pair(0, 0);
-            }
-        }
+        [[nodiscard]] std::pair<int, int> get_velocity() const;
     };
-
-    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(decision_making_component, decision, eye_sight);
 
     //--------------end of decision_making_component-----------------------------
 
     struct logging_component : public component {
         std::stringstream log{};
+
+        template <typename T>
+        static inline void log_entry(T *ent, const std::string &entry) {
+            if constexpr (has_member_logging_component<T>::value) {
+                ent->lg_cpt.log << entry;
+            }
+        }
     };
-
-    void to_json(nlohmann::json &j, const logging_component &p);
-
-    void from_json(const nlohmann::json &j, logging_component &p);
 
     //--------------end of logging_component-------------------------------------
 
-#define register_component(cmpt_name, component_type) define_has_member(cmpt_name, component_type)
+    struct name_component : public component {
+        std::string name;
 
-#include "../utility/register_for_components.h"
+        template <typename T>
+        static inline std::string get_name(const T *ent) {
+            if constexpr (has_member_name_component<T>::value) {
+                return ent->nm_cpt.name;
+            }
+            return "unknown";
+        }
+    };
 
-#undef register_component
+    //--------------end of name_component----------------------------------------
+
+    struct simple_inventory_component : public component {
+        enum inventory_spot { sword = 0, shield, armor, potion };
+        std::optional<entity_type> spot;
+        std::unordered_map<inventory_spot, entity_type> spots;
+        bool locked = false;
+        void manage();
+
+        template <typename T>
+        requires has_pickable_component<T>
+        inline bool pick_item(T *ent) {
+            ent->pk_cpt.picked = false;
+            if (spot.has_value()) {
+                lwlog_info("something is in temporal spot");
+                return false;
+            }
+            ent->pk_cpt.picked = true;
+            spot = ent;
+            manage();
+            return not spot.has_value();
+        }
+
+        [[nodiscard]] int get_damage_bonus() const;
+        [[nodiscard]] int get_defence_bonus() const;
+        [[nodiscard]] double get_protection_bonus() const;
+        [[nodiscard]] std::optional<entity_type> get_some_item() const;
+
+        static simple_inventory_component get_locked_invetory();
+    };
+
+    //--------------end of simple inventory component----------------------------
+    struct pickable_component : public component {
+        using spot_type = simple_inventory_component::inventory_spot;
+        bool picked = false;
+        spot_type desired_spot = spot_type::potion;
+    };
+
+    //--------------end of pickable component------------------------------------
+
+    struct one_time_effect_component : public component {
+        std::string msg_on_effect = "?";
+        template <typename U, typename T>
+        requires has_one_time_effect_component<U>
+        inline bool apply_effect(U *src, T *tgt) { return false; }
+    };
+
+    //--------------end of one time effect component-----------------------------
+    //--------------level component----------------------------------------------
+    struct level_component : public component {
+        int lvl = -1;
+        [[nodiscard]] int experience_on_kill() const;
+    };
+
+    //--------------destruction component----------------------------------------
+
+    struct destruction_component : public component {
+        bool destroyed = false;
+        template <typename U, typename T>
+        requires has_destruction_component<U>
+        static inline bool destroyed_on_impact(U *impacted, T *impacting) { return false; }
+    };
+
 }  // namespace roguelike
 
 #endif  // ROGUE_LIKE_COMPONENTS_H

@@ -1,6 +1,8 @@
 //
 // Created by Kirill Golubev on 18.04.2021.
 //
+#include "../strategies/agressive_strategy/agressive_strategy.h"
+#include "../strategies/random_strategy/random_strategy.h"
 #include "entity.hpp"
 
 #ifndef ROGUE_LIKE_GOBLIN_H
@@ -8,11 +10,17 @@
 namespace roguelike {
     struct goblin : entity {
         goblin(int id) : entity(id) {
-            h_cpt.health = 5;
-            a_cpt.damage = 1;
+            h_cpt.max_health = 3;
+            h_cpt.health = h_cpt.max_health;
+            a_cpt.damage = 4;
             m_cpt.y = -1;
             m_cpt.x = -1;
-            dm_cpt.strat = strategy::random;
+            dm_cpt.eye_sight = 5;
+            dm_cpt.active_strategy = std::make_unique<agressive_strategy>();
+            dm_cpt.idle_strategy = std::make_unique<random_strategy>();
+            nm_cpt.name = "goblin";
+            lvl_cpt.lvl = 3;
+            s_inv_cpt = simple_inventory_component::get_locked_invetory();
         }
 
         decision_making_component dm_cpt;
@@ -20,6 +28,9 @@ namespace roguelike {
         atk_component a_cpt;
         move_component m_cpt;
         repr_component repr_cpt;
+        name_component nm_cpt;
+        level_component lvl_cpt;
+        simple_inventory_component s_inv_cpt;
     };
 
     template <>
@@ -34,24 +45,18 @@ namespace roguelike {
             case UP:
                 return "^";
             default:
-                return "x";
+                return g->dm_cpt.wait_before_strike ? "x" : "☠";
         }
     }
 
-    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(goblin, id, dm_cpt, h_cpt, a_cpt, m_cpt, repr_cpt)
-
     template <typename entityType>
     struct interacter<goblin, entityType> {
-        static inline void interact(goblin &inted, entityType &inting) {
-            if constexpr (has_member_logging_component<entityType>::value) {
-                inting.lg_cpt.log << "you interacted with goblin" << std::to_string(inted.id.value) << "\n";
+        static inline interaction_info interact(goblin *inted, entityType *inting) {
+            if constexpr (has_member_atk_component<entityType>::value and not std::is_base_of_v<goblin, entityType>) {
+                return default_interactors::agressive<goblin, entityType>::interact(inted, inting);
+            }else {
+                return default_interactors::logging<goblin, entityType>::interact(inted, inting);
             }
-            if constexpr (has_member_atk_component<entityType>::value) {
-                auto dmg = inting.a_cpt.damage;
-                inted.h_cpt.health -= dmg;
-                return;
-            }
-            return;
         }
     };
 }  // namespace roguelike
