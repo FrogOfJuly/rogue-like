@@ -3,9 +3,6 @@
 #ifndef ROGUELIKE_COMMON_RELEASE_H
 #define ROGUELIKE_COMMON_RELEASE_H
 
-namespace roguelike {
-# 31 "common_debug.h"
-}
 template <class... Ts>
 struct overloaded : Ts... {
     using Ts::operator()...;
@@ -30,8 +27,6 @@ namespace roguelike {
 
     using general_id = std::variant<entity_id, player_id>;
 
-# 1 "./register_for_entities.h" 1
-
     struct goblin;
     struct goblin_guard;
     struct goblin_worker;
@@ -44,14 +39,9 @@ namespace roguelike {
     struct armor;
     struct shovel;
     struct chest;
-# 61 "common_debug.h" 2
-
     struct entity;
 
     using entity_type = std::variant<
-
-# 1 "./register_for_entities.h" 1
-
         goblin *,
         goblin_guard *,
         goblin_worker *,
@@ -64,14 +54,9 @@ namespace roguelike {
         armor *,
         shovel *,
         chest *,
-# 67 "common_debug.h" 2
-
         entity *>;
 
     using const_entity_type = std::variant<
-
-# 1 "./register_for_entities.h" 1
-
         const goblin *,
         const goblin_guard *,
         const goblin_worker *,
@@ -84,11 +69,8 @@ namespace roguelike {
         const armor *,
         const shovel *,
         const chest *,
-# 73 "common_debug.h" 2
-
         const entity *>;
 
-# 1 "./register_for_components.h" 1
 
     struct move_component;
     struct atk_component;
@@ -105,9 +87,15 @@ namespace roguelike {
     struct level_component;
     struct prot_component;
     struct destruction_component;
-# 78 "common_debug.h" 2
 
-# 1 "./register_for_components.h" 1
+    inline const_entity_type repack(const entity_type &var) {
+        return std::visit(
+            [](const auto *ent_ptr) {
+                const_entity_type cnst_var_ent = ent_ptr;
+                return cnst_var_ent;
+            },
+            var);
+    }
 
     template <typename T>
     concept has_move_component = std::same_as<decltype(T::m_cpt), move_component>;
@@ -364,8 +352,6 @@ namespace roguelike {
     };
     template <typename T>
     inline constexpr bool has_destruction_component_v = has_member_destruction_component<T>::value;
-# 85 "common_debug.h" 2
-
 }  // namespace roguelike
 
 #endif
