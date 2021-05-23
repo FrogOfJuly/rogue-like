@@ -90,7 +90,7 @@ void roguelike::gamestate::move_players() {
 }
 int roguelike::gamestate::receive_player_command(int player_id, roguelike::cmd command) {
     lwlog_info("getting command %d for player %d", command, player_id);
-    if (player_id >= players.size()) {
+    if (players.count(player_id) == 0) {
         throw std::runtime_error("No such player id: " + std::to_string(player_id));
     }
     if (player_id >= 0) {  // if player_id < 0, then just return next player in queue
@@ -118,19 +118,17 @@ int roguelike::gamestate::receive_player_command(int player_id, roguelike::cmd c
 }
 void roguelike::gamestate::initialize(int player_number) {
     lwlog_info("Initializning gamestate object");
-    lwlog_info("allocating  player objects");
     lvl_num = 0;
     level.generate_terrain(lvl_num);
     lwlog_info("generated level");
-    //    for (int i = 0; i < player_number; ++i) {
-    //        lwlog_info("placing player");
-    //        players.emplace(std::make_pair(i, i));
-    //        players.at(i).dm_cpt.decision = cmd::PASS;
-    //        entity_type var_ent = &players.at(i);
-    //        auto rnd_tile = level.get_random_empty_tile();
-    //        level.spawn_on_level(var_ent, rnd_tile);
-    //    }
-    //    lwlog_info("spawned players");
+    for (const auto& it : players) {
+        lwlog_info("placing player");
+        auto player_id = it.first;
+        entity_type var_ent = &players.at(player_id);
+        auto rnd_tile = level.get_random_empty_tile();
+        level.spawn_on_level(var_ent, rnd_tile);
+    }
+    lwlog_info("spawned players %ld", players.size());
     level.generate_enemies(lvl_num);
 }
 void roguelike::gamestate::end_turn() {
@@ -215,7 +213,4 @@ void roguelike::gamestate::initialize_player(int player_id) {
     lwlog_info("placing player %d", player_id);
     players.emplace(std::make_pair(player_id, player_id));
     players.at(player_id).dm_cpt.decision = cmd::PASS;
-    entity_type var_ent = &players.at(player_id);
-    auto rnd_tile = level.get_random_empty_tile();
-    level.spawn_on_level(var_ent, rnd_tile);
 }
