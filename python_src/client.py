@@ -21,8 +21,9 @@ parser.add_argument("-l", "--log", default=False, action="store_true",
 args = parser.parse_args()
 
 player_id = args.player_id
+force_id = player_id != 0
 
-BUFFERSIZE = 8192
+BUFFERSIZE = 16384
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 s.connect((args.server_addr, args.port))
@@ -57,27 +58,26 @@ def disconnect(string):
     exit()
 
 
-def color(level):
+def color(level, health):
+    clr = [[0, 250, 245],
+           [83, 41, 43],
+           [22, 21, 28],
+           [202, 166, 199],
+           [209, 203, 167],
+           [10, 161, 89],
+           [214, 207, 205],
+           [88, 76, 70],
+           [227, 12, 187],
+           [239, 241, 243]]
+    if health > 2:
+        health = 2
+    elif health < 0:
+        health = 0
     if level >= 9:
-        return 83
-    elif level == 8:
-        return 77
-    elif level == 7:
-        return 35
-    elif level == 6:
-        return 29
-    elif level == 5:
-        return 12
-    elif level == 4:
-        return 203
-    elif level == 3:
-        return 173
-    elif level == 2:
-        return 161
-    elif level == 1:
-        return 10
+        return clr[9][health]
     elif level <= 0:
-        return 197
+        return clr[0][health]
+    return clr[level][health]
 
 
 def render(stdscr, game_state: dict, flags: dict):
@@ -100,7 +100,7 @@ def render(stdscr, game_state: dict, flags: dict):
             log += list(filter(lambda x: x != '', newlog))
             break
     if not player:
-        s.send(pickle.dumps(['exit']))
+        s.send(pickle.dumps(['exit', False]))
         disconnect("You died!")
     # Level
     for i in range(H):
@@ -108,6 +108,7 @@ def render(stdscr, game_state: dict, flags: dict):
             tile = game_state[i * W + j]['tile']
             to_print = None
             lvl = None
+            hlth = 0
             if tile is None:
                 to_print = "   "
             elif 'player' in tile:
@@ -125,13 +126,12 @@ def render(stdscr, game_state: dict, flags: dict):
                         elif tile['entity']['repr_cpt']['repr'] not in legend[tile['entity']['nm_cpt']['name']]:
                             legend[tile['entity']['nm_cpt']['name']].append(tile['entity']['repr_cpt']['repr'])
                     to_print = f' {repr} '
-                    # if 'h_cpt' in tile['entity'] and tile['entity']['h_cpt']['max_health'] > 0:
-                    #     lvl = int(tile['entity']['h_cpt']['health'] * 10 / tile['entity']['h_cpt']['max_health'])
-                    # elif 'lvl_cpt' in tile['entity']:
+                    if 'h_cpt' in tile['entity'] and tile['entity']['h_cpt']['max_health'] > 0:
+                        hlth = 2 - int(tile['entity']['h_cpt']['health'] * 3 / tile['entity']['h_cpt']['max_health'])
                     if 'lvl_cpt' in tile['entity']:
                         lvl = tile['entity']['lvl_cpt']['lvl']
             if (lvl):
-                stdscr.addstr(i, j * 3, to_print, curses.color_pair(color(lvl)))
+                stdscr.addstr(i, j * 3, to_print, curses.color_pair(color(lvl, hlth)))
             else:
                 stdscr.addstr(i, j * 3, to_print)
 
@@ -154,7 +154,7 @@ def render(stdscr, game_state: dict, flags: dict):
             stdscr.addstr(H, x, section)
             to_print = ("" if value == "none" else value["entity"]["repr_cpt"]["repr"])
             lvl = 0 if value == "none" else value["entity"]["lvl_cpt"]["lvl"]
-            stdscr.addstr(H, x+3, to_print, curses.color_pair(color(lvl)))
+            stdscr.addstr(H, x+3, to_print, curses.color_pair(color(lvl, 0)))
             x = x + 5
 
     # Stats and info
@@ -183,14 +183,51 @@ def render(stdscr, game_state: dict, flags: dict):
             if not legend[key]:
                 continue
             stdscr.addstr(H + 2 + i, 0, f'{f"{key}:":20} {", ".join(legend[key])}')
-    else:
+    elif 'help' in flags:
         stdscr.addstr(H + 2, 0, f'WASD for movement.')
         stdscr.addstr(H + 3, 0, f'E for potion.')
         stdscr.addstr(H + 4, 0, f'F to skip turn.')
         stdscr.addstr(H + 4, 0, f'L for the legend.')
         stdscr.addstr(H + 5, 0, f'P to pause game (temporarily disconnect).')
         stdscr.addstr(H + 6, 0, f'X to exit game.')
+    elif 'waiting' in flags:
+        stdscr.addstr(H + 2, 0, 'Awaiting turn')
     stdscr.refresh()
+
+
+def get_action(game_state: dict):
+    action = cmd.PASS
+    valid = False
+    while not valid:
+        valid = True
+        key = stdscr.getch()
+        if key is not None:
+            if key == ord('w'):
+                action = cmd.UP
+            elif key == ord('s'):
+                action = cmd.DOWN
+            elif key == ord('a'):
+                action = cmd.LEFT
+            elif key == ord('d'):
+                action = cmd.RIGHT
+            elif key == ord('e'):
+                action = cmd.ENTER
+            elif key == ord('p'):
+                disconnect(f"Paused game. Return with id {player_id}")
+            elif key == ord('x'):
+                s.send(pickle.dumps(['exit', False]))
+                disconnect("Exited game.")
+            elif key == ord('f'):
+                pass
+            elif key == ord('h'):
+                render(stdscr, game_state, {"help": True})
+                valid = False
+            elif key == ord('l'):
+                render(stdscr, game_state, {"legend": True})
+                valid = False
+            else:
+                valid = False
+    return action
 
 
 def main(stdscr):
@@ -201,58 +238,38 @@ def main(stdscr):
     for i in range(0, curses.COLORS):
         curses.init_pair(i + 1, i, -1)
     while True:
-        ins, outs, ex = select.select([s], [], [], 0)
-        for inm in ins:
-            game_event = pickle.loads(inm.recv(BUFFERSIZE))
-            if game_event[0] == 'reject':
-                disconnect(game_event[1])
-            if game_event[0] == 'id':
-                player_id = game_event[1]
-                if args.log:
-                    init_log()
-                stdscr.addstr(0, 0, f"You're player {player_id}, awaiting game start")
-                stdscr.refresh()
-            else:
-                if args.log:
-                    dump_log(game_event[1])
-                render(stdscr, game_event[1], {})
+        # ins, outs, ex = select.select([s], [], [], 0)
+        # for inm in ins:
+        # data = []
+        # while True:
+        #     packet = s.recv(BUFFERSIZE)
+        #     if not packet:
+        #         break
+        #     data.append(packet)
+        # message, content = pickle.loads(b"".join(data))
+        message, content = pickle.loads(s.recv(BUFFERSIZE))
+        if message == 'reject':
+            disconnect(content)
+        elif message == 'id':
+            if not force_id:
+                player_id = content
+            if args.log:
+                init_log()
 
-            if game_event[0] == 'state':
-                pass
-            if game_event[0] == 'move':
-                action = cmd.PASS
-                valid = False
-                while not valid:
-                    valid = True
-                    key = stdscr.getch()
-                    if key is not None:
-                        if key == ord('w'):
-                            action = cmd.UP
-                        elif key == ord('s'):
-                            action = cmd.DOWN
-                        elif key == ord('a'):
-                            action = cmd.LEFT
-                        elif key == ord('d'):
-                            action = cmd.RIGHT
-                        elif key == ord('e'):
-                            action = cmd.ENTER
-                        elif key == ord('p'):
-                            disconnect(f"Paused game. Return with id {player_id}")
-                        elif key == ord('x'):
-                            s.send(pickle.dumps(['exit']))
-                            disconnect("Exited game.")
-                        elif key == ord('f'):
-                            pass
-                        elif key == ord('h'):
-                            render(stdscr, game_event[1], {"help": True})
-                            valid = False
-                        elif key == ord('l'):
-                            render(stdscr, game_event[1], {"legend": True})
-                            valid = False
-                        else:
-                            valid = False
-                ge = ['action', player_id, action]
-                s.send(pickle.dumps(ge))
+            s.send(pickle.dumps(["acknowledge", player_id]))
+            stdscr.addstr(0, 0, f"You're player {player_id}, awaiting game start")
+            stdscr.refresh()
+        else:
+            #  Related to the game state
+            if args.log:
+                dump_log(content)
+
+        if message == 'state':
+            render(stdscr, content, {'waiting': True})
+        if message == 'move':
+            render(stdscr, content, {})
+            ge = ['action', (player_id, get_action(content))]
+            s.send(pickle.dumps(ge))
 
 
 stdscr = curses.initscr()

@@ -76,3 +76,8 @@ log:
 > you can't pick this item 
 ```
 is displayed despite actually picking an item and dropping old one. 
+
+### Design doc
+
+The design document along with various diagrams can be found at 
+[Notion](https://www.notion.so/c751085ebb244bcf8942cf17ddce652b).

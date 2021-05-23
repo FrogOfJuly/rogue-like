@@ -11,6 +11,7 @@
 
 namespace roguelike {
     struct player {
+        static int player_num;
         player(int pl_id) {
             id = player_id{pl_id};
             h_cpt.max_health = 50;
@@ -20,8 +21,10 @@ namespace roguelike {
             m_cpt.y = -1;
             dm_cpt.decision = PASS;
             nm_cpt.name = "player" + std::to_string(pl_id);
+            my_number = player_num + 1;
+            ++player_num;
         }
-
+        int my_number = -1;
         player_id id = player_id{-1};
         logging_component lg_cpt;
         health_component h_cpt;
@@ -36,11 +39,11 @@ namespace roguelike {
 
     template <>
     inline std::string repr_component::compute_representation<player>(const player *p) {
-        return std::to_string(p->id.value + 1);
+        return std::to_string(p->my_number % 10);
     }
 
     template <>
-    inline std::pair<int, int> expirience_components::get_level<player>(player *ent) {
+    inline std::pair<int, int> expirience_components::get_level<player>(const player *ent) {
         auto &exp = ent->exp_cpt.exp;
         int exp_offset = 16;
         int lvl_offset = 4;

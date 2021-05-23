@@ -16,24 +16,35 @@ void roguelike::to_json(nlohmann::json &j, const roguelike::general_id &p) {
 void roguelike::from_json(const nlohmann::json &j, roguelike::general_id &p) { p = j.at("general_id").get_to(p); }
 
 void roguelike::to_json(nlohmann::json &j, const roguelike::entity_type &p) {
+    to_json(j, repack(p));
+}
+void roguelike::from_json(const nlohmann::json &j, roguelike::entity_type &p) {
+    throw std::runtime_error("One CAN NOT construct entity type from it's serialization");
+}
+
+void roguelike::to_json(nlohmann::json &j, const roguelike::const_entity_type &p) {
     j = std::visit(
-        [](auto *ent_ptr) {
-            using entT = std::remove_pointer_t<decltype(ent_ptr)>;
+        [](const auto *ent_ptr) {
+            using entT = std::decay_t<std::remove_pointer_t<decltype(ent_ptr)>>;
             auto j_local = nlohmann::json();
             to_json(j_local, *ent_ptr);
             j_local["repr_cpt"]["repr"] = repr_component::compute_representation(ent_ptr);
             j_local["repr_cpt"]["repr"] = repr_component::compute_representation(ent_ptr);
             if constexpr (has_member_expirience_components<entT>::value) {
-                auto exp_p = expirience_components::get_level(ent_ptr);
+                auto exp_p = expirience_components::get_level<entT>(ent_ptr);
                 j_local["exp_cpt"]["level"] = exp_p.first;
                 j_local["exp_cpt"]["exp_until_next_level"] = exp_p.second;
                 j_local["exp_cpt"]["experience"] = ent_ptr->exp_cpt.exp;
             }
+            lwlog_info("serializing thing of type: %s", typeid(ent_ptr).name());
+            lwlog_info("checking if it is a player via %s against %s", typeid(entT).name(), typeid(player).name());
             if constexpr (std::is_same_v<entT, player>) {
+                lwlog_info("it is a player!");
                 auto ret_j = nlohmann::json();
                 ret_j["player"] = j_local;
                 return ret_j;
             } else {
+                lwlog_info("it is not a player!");
                 auto ret_j = nlohmann::json();
                 ret_j["entity"] = j_local;
                 return ret_j;
@@ -41,12 +52,13 @@ void roguelike::to_json(nlohmann::json &j, const roguelike::entity_type &p) {
         },
         p);
 }
-void roguelike::from_json(const nlohmann::json &j, roguelike::entity_type &p) {
+void roguelike::from_json(const nlohmann::json &j, roguelike::const_entity_type &p) {
     throw std::runtime_error("One CAN NOT construct entity type from it's serialization");
 }
 
 void roguelike::to_json(nlohmann::json &j, const logging_component &p) { j["log"] = p.log.str(); }
 void roguelike::from_json(const nlohmann::json &j, logging_component &p) { p.log << j["log"]; }
+
 void roguelike::to_json(nlohmann::json &j, const roguelike::simple_inventory_component &p) {
     static constexpr auto item_spots = magic_enum::enum_entries<simple_inventory_component::inventory_spot>();
     j = nlohmann::json::array();
@@ -78,12 +90,22 @@ void roguelike::to_json(nlohmann::json &j, const gamestate &p) {
             continue;
         }
         auto id = tle.resident.value();
-        entity_type resident = p.get_entity(id);
+        auto resident = p.get_entity(id);
         auto resident_json = nlohmann::json();
         to_json(resident_json, resident);
         cur_tile_json["tile"] = resident_json;
         room_json.push_back(cur_tile_json);
     }
+
+    auto players_json = nlohmann::json();
+    lwlog_info("Serializing players: %ld", p.players.size());
+    for(auto& it : p.players){
+        auto& plr = it.second;
+        auto var_ent = &plr;
+        to_json(players_json[std::to_string(it.first)], var_ent);
+    }
+
+    j["players"] = players_json;
     j["level"] = room_json;
 }
 void roguelike::from_json(const nlohmann::json &j, roguelike::gamestate &p) {

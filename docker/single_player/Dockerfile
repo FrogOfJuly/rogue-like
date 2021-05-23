@@ -11,7 +11,7 @@ RUN apt-get update && \
 RUN git clone --single-branch --branch soft_deadline_2 --recurse-submodules https://github.com/FrogOfJuly/roguelike.git
 
 RUN cd roguelike
-RUN pip3 install ./roguelike
+RUN pip3 install ./roguelike --verbose
 CMD cd roguelike/python_src && \
     echo "nohup python3 server.py &\n" | bash && \
     sleep 1s && \

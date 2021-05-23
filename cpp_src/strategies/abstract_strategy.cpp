@@ -8,3 +8,4 @@
 
 void roguelike::strategy::set_view(const roguelike::room_view& _view) { this->view = std::make_unique<room_view>(_view); }
 void roguelike::strategy::discard_view() { this->view.reset(); }
+roguelike::strategy::~strategy() {}
