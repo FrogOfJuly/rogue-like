@@ -87,21 +87,16 @@ def render(stdscr, game_state: dict, flags: dict):
     # print(game_state)
     if game_state == {'start'}:
         return
+    player = None
+    if str(player_id) in game_state['players']:
+        player = game_state['players'][str(player_id)]['player']
+    else:
+        s.send(pickle.dumps(['death', False]))
+        disconnect(f"You died!, {', '.join(game_state['players'])}: {player_id}")
     game_state = game_state['level']
     H = int(math.sqrt(len(game_state)))
     W = H
     legend = {}
-    player = None
-    for tile_ in game_state:
-        tile = tile_["tile"]
-        if tile and "player" in tile:
-            player = tile["player"]
-            newlog = player["lg_cpt"]["log"].split("\n")
-            log += list(filter(lambda x: x != '', newlog))
-            break
-    if not player:
-        s.send(pickle.dumps(['exit', False]))
-        disconnect("You died!")
     # Level
     for i in range(H):
         for j in range(W):

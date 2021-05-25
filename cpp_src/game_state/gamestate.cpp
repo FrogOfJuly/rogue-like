@@ -90,6 +90,18 @@ void roguelike::gamestate::move_players() {
 }
 int roguelike::gamestate::receive_player_command(int player_id, roguelike::cmd command) {
     lwlog_info("getting command %d for player %d", command, player_id);
+    if (player_id == -1) {
+        while (not command_to_receive.empty()) {
+            auto next_player_id = command_to_receive.front();
+            if (received_command.count(next_player_id) == 0 and dead_players.count(next_player_id) == 0) {
+                lwlog_info("next player to receive command is %d", next_player_id);
+                command_to_receive.pop();
+                return next_player_id;
+            }
+            command_to_receive.pop();
+        }
+        throw std::runtime_error("Everyone is dead");
+    }
     if (players.count(player_id) == 0) {
         throw std::runtime_error("No such player id: " + std::to_string(player_id));
     }
@@ -103,6 +115,7 @@ int roguelike::gamestate::receive_player_command(int player_id, roguelike::cmd c
         auto next_player_id = command_to_receive.front();
         if (received_command.count(next_player_id) == 0 and dead_players.count(next_player_id) == 0) {
             lwlog_info("next player to receive command is %d", next_player_id);
+            command_to_receive.pop();
             return next_player_id;
         }
         command_to_receive.pop();

@@ -53,6 +53,12 @@ The second is determined by it.
 
     A response to a `move` message.
     Sends the player input back to the server.
+
+- `death`
+
+  Parameter: `dummy` (bool)
+
+  Command to signal the player is dead.
   
 - `exit`
 

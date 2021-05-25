@@ -41,19 +41,10 @@ class Backend:
         data = json.loads(self.state.get_serialization())
         return player_id, data
 
-    def turn(self):
-        pass
-
     def get_state(self):
         return json.loads(self.state.get_serialization())
 
-    def player_action(self, player_id: int, action: cmd):
-        # Currently the game is single player
-        # We'll have to decide on the multiplayer model eventually
-        # And most of this will be moved to the turn function.
-        print(f"Sent action {action} from player {player_id} to backend")
-        self.state.receive_player_command(player_id, action)
-        self.state.move_players()
+    def turn(self):
         self.state.resolve_all_interactions()
         self.state.move_nonplayers()
         self.state.resolve_all_interactions()
@@ -63,7 +54,20 @@ class Backend:
 
         data = json.loads(self.state.get_serialization())
         self.state.clean_logs()
-        return data, player_id
+        return data
+
+    def player_action(self, player_id: int, action: cmd):
+        print(f"Sent action {action} from player {player_id} to backend")
+        next_player = self.state.receive_player_command(player_id, action)
+        self.state.move_players()
+        if next_player == -1:
+            print("All players moved, moving enemies")
+            data = self.turn()
+            next_player = self.state.receive_player_command(-1)
+        else:
+            data = json.loads(self.state.get_serialization())
+        print(f'Next player to move is {next_player}')
+        return data, next_player
 
     def player_connect(self, player_id: int):
         print(f"Initializing player {player_id} at the backend")
@@ -138,16 +142,16 @@ def append_or_activate_client(new_client):
     print(f'Active player count: {active_players}')
     for i in range(len(outgoing)):
         if outgoing[i].player_id == new_client.player_id:
+            if not outgoing[i].alive:
+                print(f'Player {new_client.player_id} is already dead, rejecting')
+                return "reject"
             outgoing[i] = new_client
             print(f'Re-activated player {new_client.player_id}')
             active_players += 1
             print(f'New active player count: {active_players}')
-            global last_state
-            print(f'Last_state is {"not " if last_state is not None else ""}None')
-            if active_players == 1 and last_state is not None:
-                print('Re-starting game')
-                next_turn(new_client.player_id, last_state)
-            return
+            return "reactivate"
+    if active_players >= num_players:
+        return "reject"
     outgoing.append(new_client)
     active_players += 1
     print(f'New active player count: {active_players}')
@@ -189,27 +193,46 @@ class SecondaryServer(asyncore.dispatcher_with_send):
                 if content != self.id:
                     self.id = content
                     print(f'Player has chosen id {self.id}')
+                res = append_or_activate_client(RemoteDrawClient(self.sock, self.id))
+                if res == 'reject':
+                    self.handle_close('reject')
+                    return
+
                 backend.player_connect(self.id)
-                append_or_activate_client(RemoteDrawClient(self.sock, self.id))
+                if res == 'reactivate':
+                    global last_state
+                    print(f'Last_state is {"not " if last_state is not None else ""}None')
+                    if active_players == 1 and last_state is not None:
+                        print('Re-starting game')
+                        next_turn(self.id, last_state)
+                        return
                 if active_players == num_players and not started:
                     start_game()
+                    return
+
+            if message == 'death':
+                print(f'Player {self.id} has died')
+                self.handle_close('death')
             if message == "action":
                 forward_player_action(content)
         else:
             print(f"Received no data from {self.id}, setting the connection to inactive")
             self.handle_close()
 
-    def handle_close(self):
-        for client in outgoing:
-            if client.player_id == self.id:
-                if client.active:
-                    print(f'Player {self.id} has disconnected.')
-                    client.active = False
-                    global active_players
-                    active_players -= 1
-                    backend.player_disconnect(self.id)
-                    print(f"New active player count: {active_players}")
-                break
+    def handle_close(self, reason=''):
+        if reason == 'reject':
+            print(f"Rejecting connection from player f{self.id}")
+        else:
+            for client in outgoing:
+                if client.player_id == self.id:
+                    if client.active:
+                        print(f'Player {self.id} has disconnected.')
+                        client.active = False
+                        global active_players
+                        active_players -= 1
+                        backend.player_disconnect(self.id)
+                        print(f"New active player count: {active_players}")
+                    break
         self.close()
         # raise Exception("Unregistered Player")
 
