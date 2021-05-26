@@ -138,10 +138,19 @@ def start_game():
     next_turn(first_player, game_state)
 
 
+def is_active_and_alive(player_id):
+    for client in outgoing:
+        if player_id == client.player_id:
+            return client.active and client.alive
+    return False
+
 def forward_player_action(player_action):
     player_id, action = player_action
-    print(f"Received action {action} from player {player_id}")
+    print(f"Received action {action} from player {player_id}.")
     new_game_state, next_player_id = backend.player_action(player_id, action)
+    while not is_active_and_alive(next_player_id):
+        print(f'Player {next_player_id} is dead or inactive, requesting new action.')
+        new_game_state, next_player_id = backend.player_action(player_id, cmd.PASS)
     next_turn(next_player_id, new_game_state)
 
 
@@ -157,6 +166,7 @@ def append_or_activate_client(new_client):
             print(f'Re-activated player {new_client.player_id}')
             active_players += 1
             print(f'New active player count: {active_players}')
+            new_client.update_state(last_state)
             return "reactivate"
     if active_players >= num_players:
         return "reject"
@@ -221,7 +231,6 @@ class SecondaryServer(asyncore.dispatcher_with_send):
                     self.handle_close('reject')
                     return
 
-                backend.player_connect(self.id)
                 if res == 'reactivate':
                     global last_state
                     print(f'Last_state is {"not " if last_state is not None else ""}None')
@@ -229,8 +238,10 @@ class SecondaryServer(asyncore.dispatcher_with_send):
                         print('Re-starting game')
                         next_turn(self.id, last_state)
                         return
-                if active_players == num_players and not started:
-                    start_game()
+                else:
+                    backend.player_connect(self.id)
+                    if active_players == num_players and not started:
+                        start_game()
                     return
 
             if message == 'death':
@@ -258,6 +269,9 @@ class SecondaryServer(asyncore.dispatcher_with_send):
                         active_players -= 1
                         backend.player_disconnect(self.id)
                         print(f"New active player count: {active_players}")
+                        if last_player_id == self.id and active_players > 0:
+                            print(f"Player {self.id} was active, sending PASS to the backend.")
+                            forward_player_action([self.id, cmd.PASS])
                     break
         self.close()
         # raise Exception("Unregistered Player")
