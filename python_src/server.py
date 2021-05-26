@@ -169,7 +169,7 @@ def append_or_activate_client(new_client):
             print(f'New active player count: {active_players}')
             new_client.update_state(last_state)
             return "reactivate"
-    if active_players >= num_players:
+    if active_players >= num_players or len(outgoing) >= num_players:
         return "reject"
     outgoing.append(new_client)
     active_players += 1
@@ -239,6 +239,7 @@ class SecondaryServer(asyncore.dispatcher_with_send):
                     print(f'Player has chosen id {self.id}')
                 res = append_or_activate_client(RemoteDrawClient(self.sock, self.id))
                 if res == 'reject':
+                    self.sock.send(pickle.dumps(['reject', "Too many players"]))
                     self.handle_close('reject')
                     return
 
