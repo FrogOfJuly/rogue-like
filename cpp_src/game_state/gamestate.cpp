@@ -86,6 +86,7 @@ void roguelike::gamestate::move_players() {
         lwlog_info("moving player %d with decision %d", plr.id.value, plr.dm_cpt.decision);
         entity_type var_ent = &plr;
         mv_system.more_general_move(var_ent);
+        plr.dm_cpt.decision = cmd::PASS;
     }
 }
 int roguelike::gamestate::receive_player_command(int player_id, roguelike::cmd command) {
