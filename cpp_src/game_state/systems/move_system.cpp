@@ -80,12 +80,12 @@ bool roguelike::move_system::more_general_move(entity_type &var_ent) {
             constexpr bool able_to_dm = has_member_decision_making_component<entT>::value;
             constexpr bool able_to_move = has_member_move_component<entT>::value;
             constexpr bool has_inventory = has_member_simple_inventory_component<entT>::value;
-            lwlog_info("checking flag for %s", typeid(entT).name());
-            lwlog_info("Flags: %d, %d, %d", able_to_dm, able_to_move, has_inventory);
+            lwlog_debug("checking flag for %s", typeid(entT).name());
+            lwlog_debug("Flags: %d, %d, %d", able_to_dm, able_to_move, has_inventory);
 
             if constexpr (able_to_dm and has_inventory) {
                 auto active_slot = simple_inventory_component::inventory_spot::potion;
-                lwlog_info("Somebody has dm and inventory");
+                lwlog_debug("Somebody has dm and inventory");
                 bool has_active_slot = ent_ptr->s_inv_cpt.spots.count(active_slot) != 0;
                 if (ent_ptr->dm_cpt.decision == cmd::ENTER and has_active_slot) {
                     lwlog_info("received enter command with nonempty spot");

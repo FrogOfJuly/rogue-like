@@ -36,15 +36,11 @@ void roguelike::to_json(nlohmann::json &j, const roguelike::const_entity_type &p
                 j_local["exp_cpt"]["exp_until_next_level"] = exp_p.second;
                 j_local["exp_cpt"]["experience"] = ent_ptr->exp_cpt.exp;
             }
-            lwlog_info("serializing thing of type: %s", typeid(ent_ptr).name());
-            lwlog_info("checking if it is a player via %s against %s", typeid(entT).name(), typeid(player).name());
             if constexpr (std::is_same_v<entT, player>) {
-                lwlog_info("it is a player!");
                 auto ret_j = nlohmann::json();
                 ret_j["player"] = j_local;
                 return ret_j;
             } else {
-                lwlog_info("it is not a player!");
                 auto ret_j = nlohmann::json();
                 ret_j["entity"] = j_local;
                 return ret_j;
