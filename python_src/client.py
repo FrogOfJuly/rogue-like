@@ -90,9 +90,13 @@ def render(stdscr, game_state: dict, flags: dict):
     player = None
     if str(player_id) in game_state['players']:
         player = game_state['players'][str(player_id)]['player']
-    else:
+        newlog = player["lg_cpt"]["log"].split("\n")
+        log += list(filter(lambda x: x != '', newlog))
+        while len(log) > printed_log_len:
+            log.pop(0)
+    if not player or player['h_cpt']['health'] <= 0:
         s.send(pickle.dumps(['death', False]))
-        disconnect(f"You died!, {', '.join(game_state['players'])}: {player_id}")
+        disconnect(f"You died!")
     game_state = game_state['level']
     H = int(math.sqrt(len(game_state)))
     W = H
@@ -162,7 +166,7 @@ def render(stdscr, game_state: dict, flags: dict):
     stdscr.addstr(5, W * 3 + 1, f"{'Damage:':9} {player['a_cpt']['damage']}")
     stdscr.addstr(7, W * 3 + 1, f'log:')
 
-    for i, entry in enumerate(log[-printed_log_len:]):
+    for i, entry in enumerate(log):
         stdscr.addstr(8 + i, W * 3 + 1, f'> {entry}')
     if len(log) < printed_log_len:
         for i in range(printed_log_len - len(log)):

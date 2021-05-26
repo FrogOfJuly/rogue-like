@@ -117,7 +117,7 @@ int roguelike::gamestate::receive_player_command(int player_id, roguelike::cmd c
     }
     lwlog_info("all players got their commands");
     if (player_id == -1) {
-        throw std::runtime_error("Everyone is dead");
+        return -2;
     }
     return -1;
 }

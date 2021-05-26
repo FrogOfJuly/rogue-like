@@ -149,6 +149,9 @@ def forward_player_action(player_action):
     player_id, action = player_action
     print(f"Received action {action} from player {player_id}.")
     new_game_state, next_player_id = backend.player_action(player_id, action)
+    if next_player_id == -2:
+        shutdown("Everyone is dead")
+        return
     while not is_active_and_alive(next_player_id):
         print(f'Player {next_player_id} is dead or inactive, requesting new action.')
         new_game_state, next_player_id = backend.player_action(player_id, cmd.PASS)
