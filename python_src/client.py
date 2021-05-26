@@ -187,8 +187,9 @@ def render(stdscr, game_state: dict, flags: dict):
         stdscr.addstr(H + 3, 0, f'E for potion.')
         stdscr.addstr(H + 4, 0, f'F to skip turn.')
         stdscr.addstr(H + 4, 0, f'L for the legend.')
-        stdscr.addstr(H + 5, 0, f'P to pause game (temporarily disconnect).')
-        stdscr.addstr(H + 6, 0, f'X to exit game.')
+        stdscr.addstr(H + 5, 0, f'F to pass.')
+        stdscr.addstr(H + 6, 0, f'P to pause game (temporarily disconnect).')
+        stdscr.addstr(H + 7, 0, f'X to exit game.')
     elif 'waiting' in flags:
         stdscr.addstr(H + 2, 0, 'Awaiting turn')
     stdscr.refresh()
