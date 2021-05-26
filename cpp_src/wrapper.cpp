@@ -29,6 +29,8 @@ PYBIND11_MODULE(roguelike, m) {
             py::arg("player_idx") = -1,
             py::arg("command") = roguelike::cmd::PASS)
         .def("resolve_all_interactions", &roguelike::gamestate::resolve_all_interactions)
+        .def("move_target_player", &roguelike::gamestate::move_target_player)
+        .def("set_decision_target_player", &roguelike::gamestate::set_decision_target_player)
         .def("move_players", &roguelike::gamestate::move_players)
         .def("move_nonplayers", &roguelike::gamestate::move_nonplayers)
         .def("clean_dead", &roguelike::gamestate::clean_dead)

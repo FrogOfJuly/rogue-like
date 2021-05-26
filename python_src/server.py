@@ -46,7 +46,6 @@ class Backend:
         return json.loads(self.state.get_serialization())
 
     def turn(self):
-        self.state.resolve_all_interactions()
         self.state.move_nonplayers()
         self.state.resolve_all_interactions()
 
@@ -60,7 +59,8 @@ class Backend:
     def player_action(self, player_id: int, action: cmd):
         print(f"Sent action {action} from player {player_id} to backend")
         next_player = self.state.receive_player_command(player_id, action)
-        self.state.move_players()
+        self.state.move_target_player(player_id)
+        self.state.resolve_all_interactions()
         if next_player == -1:
             print("All players moved, moving enemies")
             data = self.turn()
