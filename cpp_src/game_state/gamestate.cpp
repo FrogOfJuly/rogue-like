@@ -68,15 +68,15 @@ void roguelike::gamestate::move_nonplayers() {
     for (auto &var_ent : level.residents) {
         bool is_dead = std::visit(
             [this](auto *ent_ptr) {
-                lwlog_info("-checking if entity %d is despawned", ent_ptr->id.value);
+                lwlog_debug("-checking if entity %d is despawned", ent_ptr->id.value);
                 return level.despawned.count(ent_ptr->id.value) != 0;
             },
             var_ent);
         if (is_dead) {
-            lwlog_info("-it is despawned. Skipping");
+            lwlog_debug("-it is despawned. Skipping");
             continue;
         }
-        lwlog_info("-it is not despawned. Making move");
+        lwlog_debug("-it is NOT despawned. Making move");
         mv_system.more_general_move(var_ent);
     }
 }
@@ -86,11 +86,12 @@ void roguelike::gamestate::move_players() {
         lwlog_info("moving player %d with decision %d", plr.id.value, plr.dm_cpt.decision);
         entity_type var_ent = &plr;
         mv_system.more_general_move(var_ent);
+        plr.dm_cpt.decision = cmd::PASS;
     }
 }
 int roguelike::gamestate::receive_player_command(int player_id, roguelike::cmd command) {
     lwlog_info("getting command %d for player %d", command, player_id);
-    if (player_id >= players.size()) {
+    if (player_id >= 0 and players.count(player_id) == 0) {
         throw std::runtime_error("No such player id: " + std::to_string(player_id));
     }
     if (player_id >= 0) {  // if player_id < 0, then just return next player in queue
@@ -100,9 +101,10 @@ int roguelike::gamestate::receive_player_command(int player_id, roguelike::cmd c
         }
     }
     while (not command_to_receive.empty()) {
-        auto next_player_id = command_to_receive.front();
+        auto next_player_id = command_to_receive.top();
         if (received_command.count(next_player_id) == 0 and dead_players.count(next_player_id) == 0) {
             lwlog_info("next player to receive command is %d", next_player_id);
+            command_to_receive.pop();
             return next_player_id;
         }
         command_to_receive.pop();
@@ -114,23 +116,24 @@ int roguelike::gamestate::receive_player_command(int player_id, roguelike::cmd c
         command_to_receive.push(plr.id.value);  // enqueue all players for commands
     }
     lwlog_info("all players got their commands");
+    if (player_id == -1) {
+        return -2;
+    }
     return -1;
 }
 void roguelike::gamestate::initialize(int player_number) {
     lwlog_info("Initializning gamestate object");
-    lwlog_info("allocating  player objects");
     lvl_num = 0;
     level.generate_terrain(lvl_num);
     lwlog_info("generated level");
-    for (int i = 0; i < player_number; ++i) {
+    for (const auto &it : players) {
         lwlog_info("placing player");
-        players.emplace(std::make_pair(i, i));
-        players.at(i).dm_cpt.decision = cmd::PASS;
-        entity_type var_ent = &players.at(i);
+        auto player_id = it.first;
+        entity_type var_ent = &players.at(player_id);
         auto rnd_tile = level.get_random_empty_tile();
         level.spawn_on_level(var_ent, rnd_tile);
     }
-    lwlog_info("spawned players");
+    lwlog_info("spawned players %ld", players.size());
     level.generate_enemies(lvl_num);
 }
 void roguelike::gamestate::end_turn() {
@@ -143,7 +146,7 @@ void roguelike::gamestate::decide_next_move() {
     for (auto &var_ent : level.residents) {
         bool is_dead = std::visit(
             [this](auto *ent_ptr) {
-                lwlog_info("-checking if entity %d is despawned", ent_ptr->id.value);
+                lwlog_debug("-checking if entity %d is despawned", ent_ptr->id.value);
                 return level.despawned.count(ent_ptr->id.value) != 0;
             },
             var_ent);
@@ -151,7 +154,7 @@ void roguelike::gamestate::decide_next_move() {
             lwlog_info("-it is despawned. Skipping");
             continue;
         }
-        lwlog_info("-it is not despawned. Making decision");
+        lwlog_debug("-it is not despawned. Making decision");
         dm_system.make_decision(var_ent);
     }
     for (auto &it : players) {
@@ -161,9 +164,27 @@ void roguelike::gamestate::decide_next_move() {
     }
 }
 
-roguelike::player *roguelike::gamestate::get_player(roguelike::player_id id) const { return &players.at(id.value); }
+const roguelike::player *roguelike::gamestate::get_player(roguelike::player_id id) const {
+    return &players.at(id.value);
+}
+roguelike::const_entity_type roguelike::gamestate::get_entity(roguelike::general_id id) const {
+    return std::visit(
+        overloaded{
+            [this](player_id id) {
+                lwlog_info("-player with id %d", id.value);
+                const_entity_type plr = get_player(id);
+                return plr;
+            },
+            [this](entity_id id) {
+                lwlog_debug("-residnet with id %d", id.value);
+                const_entity_type var_ent = level.get_resident(id);
+                return var_ent;
+            }},
+        id);
+}
 
-roguelike::entity_type roguelike::gamestate::get_entity(roguelike::general_id id) const {
+roguelike::player *roguelike::gamestate::get_player(roguelike::player_id id) { return &players.at(id.value); }
+roguelike::entity_type roguelike::gamestate::get_entity(roguelike::general_id id) {
     return std::visit(
         overloaded{
             [this](player_id id) {
@@ -173,12 +194,13 @@ roguelike::entity_type roguelike::gamestate::get_entity(roguelike::general_id id
             },
             [this](entity_id id) {
                 lwlog_debug("-residnet with id %d", id.value);
-                return level.get_resident(id);
+                entity_type var_ent = level.get_resident(id);
+                return var_ent;
             }},
         id);
 }
 void roguelike::gamestate::report_despawn(roguelike::general_id mdred_id) {
-    lwlog_info("reporting murder");
+    lwlog_info("reporting despawn");
     std::visit(
         overloaded{
             [this](player_id id) {
@@ -191,4 +213,21 @@ void roguelike::gamestate::report_despawn(roguelike::general_id mdred_id) {
                 level.despawned.insert(id.value);
             }},
         mdred_id);
+}
+void roguelike::gamestate::initialize_player(int player_id) {
+    lwlog_info("placing player %d", player_id);
+    players.emplace(std::make_pair(player_id, player_id));
+    players.at(player_id).dm_cpt.decision = cmd::PASS;
+    command_to_receive.push(player_id);
+}
+void roguelike::gamestate::move_target_player(int player_id) {
+    auto &plr = players.at(player_id);
+    lwlog_info("moving player %d with decision %d", plr.id.value, plr.dm_cpt.decision);
+    entity_type var_ent = &plr;
+    mv_system.more_general_move(var_ent);
+}
+void roguelike::gamestate::set_decision_target_player(int player_id, roguelike::cmd command) {
+    auto &plr = players.at(player_id);
+    lwlog_info("setting player %d with decision %d", plr.id.value, command);
+    plr.dm_cpt.decision = command;
 }

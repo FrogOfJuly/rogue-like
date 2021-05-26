@@ -1,5 +1,8 @@
 import math
 import pickle
+from random import choice
+from time import sleep
+
 import select
 import socket
 import sys
@@ -16,6 +19,8 @@ parser.add_argument("-p", "--port", default=4321, type=int, dest='port',
                     help="Port number of the server")
 parser.add_argument("-a", "--address", default='127.0.0.1', type=str, dest='server_addr',
                     help="IP address of the server")
+parser.add_argument("-r", "--random", default=False, action="store_true",
+                    help="Enable highly sophisticated AI")
 parser.add_argument("-l", "--log", default=False, action="store_true",
                     help="Enable game state logging")
 args = parser.parse_args()
@@ -87,21 +92,20 @@ def render(stdscr, game_state: dict, flags: dict):
     # print(game_state)
     if game_state == {'start'}:
         return
+    player = None
+    if str(player_id) in game_state['players']:
+        player = game_state['players'][str(player_id)]['player']
+        newlog = player["lg_cpt"]["log"].split("\n")
+        log += list(filter(lambda x: x != '', newlog))
+        while len(log) > printed_log_len:
+            log.pop(0)
+    if not player or player['h_cpt']['health'] <= 0:
+        s.send(pickle.dumps(['death', False]))
+        disconnect(f"You died!")
     game_state = game_state['level']
     H = int(math.sqrt(len(game_state)))
     W = H
     legend = {}
-    player = None
-    for tile_ in game_state:
-        tile = tile_["tile"]
-        if tile and "player" in tile:
-            player = tile["player"]
-            newlog = player["lg_cpt"]["log"].split("\n")
-            log += list(filter(lambda x: x != '', newlog))
-            break
-    if not player:
-        s.send(pickle.dumps(['exit']))
-        disconnect("You died!")
     # Level
     for i in range(H):
         for j in range(W):
@@ -167,7 +171,7 @@ def render(stdscr, game_state: dict, flags: dict):
     stdscr.addstr(5, W * 3 + 1, f"{'Damage:':9} {player['a_cpt']['damage']}")
     stdscr.addstr(7, W * 3 + 1, f'log:')
 
-    for i, entry in enumerate(log[-printed_log_len:]):
+    for i, entry in enumerate(log):
         stdscr.addstr(8 + i, W * 3 + 1, f'> {entry}')
     if len(log) < printed_log_len:
         for i in range(printed_log_len - len(log)):
@@ -188,8 +192,9 @@ def render(stdscr, game_state: dict, flags: dict):
         stdscr.addstr(H + 3, 0, f'E for potion.')
         stdscr.addstr(H + 4, 0, f'F to skip turn.')
         stdscr.addstr(H + 4, 0, f'L for the legend.')
-        stdscr.addstr(H + 5, 0, f'P to pause game (temporarily disconnect).')
-        stdscr.addstr(H + 6, 0, f'X to exit game.')
+        stdscr.addstr(H + 5, 0, f'F to pass.')
+        stdscr.addstr(H + 6, 0, f'P to pause game (temporarily disconnect).')
+        stdscr.addstr(H + 7, 0, f'X to exit game.')
     elif 'waiting' in flags:
         stdscr.addstr(H + 2, 0, 'Awaiting turn')
     stdscr.refresh()
@@ -248,7 +253,7 @@ def main(stdscr):
         #     data.append(packet)
         # message, content = pickle.loads(b"".join(data))
         message, content = pickle.loads(s.recv(BUFFERSIZE))
-        if message == 'reject':
+        if message == 'reject' or message == 'shutdown':
             disconnect(content)
         elif message == 'id':
             if not force_id:
@@ -268,7 +273,12 @@ def main(stdscr):
             render(stdscr, content, {'waiting': True})
         if message == 'move':
             render(stdscr, content, {})
-            ge = ['action', (player_id, get_action(content))]
+            if args.random:
+                sleep(1)
+                action = choice([cmd.UP, cmd.DOWN, cmd.LEFT, cmd.RIGHT])
+            else:
+                action = get_action(content)
+            ge = ['action', (player_id, action)]
             s.send(pickle.dumps(ge))
 
 

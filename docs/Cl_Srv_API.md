@@ -35,6 +35,12 @@ The second is determined by it.
     
     The updated game state is sent to all active players who aren't moving yet.
     They are not expected to reply.
+  
+- `shutdown`
+
+    Parameter: 'message' (str)
+    
+    Signals the game was shut down or is over.
 
 ### Client to server messages
 
@@ -53,6 +59,12 @@ The second is determined by it.
 
     A response to a `move` message.
     Sends the player input back to the server.
+
+- `death`
+
+  Parameter: `dummy` (bool)
+
+  Command to signal the player is dead.
   
 - `exit`
 
