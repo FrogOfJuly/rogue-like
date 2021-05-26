@@ -5,18 +5,9 @@ from time import sleep
 import socket
 import json  # for logging only
 import curses
-from enum import Enum
+from command import Cmd
 import os
 import argparse
-
-class cmd(Enum):
-    UP=0
-    DOWN = 1
-    LEFT = 2
-    RIGHT = 3
-    ENTER = 4
-    ESC = 5
-    PASS = 6
 
 parser = argparse.ArgumentParser(description="Client for Crypt of the Darkness")
 parser.add_argument("-i", "--player_id", default=0, type=int, dest='player_id',
@@ -215,22 +206,22 @@ def get_action(game_state: dict):
         while key != -1:
             key = stdscr.getch()
         stdscr.nodelay(False)
-    action = cmd.PASS
+    action = Cmd.PASS
     valid = False
     while not valid:
         valid = True
         key = stdscr.getch()
         if key is not None:
             if key == ord('w'):
-                action = cmd.UP
+                action = Cmd.UP
             elif key == ord('s'):
-                action = cmd.DOWN
+                action = Cmd.DOWN
             elif key == ord('a'):
-                action = cmd.LEFT
+                action = Cmd.LEFT
             elif key == ord('d'):
-                action = cmd.RIGHT
+                action = Cmd.RIGHT
             elif key == ord('e'):
-                action = cmd.ENTER
+                action = Cmd.ENTER
             elif key == ord('p'):
                 disconnect(f"Paused game. Return with id {player_id}")
             elif key == ord('x'):
@@ -289,10 +280,10 @@ def main(stdscr):
             render(stdscr, content, {})
             if args.random:
                 sleep(1)
-                action = choice([cmd.UP, cmd.DOWN, cmd.LEFT, cmd.RIGHT])
+                action = choice([Cmd.UP, Cmd.DOWN, Cmd.LEFT, Cmd.RIGHT])
             else:
                 action = get_action(content)
-            ge = ['action', (player_id, action.value)]
+            ge = ['action', (player_id, action)]
             s.send(pickle.dumps(ge))
 
 

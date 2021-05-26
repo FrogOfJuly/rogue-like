@@ -4,8 +4,7 @@ import random
 import pickle
 import json
 import roguelike as rl
-from enum import Enum
-from roguelike import cmd
+from command import Cmd
 import argparse
 
 parser = argparse.ArgumentParser(description="Server for Crypt of the Darkness")
@@ -57,9 +56,9 @@ class Backend:
         self.state.clean_logs()
         return data
 
-    def player_action(self, player_id: int, action: cmd):
+    def player_action(self, player_id: int, action: Cmd):
         print(f"Sent action {action} from player {player_id} to backend")
-        next_player = self.state.receive_player_command(player_id, action)
+        next_player = self.state.receive_player_command(player_id, action.value)
         self.state.move_target_player(player_id)
         self.state.resolve_all_interactions()
         if next_player == -1:
@@ -147,7 +146,7 @@ def is_active_and_alive(player_id):
     return False
 
 
-def forward_player_action(player_id: int, action: cmd):
+def forward_player_action(player_id: int, action: Cmd):
     print(f"Received action {action} from player {player_id}.")
     new_game_state, next_player_id = backend.player_action(player_id, action)
     if next_player_id == -2:
@@ -155,7 +154,7 @@ def forward_player_action(player_id: int, action: cmd):
         return
     while not is_active_and_alive(next_player_id):
         print(f'Player {next_player_id} is dead or inactive, requesting new action.')
-        new_game_state, next_player_id = backend.player_action(player_id, cmd.PASS)
+        new_game_state, next_player_id = backend.player_action(player_id, Cmd.PASS)
     next_turn(next_player_id, new_game_state)
 
 
@@ -202,23 +201,6 @@ def shutdown(reason: str):
             print(f'Player {client.player_id} has been disconnected due to shutdown.')
     print(f'The server has shut down successfully')
     exit()
-
-
-def get_cmd(action: int):
-    if action == 0:
-        return cmd.UP
-    if action == 1:
-        return cmd.DOWN
-    if action == 2:
-        return cmd.LEFT
-    if action == 3:
-        return cmd.RIGHT
-    if action == 4:
-        return cmd.ENTER
-    if action == 5:
-        return cmd.ESC
-    if action == 6:
-        return cmd.PASS
 
 
 class MainServer(asyncore.dispatcher):
@@ -281,7 +263,8 @@ class SecondaryServer(asyncore.dispatcher_with_send):
                 self.handle_close('death')
             if message == "action":
                 player_id, action = content
-                forward_player_action(player_id, get_cmd(action))
+                print(f"Received {action} from player {player_id}")
+                forward_player_action(player_id, action)
         else:
             print(f"Received no data from {self.id}, setting the connection to inactive")
             self.handle_close()
@@ -306,7 +289,7 @@ class SecondaryServer(asyncore.dispatcher_with_send):
                             kill_player(self.id)
                         if last_player_id == self.id and active_players > 0 and reason != 'closed':
                             print(f"Player {self.id} was active, sending PASS to the backend.")
-                            forward_player_action(self.id, cmd.PASS)
+                            forward_player_action(self.id, Cmd.PASS)
                     break
         self.close()
         # raise Exception("Unregistered Player")
