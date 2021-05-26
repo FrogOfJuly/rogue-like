@@ -6,6 +6,7 @@
 #include <variant>
 
 #include "../serializers/serialize_info.h"
+#include "../common.h"
 
 roguelike::gamestate::gamestate() noexcept : mv_system(this), inter_system(this), dm_system(this) { srand(time(NULL)); }
 roguelike::gamestate::gamestate(gamestate &&rhs) noexcept : gamestate() { *this = std::move(rhs); }
@@ -23,6 +24,28 @@ roguelike::gamestate &roguelike::gamestate::operator=(roguelike::gamestate &&rhs
     dm_system.reset_owner(this);
 
     return *this;
+}
+
+roguelike::cmd roguelike::gamestate::cmdFromInt(int c){
+    //UP = 0, DOWN, LEFT, RIGHT, ENTER, ESC, PASS
+    switch (c){
+        case 0:
+            return cmd::UP;
+        case 1:
+            return cmd::DOWN;
+        case 2:
+            return cmd::LEFT;
+        case 3:
+            return cmd::RIGHT;
+        case 4:
+            return cmd::ENTER;
+        case 5:
+            return cmd::ESC;
+        case 6:
+            return cmd::PASS;
+        default:
+            throw std::runtime_error("illegal integer for command: " + std::to_string(c));
+    }
 }
 
 std::string roguelike::gamestate::get_serialization() const {
@@ -89,7 +112,8 @@ void roguelike::gamestate::move_players() {
         plr.dm_cpt.decision = cmd::PASS;
     }
 }
-int roguelike::gamestate::receive_player_command(int player_id, roguelike::cmd command) {
+int roguelike::gamestate::receive_player_command(int player_id, int c) {
+    auto command = cmdFromInt(c);
     lwlog_info("getting command %d for player %d", command, player_id);
     if (player_id >= 0 and players.count(player_id) == 0) {
         throw std::runtime_error("No such player id: " + std::to_string(player_id));
@@ -226,7 +250,8 @@ void roguelike::gamestate::move_target_player(int player_id) {
     entity_type var_ent = &plr;
     mv_system.more_general_move(var_ent);
 }
-void roguelike::gamestate::set_decision_target_player(int player_id, roguelike::cmd command) {
+void roguelike::gamestate::set_decision_target_player(int player_id, int c) {
+    auto command = cmdFromInt(c);
     auto &plr = players.at(player_id);
     lwlog_info("setting player %d with decision %d", plr.id.value, command);
     plr.dm_cpt.decision = command;

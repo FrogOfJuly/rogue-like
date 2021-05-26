@@ -41,10 +41,12 @@ namespace roguelike {
 
         void report_despawn(general_id mdred_id);
 
+        static cmd cmdFromInt(int c);
+
       public:
         void initialize(int player_num);
         void initialize_player(int player_id);
-        int receive_player_command(int player_id, cmd command);
+        int receive_player_command(int player_id, int c);
         void move_players();
         void move_nonplayers();
         void decide_next_move();
@@ -55,7 +57,7 @@ namespace roguelike {
         void end_turn();
 
         void move_target_player(int player_id);
-        void set_decision_target_player(int player_id, cmd command);
+        void set_decision_target_player(int player_id, int c);
 
 
         [[nodiscard]] std::string get_serialization() const;
