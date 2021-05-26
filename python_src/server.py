@@ -19,6 +19,7 @@ BUFFERSIZE = 32768
 
 outgoing = []
 active_players = 0
+dead_players = 0
 
 num_players = args.num_players
 port = args.port
@@ -176,6 +177,16 @@ def append_or_activate_client(new_client):
     print(f'Added player {new_client.player_id}')
 
 
+def kill_player(player_id):
+    for client in outgoing:
+        if player_id == client.player_id:
+            client.alive = False
+            global dead_players
+            dead_players += 1
+            if dead_players == num_players:
+                shutdown('Everyone is dead')
+
+
 def shutdown(reason: str):
     for client in outgoing:
         if client.active:
@@ -269,9 +280,11 @@ class SecondaryServer(asyncore.dispatcher_with_send):
                         active_players -= 1
                         backend.player_disconnect(self.id)
                         print(f"New active player count: {active_players}")
-                        if last_player_id == self.id and active_players > 0:
+                        if last_player_id == self.id and active_players > 0 and reason != 'closed' and reason != 'death':
                             print(f"Player {self.id} was active, sending PASS to the backend.")
                             forward_player_action([self.id, cmd.PASS])
+                        if reason == 'death':
+                            kill_player(self.id)
                     break
         self.close()
         # raise Exception("Unregistered Player")
