@@ -269,7 +269,7 @@ class SecondaryServer(asyncore.dispatcher_with_send):
                         active_players -= 1
                         backend.player_disconnect(self.id)
                         print(f"New active player count: {active_players}")
-                        if last_player_id == self.id and active_players > 0:
+                        if last_player_id == self.id and active_players > 0 and reason != 'closed':
                             print(f"Player {self.id} was active, sending PASS to the backend.")
                             forward_player_action([self.id, cmd.PASS])
                     break
