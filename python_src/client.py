@@ -243,7 +243,7 @@ def main(stdscr):
         #     data.append(packet)
         # message, content = pickle.loads(b"".join(data))
         message, content = pickle.loads(s.recv(BUFFERSIZE))
-        if message == 'reject':
+        if message == 'reject' or message == 'shutdown':
             disconnect(content)
         elif message == 'id':
             if not force_id:

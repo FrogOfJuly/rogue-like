@@ -35,6 +35,12 @@ The second is determined by it.
     
     The updated game state is sent to all active players who aren't moving yet.
     They are not expected to reply.
+  
+- `shutdown`
+
+    Parameter: 'message' (str)
+    
+    Signals the game was shut down or is over.
 
 ### Client to server messages
 

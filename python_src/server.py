@@ -108,6 +108,14 @@ class RemoteDrawClient(Client):
         except Exception:
             pass
 
+    def shut_down(self, message: str):
+        try:
+            binary_string = pickle.dumps(["shutdown", message])
+            # print(f'Sending {binary_string} to {self.player_id}')
+            self.connection.send(binary_string)
+        except Exception:
+            pass
+
 
 def next_turn(next_player_id, new_game_state):
     global last_player_id, last_state
@@ -158,6 +166,20 @@ def append_or_activate_client(new_client):
     print(f'Added player {new_client.player_id}')
 
 
+def shutdown(reason: str):
+    for client in outgoing:
+        if client.active:
+            client.active = False
+            client.shut_down(reason)
+            global active_players
+            active_players -= 1
+            backend.player_disconnect(client.player_id)
+            print(f'Player {client.player_id} has been disconnected due to shutdown.')
+    print(f'The server has shut down successfully')
+    exit()
+
+
+
 class MainServer(asyncore.dispatcher):
     def __init__(self, port):
         asyncore.dispatcher.__init__(self)
@@ -186,9 +208,10 @@ class SecondaryServer(asyncore.dispatcher_with_send):
         if recievedData:
             message, content = pickle.loads(recievedData)
             if message == 'exit':
-                print(f'Player {self.id} has closed the game.')
-                self.close()
-                exit()
+                reason = f'Player {self.id} has closed the game.'
+                print(reason)
+                self.handle_close("closed")
+                shutdown(reason)
             if message == 'acknowledge':
                 if content != self.id:
                     self.id = content
@@ -226,7 +249,10 @@ class SecondaryServer(asyncore.dispatcher_with_send):
             for client in outgoing:
                 if client.player_id == self.id:
                     if client.active:
-                        print(f'Player {self.id} has disconnected.')
+                        if reason == 'closed':
+                            print(f'Player {self.id} has been disconnected due to shutdown.')
+                        else:
+                            print(f'Player {self.id} has disconnected.')
                         client.active = False
                         global active_players
                         active_players -= 1
