@@ -66,7 +66,9 @@ You're player 970123, awaiting game start
 And the game won't start. This is fixed by rerunning server and client processes.
 You might need a couple of times :)
 
-I think we will fix it during multiplayer development.
+I think we will fix it during multiplayer development. 
+
+UPDATE: fixed
 
 
  2. When switching items message
@@ -77,7 +79,25 @@ log:
 ```
 is displayed despite actually picking an item and dropping old one. 
 
+ 3. Sticky actions
+
+While performing an action if one had pressed control buttons more then once their sequence is recorded and
+    then - executed. It looks like you are skipping turns and your character is doing something
+on his own. Do not worry. Just press desired button exactly one time once stashed sequence is depleted. 
+
+
 ### Design doc
 
 The design document along with various diagrams can be found at 
 [Notion](https://www.notion.so/c751085ebb244bcf8942cf17ddce652b).
+
+### Multiplayer
+
+There are some options for multiplayer. 
+  1. build/install everythin as above.
+  2. `python server.py -n N`, where `N` is expected number of players.
+  3. `python client.py` in each terminal window. For now there is only multiplayer in bounds of one physical machine.
+
+If one wants to test multiple clients without developing multiple personal disorder, then 
+run `python client.py -r`, where `-r` stands for random. Such move will make full scale client, but with actions
+picked from random pool instead of human input.
