@@ -28,14 +28,6 @@ namespace roguelike {
         static const interaction_info interacted_got_destroyed;
     };
 
-    template <typename interacted, typename interacting>
-    struct interacter {  // C++ does not permit partial function template specialization
-      public:
-        static inline interaction_info interact(interacted *inted, interacting *inting) {
-            return interaction_info::nothing_happened;
-        }
-    };
-
     namespace default_interactors {
 
         template <typename interacted, typename interacting>
@@ -98,6 +90,19 @@ namespace roguelike {
             }
         };
     }  // namespace default_interactors
+
+    template <typename interacted, typename interacting>
+    struct interacter {  // C++ does not permit partial function template specialization
+      public:
+        static inline interaction_info interact(interacted *inted, interacting *inting) {
+            lwlog_info(
+                "performing default interaction between: %s and %s",
+                name_component::get_name(inted),
+                name_component::get_name(inting));
+            return default_interactors::logging<interacted, interacting>::interact(inted, inting);
+        }
+    };
+
 }  // namespace roguelike
 
 #endif  // ROGUE_LIKE_ENTITY_HPP
