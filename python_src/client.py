@@ -21,6 +21,8 @@ parser.add_argument("-a", "--address", default='127.0.0.1', type=str, dest='serv
                     help="IP address of the server")
 parser.add_argument("-r", "--random", default=False, action="store_true",
                     help="Enable highly sophisticated AI")
+parser.add_argument("-b", "--buffer", default=False, action="store_true",
+                    help="Enable input buffering")
 parser.add_argument("-l", "--log", default=False, action="store_true",
                     help="Enable game state logging")
 args = parser.parse_args()
@@ -201,6 +203,12 @@ def render(stdscr, game_state: dict, flags: dict):
 
 
 def get_action(game_state: dict):
+    if not args.buffer:
+        stdscr.nodelay(True)
+        key = 0
+        while key != -1:
+            key = stdscr.getch()
+        stdscr.nodelay(False)
     action = cmd.PASS
     valid = False
     while not valid:
