@@ -27,7 +27,7 @@ namespace roguelike {
         int lvl_num = -1;
 
         std::unordered_set<int> received_command;
-        std::queue<int> command_to_receive;
+        std::priority_queue<int> command_to_receive;
 
         move_system mv_system;
         interaction_system inter_system;

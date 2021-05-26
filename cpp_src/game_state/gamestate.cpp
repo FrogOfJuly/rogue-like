@@ -101,7 +101,7 @@ int roguelike::gamestate::receive_player_command(int player_id, roguelike::cmd c
         }
     }
     while (not command_to_receive.empty()) {
-        auto next_player_id = command_to_receive.front();
+        auto next_player_id = command_to_receive.top();
         if (received_command.count(next_player_id) == 0 and dead_players.count(next_player_id) == 0) {
             lwlog_info("next player to receive command is %d", next_player_id);
             command_to_receive.pop();
@@ -200,7 +200,7 @@ roguelike::entity_type roguelike::gamestate::get_entity(roguelike::general_id id
         id);
 }
 void roguelike::gamestate::report_despawn(roguelike::general_id mdred_id) {
-    lwlog_info("reporting murder");
+    lwlog_info("reporting despawn");
     std::visit(
         overloaded{
             [this](player_id id) {
@@ -218,6 +218,7 @@ void roguelike::gamestate::initialize_player(int player_id) {
     lwlog_info("placing player %d", player_id);
     players.emplace(std::make_pair(player_id, player_id));
     players.at(player_id).dm_cpt.decision = cmd::PASS;
+    command_to_receive.push(player_id);
 }
 void roguelike::gamestate::move_target_player(int player_id) {
     auto &plr = players.at(player_id);
