@@ -116,7 +116,7 @@ int roguelike::gamestate::receive_player_command(int player_id, roguelike::cmd c
         command_to_receive.push(plr.id.value);  // enqueue all players for commands
     }
     lwlog_info("all players got their commands");
-    if (player_id == -1){
+    if (player_id == -1) {
         throw std::runtime_error("Everyone is dead");
     }
     return -1;
@@ -126,7 +126,7 @@ void roguelike::gamestate::initialize(int player_number) {
     lvl_num = 0;
     level.generate_terrain(lvl_num);
     lwlog_info("generated level");
-    for (const auto& it : players) {
+    for (const auto &it : players) {
         lwlog_info("placing player");
         auto player_id = it.first;
         entity_type var_ent = &players.at(player_id);
@@ -218,4 +218,15 @@ void roguelike::gamestate::initialize_player(int player_id) {
     lwlog_info("placing player %d", player_id);
     players.emplace(std::make_pair(player_id, player_id));
     players.at(player_id).dm_cpt.decision = cmd::PASS;
+}
+void roguelike::gamestate::move_target_player(int player_id) {
+    auto &plr = players.at(player_id);
+    lwlog_info("moving player %d with decision %d", plr.id.value, plr.dm_cpt.decision);
+    entity_type var_ent = &plr;
+    mv_system.more_general_move(var_ent);
+}
+void roguelike::gamestate::set_decision_target_player(int player_id, roguelike::cmd command) {
+    auto &plr = players.at(player_id);
+    lwlog_info("setting player %d with decision %d", plr.id.value, command);
+    plr.dm_cpt.decision = command;
 }

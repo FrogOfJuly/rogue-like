@@ -54,6 +54,10 @@ namespace roguelike {
         void clean_logs();
         void end_turn();
 
+        void move_target_player(int player_id);
+        void set_decision_target_player(int player_id, cmd command);
+
+
         [[nodiscard]] std::string get_serialization() const;
 
         gamestate() noexcept;
