@@ -2,15 +2,21 @@ import math
 import pickle
 from random import choice
 from time import sleep
-
-import select
 import socket
-import sys
 import json  # for logging only
 import curses
-from roguelike import cmd
+from enum import Enum
 import os
 import argparse
+
+class cmd(Enum):
+    UP=0
+    DOWN = 1
+    LEFT = 2
+    RIGHT = 3
+    ENTER = 4
+    ESC = 5
+    PASS = 6
 
 parser = argparse.ArgumentParser(description="Client for Crypt of the Darkness")
 parser.add_argument("-i", "--player_id", default=0, type=int, dest='player_id',
@@ -286,7 +292,7 @@ def main(stdscr):
                 action = choice([cmd.UP, cmd.DOWN, cmd.LEFT, cmd.RIGHT])
             else:
                 action = get_action(content)
-            ge = ['action', (player_id, action)]
+            ge = ['action', (player_id, action.value)]
             s.send(pickle.dumps(ge))
 
 

@@ -29,6 +29,7 @@ last_state = None
 
 started = False
 
+
 class Backend:
     def __init__(self, difficulty: str = "normal"):
         self.state = rl.GameState()
@@ -145,8 +146,8 @@ def is_active_and_alive(player_id):
             return client.active and client.alive
     return False
 
-def forward_player_action(player_action):
-    player_id, action = player_action
+
+def forward_player_action(player_id: int, action: cmd):
     print(f"Received action {action} from player {player_id}.")
     new_game_state, next_player_id = backend.player_action(player_id, action)
     if next_player_id == -2:
@@ -202,6 +203,22 @@ def shutdown(reason: str):
     print(f'The server has shut down successfully')
     exit()
 
+
+def get_cmd(action: int):
+    if action == 0:
+        return cmd.UP
+    if action == 1:
+        return cmd.DOWN
+    if action == 2:
+        return cmd.LEFT
+    if action == 3:
+        return cmd.RIGHT
+    if action == 4:
+        return cmd.ENTER
+    if action == 5:
+        return cmd.ESC
+    if action == 6:
+        return cmd.PASS
 
 
 class MainServer(asyncore.dispatcher):
@@ -263,7 +280,8 @@ class SecondaryServer(asyncore.dispatcher_with_send):
                 print(f'Player {self.id} has died')
                 self.handle_close('death')
             if message == "action":
-                forward_player_action(content)
+                player_id, action = content
+                forward_player_action(player_id, get_cmd(action))
         else:
             print(f"Received no data from {self.id}, setting the connection to inactive")
             self.handle_close()
@@ -288,7 +306,7 @@ class SecondaryServer(asyncore.dispatcher_with_send):
                             kill_player(self.id)
                         if last_player_id == self.id and active_players > 0 and reason != 'closed':
                             print(f"Player {self.id} was active, sending PASS to the backend.")
-                            forward_player_action([self.id, cmd.PASS])
+                            forward_player_action(self.id, cmd.PASS)
                     break
         self.close()
         # raise Exception("Unregistered Player")
