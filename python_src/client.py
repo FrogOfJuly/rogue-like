@@ -1,5 +1,8 @@
 import math
 import pickle
+from random import choice
+from time import sleep
+
 import select
 import socket
 import sys
@@ -16,6 +19,8 @@ parser.add_argument("-p", "--port", default=4321, type=int, dest='port',
                     help="Port number of the server")
 parser.add_argument("-a", "--address", default='127.0.0.1', type=str, dest='server_addr',
                     help="IP address of the server")
+parser.add_argument("-r", "--random", default=False, action="store_true",
+                    help="Enable highly sophisticated AI")
 parser.add_argument("-l", "--log", default=False, action="store_true",
                     help="Enable game state logging")
 args = parser.parse_args()
@@ -268,7 +273,12 @@ def main(stdscr):
             render(stdscr, content, {'waiting': True})
         if message == 'move':
             render(stdscr, content, {})
-            ge = ['action', (player_id, get_action(content))]
+            if args.random:
+                sleep(1)
+                action = choice([cmd.UP, cmd.DOWN, cmd.LEFT, cmd.RIGHT])
+            else:
+                action = get_action(content)
+            ge = ['action', (player_id, action)]
             s.send(pickle.dumps(ge))
 
 
